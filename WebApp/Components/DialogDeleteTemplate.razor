@@ -1,0 +1,15 @@
+
+<MudDialog>
+    <DialogContent>
+        <MudText>Deletion cannot been undone!</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" Variant="Variant.Filled" OnClick="Submit">Delete</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; }
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+}

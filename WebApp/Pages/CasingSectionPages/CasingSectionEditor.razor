@@ -1,0 +1,80 @@
+<MudPaper Class="@Class"  Style="@($"background:{Colors.Gray.Lighten4};")">
+    <MudGrid Class="my-2 mx-2">
+        <InputHeader xs="2" Text="Top depth"/>        
+        <InputHeader xs="2" Text="Length"/>
+        <InputHeader xs="3" Text="Cement depth"/>                
+    </MudGrid>
+    <MudGrid Class="my-2 mx-2">
+        <MudItem xs="2">
+            <MudInputWithUnitAdornment VariantType="Variant.Text"
+                QuantityName="DepthDrilling"
+                SIValueNullable="topDepth"
+                SIValueNullableChanged="val => { UpdateDepth(val); }" />
+        </MudItem>
+        <MudItem xs="2">
+            <MudInputWithUnitAdornment VariantType="Variant.Text"
+                QuantityName="Length"
+                SIValueNullable="length"
+                SIValueNullableChanged="val => { UpdateLength(val); }" />
+        </MudItem>
+        <MudItem xs="3">
+            <MudInputWithUnitAdornment VariantType="Variant.Text"
+                QuantityName="DepthDrilling"
+                SIValueNullable="topCementDepth"
+                SIValueNullableChanged="val => { UpdateTopCementDepth(val); }" />
+        </MudItem>
+    </MudGrid>
+     <!-- Add editor for CasingSectionElements-->
+    <CasingSectionElementMain Class="py-2 px-4 my-4 mx-4" CasingSectionElements="@CasingSectionElements"/>
+    <CasingSectionSizeMain Class="py-2 px-4 my-4 mx-4" CasingSectionInstance="@CasingSectionsInstance"/>
+</MudPaper>
+@if( CasingSectionElements.Count > 0)
+{
+    CasingSectionsInstance.CasingSectionElements = CasingSectionElements;
+}
+
+@code{
+    [Parameter]
+    public CasingSection CasingSectionsInstance {get; set;} = new CasingSection();
+    [Parameter]
+    public string Class {get; set;} = "mb-4";
+    [Parameter]
+    public ICollection<CasingSectionElement> CasingSectionElements {get; set;} = new List<CasingSectionElement>(){new CasingSectionElement()};
+    private double? topDepth = 0.0;
+    private double? topCementDepth = 0.0;
+    private double? length = 0.0;
+    protected override void OnInitialized()
+    {
+        //Proper loading of the instance
+        if (CasingSectionsInstance != null)
+        {
+            length = ConversionsFromOSDC.GaussianToDouble(CasingSectionsInstance.Length);
+            topDepth = ConversionsFromOSDC.GaussianToDouble(CasingSectionsInstance.TopDepth);
+            topCementDepth = ConversionsFromOSDC.GaussianToDouble(CasingSectionsInstance.TopCementDepth);        
+        }             
+        if (CasingSectionElements == null)
+        {            
+            CasingSectionElements = new List<CasingSectionElement>{new CasingSectionElement()};
+        }   
+    }
+
+    void ManageUnits(){}
+    Conversions Conversions = new();
+    void UpdateDepth(double? val)
+    {
+        if(val != null){topDepth = (double) val;}
+        CasingSectionsInstance.TopDepth = ConversionsFromOSDC.DoubleToGaussian(val);        
+    }        
+    void UpdateLength(double? val)
+    {
+        if(val != null){length = (double) val;}
+        CasingSectionsInstance.Length = ConversionsFromOSDC.DoubleToGaussian(val);        
+    }    
+
+    void UpdateTopCementDepth(double? val)
+    {
+        if(val != null){topCementDepth = (double) val;}
+        CasingSectionsInstance.TopCementDepth = ConversionsFromOSDC.DoubleToGaussian(val);        
+    }    
+
+}   

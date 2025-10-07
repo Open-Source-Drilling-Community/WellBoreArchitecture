@@ -1,0 +1,130 @@
+
+<MudPaper Class="@Class">
+    <MudToolBar Class="ml-n6 my-n4 ">
+        <MudText Typo="Typo.h6">Well head properties</MudText>
+         <MudSpacer />
+        <MudButton Class="mx-2" StartIcon="@expandIcon" OnClick="OpenAndCloseTab " Size="Size.Small"> @ShowHideText</MudButton>               
+    </MudToolBar>
+    <MudCollapse Expanded="openPanel">
+        <MudDivider Class="mb-2"/>
+        <MudGrid Class="my-2">
+            <InputHeader xs="1" Text="Max OD"/>
+            <InputHeader xs="1" Text="Min OD"/>
+            <InputHeader xs="2" Text="Depth"/>
+            <InputHeader xs="2" Text="Casing Hanger Depth"/>
+            <InputHeader xs="2" Text="Tubing Hanger Depth"/>        
+        </MudGrid>
+        <MudGrid Class="my-2">
+            <MudItem xs="1">
+                <MudInputWithUnitAdornment VariantType="Variant.Text"
+                    QuantityName="DiameterPipeDrilling"
+                    SIValueNullable="maxOD"
+                    SIValueNullableChanged="UpdateMaxOD" />
+            </MudItem>
+            <MudItem xs="1">
+                <MudInputWithUnitAdornment VariantType="Variant.Text"
+                    QuantityName="DiameterPipeDrilling"
+                    SIValueNullable="minOD"
+                    SIValueNullableChanged="val => { UpdateMinOD(val); }" />
+            </MudItem>
+
+            <MudItem xs="2">
+                <MudInputWithUnitAdornment VariantType="Variant.Text"
+                    QuantityName="DepthDrilling"
+                    SIValueNullable="depth"
+                    SIValueNullableChanged="val => { UpdateDepth(val); }" />
+            </MudItem>
+
+            <MudItem xs="2">
+                <MudInputWithUnitAdornment VariantType="Variant.Text"
+                    QuantityName="DepthDrilling"
+                    SIValueNullable="casingHangerDepth"
+                    SIValueNullableChanged="val => { UpdateCasingHangerDepth(val); }" />
+            </MudItem>                
+            <MudItem xs="2">
+                <MudInputWithUnitAdornment VariantType="Variant.Text"
+                    QuantityName="DepthDrilling"
+                    SIValueNullable="tubingHangerDepth"
+                    SIValueNullableChanged="val => { UpdateTubingHangerDepth(val); }" />
+            </MudItem>
+        </MudGrid>
+    </MudCollapse>
+</MudPaper>
+
+
+@code{
+    [Parameter]
+    public WellHead WellHead {get; set;} = new WellHead();
+    [Parameter]
+    public string Class {get; set;} = "mb-4";
+
+    private double? maxOD;
+    private double? minOD;
+    private double? depth;
+    private double? casingHangerDepth;
+    private double? tubingHangerDepth;
+    private bool openPanel = true;
+    string expandIcon = Icons.Material.Filled.ExpandLess;
+    string ShowHideText = "Hide";
+    protected override void OnInitialized()
+    {        
+        //Populate constants in case of loading edit mode
+        if (WellHead != null)
+        {
+            maxOD = ConversionsFromOSDC.ScalarToDouble(WellHead.MaxOD);
+            minOD = ConversionsFromOSDC.ScalarToDouble(WellHead.MinOD);
+            depth = ConversionsFromOSDC.GaussianToDouble(WellHead.Depth);
+            casingHangerDepth = ConversionsFromOSDC.ScalarToDouble(WellHead.CasingHangerDepth);
+            tubingHangerDepth = ConversionsFromOSDC.ScalarToDouble(WellHead.TubingHangerDepth);
+        } 
+
+    }
+    void OpenAndCloseTab()
+    {
+        //Control collapse of this property
+        if (openPanel)
+        {
+            expandIcon = Icons.Material.Filled.ExpandMore;
+            ShowHideText = "Show";
+        }    
+        else
+        {
+            expandIcon = Icons.Material.Filled.ExpandLess;
+            ShowHideText = "Hide";
+        }
+        openPanel = !openPanel;
+    }
+
+    void ManageUnits(){}
+    void UpdateMaxOD(double? val)
+    {
+        if(val != null){maxOD = (double) val;}
+        else{val = 0.0;}
+        WellHead.MaxOD = ConversionsFromOSDC.DoubleToScalar(val);        
+    }        
+    void UpdateMinOD(double? val)
+    {
+        if(val != null){minOD = (double) val;}
+        else{val = 0.0;}
+        WellHead.MinOD = ConversionsFromOSDC.DoubleToScalar(val);        
+    }
+    void UpdateDepth(double? val)
+    {
+        if(val != null){depth = (double) val;}
+        else{val = 0.0;}        
+        WellHead.Depth = ConversionsFromOSDC.DoubleToGaussian(val);        
+    }        
+    void UpdateCasingHangerDepth(double? val)
+    {
+        if(val != null){casingHangerDepth = (double) val;}
+        else{val = 0.0;}        
+        WellHead.CasingHangerDepth = ConversionsFromOSDC.DoubleToScalar(val);        
+    }        
+    void UpdateTubingHangerDepth(double? val)
+    {
+        if(val != null){tubingHangerDepth = (double) val;}
+        else{val = 0.0;}        
+        WellHead.TubingHangerDepth = ConversionsFromOSDC.DoubleToScalar(val);        
+    }        
+
+}  

@@ -1,0 +1,167 @@
+<MudGrid Class="my-2">      
+    <InputHeader xs="1" Text="Name"/>    
+    <InputHeader xs="2" Text="Type"/>    
+    <InputHeader xs="2" Text="Length"/>    
+    <InputHeader xs="2" Text="Vertical Depth"/>
+    <InputHeader xs="1" Text="OD"/>    
+    <InputHeader xs="1" Text="ID"/>    
+    <InputHeader xs="3" Text="Connected to"/>            
+    
+</MudGrid>
+<MudGrid Class="my-2">
+    <MudItem xs="1">
+        <MudTextField T="string" Value="@SideElement.Name" ValueChanged="OnNameChange"/>
+    </MudItem>                  
+    <MudItem xs="2">
+        <MudSelect T="SideElementType" Value="@SideElement.Type" Dense="true" ValueChanged="OnTypeChange">
+            @foreach (SideElementType sideElement in Enum.GetValues(typeof(SideElementType)))
+                {
+                    <MudSelectItem Value="@sideElement">@sideElement</MudSelectItem>
+                }  
+        </MudSelect>    
+    </MudItem>              
+    <MudItem xs="2">
+        <MudInputWithUnitAdornment VariantType="Variant.Text"
+            QuantityName="Length"
+            SIValueNullable="length"
+            SIValueNullableChanged="val => { UpdateLength(val); }" />
+    </MudItem>
+    <MudItem xs="2">
+        <MudInputWithUnitAdornment VariantType="Variant.Text"
+            QuantityName="DepthDrilling"
+            SIValueNullable="depth"
+            SIValueNullableChanged="val => { UpdateDepth(val); }" />
+    </MudItem>
+    <MudItem xs="1">
+        <MudInputWithUnitAdornment VariantType="Variant.Text"
+            QuantityName="DiameterPipeDrilling"
+            SIValueNullable="od"
+            SIValueNullableChanged="val => { UpdateOD(val); }" />
+    </MudItem>
+    <MudItem xs="1">
+        <MudInputWithUnitAdornment VariantType="Variant.Text"
+            QuantityName="DiameterPipeDrilling"
+            SIValueNullable="id"
+            SIValueNullableChanged="val => { UpdateID(val); }" />
+    </MudItem>
+        <MudItem xs="3">
+            <MudSelect T="SideElement" Value="@connectedTo" Dense="true" ValueChanged="UpdateConnectivity"
+                Text="@connectedTo.Name">
+                @foreach (SideElement element in AvailableElements)
+                {
+                    <MudSelectItem Value="@element">
+                        <MudGrid>
+                            <MudItem>
+                                <MudText><b>@element.Name</b></MudText>
+                            </MudItem>
+                            <MudItem>
+                                <MudText>@element.Type.ToString()</MudText>
+                            </MudItem>
+                        </MudGrid>     
+                    </MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+    <!-- #Update connectivities at the end of the component! -->
+    @{ UpdateSideConnector(); }
+</MudGrid>
+
+@code{
+    [Parameter]
+    public int index {get; set;}
+    [Parameter]
+    public SideConnector SideConnector {get; set;} = new SideConnector();
+    [Parameter]
+    public SideElement SideElement {get; set;} = new SideElement (){Type = SideElementType.Unknown};
+    [Parameter]
+    public ICollection<ElementConnectivity>? ElementConnectivity {get; set;} = new List<ElementConnectivity>();
+    [Parameter]
+    public List<SideElement>? AvailableElements {get; set;} = new();
+    [Parameter]
+    public string? ConnectivityList {get; set;}    
+    private SideElement? connectedTo = new SideElement();
+    private double? length;
+    private double? depth;
+    private double? od;
+    private double? id;
+    
+    protected override void OnInitialized()
+    {
+        //Load variables for edit mode
+        length = ConversionsFromOSDC.GaussianToDouble(SideElement.Length);
+        depth = ConversionsFromOSDC.GaussianToDouble(SideElement.TopVerticalDepth);
+        od = ConversionsFromOSDC.GaussianToDouble(SideElement.OD);
+        id = ConversionsFromOSDC.GaussianToDouble(SideElement.ID);
+        if (ElementConnectivity != null)
+           {
+            //Check if it is a new element
+            if (ElementConnectivity.ElementAt<ElementConnectivity>(index).DownstreamElement != null)
+            {    
+                //Load connections
+                connectedTo = ElementConnectivity.ElementAt<ElementConnectivity>(index).DownstreamElement;
+            }
+            else
+            {
+                //If it is a new connection, connect to the last available element
+                if(AvailableElements!=null)
+                {
+                    connectedTo = AvailableElements[AvailableElements.Count-1]; 
+                    UpdateConnectivity(connectedTo);           
+                }
+            }
+        } 
+    }
+    void ManageUnits(){}
+    void UpdateSideConnector()
+    {
+        SideConnector.ElementConnectivities = ElementConnectivity;
+    }
+    void UpdateLength(double? val)
+    {        
+        UpdateSideConnector();
+        if(val != null){length = (double) val;}
+        SideElement.Length = ConversionsFromOSDC.DoubleToGaussian(val);        
+    }    
+
+    void UpdateDepth(double? val)
+    {
+        UpdateSideConnector();
+        if(val != null){depth = (double) val;}
+        SideElement.TopVerticalDepth = ConversionsFromOSDC.DoubleToGaussian(val);        
+    }    
+    void UpdateOD(double? val)
+    {
+        UpdateSideConnector();
+        if(val != null){od = (double) val;}
+        SideElement.OD = ConversionsFromOSDC.DoubleToGaussian(val);        
+    }  
+    void UpdateID(double? val)
+    {
+        UpdateSideConnector();
+        if(val != null){id = (double) val;}
+        SideElement.ID = ConversionsFromOSDC.DoubleToGaussian(val);        
+    }      
+    void UpdateConnectivity(SideElement? val)
+    {
+        connectedTo = val;
+        if (ElementConnectivity != null)
+        {
+            ElementConnectivity.ElementAt<ElementConnectivity>(index).UpstreamElement = val;
+            ElementConnectivity.ElementAt<ElementConnectivity>(index).DownstreamElement = SideElement;
+        }
+    }
+    void OnNameChange(string? val)
+    {   
+        UpdateSideConnector();
+        if(val != null)
+        {
+            SideElement.Name = val;
+        }
+    }
+    void OnTypeChange(SideElementType val)
+    {
+        UpdateSideConnector();
+        SideElement.Type = val;
+    }
+
+}

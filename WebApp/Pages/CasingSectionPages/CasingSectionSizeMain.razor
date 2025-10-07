@@ -1,0 +1,165 @@
+
+<MudPaper Class="@Class">
+    <MudToolBar Class="ml-n6 my-n4">    
+        <MudText Typo="Typo.body1"><b>Casing size properties table</b></MudText>
+        <MudSpacer/>
+        <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Add" Color="Color.Secondary" OnClick="AddCasingSectionTableLine" Size="Size.Small"> Add line </MudButton>        
+        <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Remove"  Color="Color.Tertiary" OnClick="RemoveCasingSectionTableLine " Size="Size.Small"> Remove line</MudButton>              
+        <MudButton Class="mx-2" StartIcon="@expandIcon" OnClick="OpenAndCloseTab " Size="Size.Small"> @ShowHideText</MudButton>                   
+    </MudToolBar>
+    <MudDivider/>
+    <MudCollapse Expanded="openPanel" >
+        @for(int i = 0; i < boreHoleSizes.Count; i++)
+        {
+            int index = i;
+            <MudPaper Class="@Class" Style="@($"background:{createRowColor(i)};")" Elevation="0">
+                <MudGrid Class="my-2">
+                    <InputHeader xs="1" Text="#"/>    
+                    <InputHeader xs="2" Text="Length"/>        
+                    <InputHeader xs="2" Text="Diameter"/>
+                </MudGrid>
+                <MudGrid Class="my-2"> 
+                    <MudItem xs="1">       
+                        <MudText Typo="Typo.body1">@(index+1)</MudText>
+                    </MudItem>
+                    <MudItem xs="2">
+                        <MudInputWithUnitAdornment VariantType="Variant.Text"
+                            QuantityName="Length"
+                            SIValueNullable="length[index]"
+                            SIValueNullableChanged="val => { UpdateLength(val, index); }" />
+                    </MudItem>
+                    <MudItem xs="2">
+                        <MudInputWithUnitAdornment VariantType="Variant.Text"
+                            QuantityName="DiameterPipeDrilling"
+                            SIValueNullable="diameter[index]"
+                            SIValueNullableChanged="val => { UpdateDiameter(val, index); }" />
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        }    
+        @if (showAlert)
+        {
+            <MudAlert Severity="Severity.Error" ContentAlignment="HorizontalAlignment.Center" ShowCloseIcon="true" CloseIconClicked="CloseAlert">At least one CasingSection is necessary!</MudAlert>
+        }
+    </MudCollapse>
+</MudPaper>
+@code{
+    [Parameter]
+    public CasingSection CasingSectionInstance {get; set;} 
+    [Parameter]
+    public string Class {get; set;} = "mb-4";
+    private ICollection<BoreHoleSize> boreHoleSizes = new List<BoreHoleSize>
+    {
+        new BoreHoleSize
+        {
+            HoleSize = ConversionsFromOSDC.DoubleToGaussian(null),
+            Length = ConversionsFromOSDC.DoubleToGaussian(null)
+        }
+    };
+    private List<double?> length = new List<double?>{null};
+    private List<double?> diameter = new List<double?>{null};
+    // Zero table alert boolean
+    private bool showAlert = false;
+    private string ShowHideText = "Hide";
+    private bool openPanel = true;
+
+    //Expand options
+    private string expandIcon = Icons.Material.Filled.ExpandLess;
+    protected override void OnInitialized()
+    {
+        //check if there are any initial information. If so, load it.
+        if(CasingSectionInstance!=null)
+        {
+            if(CasingSectionInstance.CasingSectionSizeTable != null)
+            {
+                if (boreHoleSizes is List<BoreHoleSize> list)
+                {
+
+                    list[0] = CasingSectionInstance.CasingSectionSizeTable.ElementAt<BoreHoleSize>(0);
+                    length[0] = ConversionsFromOSDC.GaussianToDouble(CasingSectionInstance.CasingSectionSizeTable.ElementAt<BoreHoleSize>(0).Length);
+                    diameter[0] = ConversionsFromOSDC.GaussianToDouble(CasingSectionInstance.CasingSectionSizeTable.ElementAt<BoreHoleSize>(0).HoleSize);
+                    for (int i = 1; i < CasingSectionInstance.CasingSectionSizeTable.Count; i++)
+                    {
+                        list.Add(CasingSectionInstance.CasingSectionSizeTable.ElementAt<BoreHoleSize>(i));
+                        length.Add(ConversionsFromOSDC.GaussianToDouble(CasingSectionInstance.CasingSectionSizeTable.ElementAt<BoreHoleSize>(i).Length));
+                        diameter.Add(ConversionsFromOSDC.GaussianToDouble(CasingSectionInstance.CasingSectionSizeTable.ElementAt<BoreHoleSize>(i).HoleSize));
+                    }
+                }
+            }
+        }
+    }
+
+    void ManageUnits(){}
+
+    void AddCasingSectionTableLine()
+    {
+        length.Add(null);
+        diameter.Add(null);        
+        boreHoleSizes.Add(
+            new BoreHoleSize
+            {
+                HoleSize = ConversionsFromOSDC.DoubleToGaussian(null),
+                Length = ConversionsFromOSDC.DoubleToGaussian(null)
+            }        
+        );
+        CasingSectionInstance.CasingSectionSizeTable = boreHoleSizes;
+    }
+    void RemoveCasingSectionTableLine()
+    {
+        if(boreHoleSizes.Count > 1)
+        {
+            boreHoleSizes.Remove(boreHoleSizes.ElementAt<BoreHoleSize>(boreHoleSizes.Count - 1));
+            length.RemoveAt(length.Count-1);
+            diameter.RemoveAt(diameter.Count-1);        
+            CasingSectionInstance.CasingSectionSizeTable = boreHoleSizes;
+        }
+        else
+        {
+            showAlert = true;  
+        }
+    }
+    void CloseAlert()
+    {
+        showAlert = false;
+    }
+    private string createRowColor(int index)
+    {
+        if (2*(index/2) - index  == 0)
+        {
+            return Colors.Indigo.Lighten5;   
+        }
+        else
+        {
+            return Colors.Indigo.Lighten4;
+        }
+    }
+
+    void UpdateLength(double? val, int index)
+    {
+        length[index] = val;
+        boreHoleSizes.ElementAt<BoreHoleSize>(index).Length = ConversionsFromOSDC.DoubleToGaussian(val);
+        CasingSectionInstance.CasingSectionSizeTable = boreHoleSizes;     
+    }    
+    void UpdateDiameter(double? val, int index)
+    {
+        diameter[index] = val;
+        boreHoleSizes.ElementAt<BoreHoleSize>(index).HoleSize = ConversionsFromOSDC.DoubleToGaussian(val);
+        CasingSectionInstance.CasingSectionSizeTable = boreHoleSizes;     
+    }    
+
+    void OpenAndCloseTab()
+    {   
+        if (openPanel)
+        {
+            expandIcon = Icons.Material.Filled.ExpandMore;
+            ShowHideText = "Show";
+        }    
+        else
+        {
+            expandIcon = Icons.Material.Filled.ExpandLess;
+            ShowHideText = "Hide";
+        }
+        openPanel = !openPanel;
+    }
+
+}

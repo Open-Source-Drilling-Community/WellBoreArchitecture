@@ -1,0 +1,208 @@
+<div hidden="@(!showTreeStruct)">
+    <MudPaper>
+           <MudIconButton Icon="@Icons.Material.Filled.Close" OnClick="OnClickHideStruct"></MudIconButton>      
+           <ViewSideConnectorTree FirstSideElement="@firstElementForPlot" 
+                ElementConnectivities="@treePlotConectitvities" updatebool="@updatebool"/>  
+    </MudPaper>        
+</div>
+<div hidden="@(showTreeStruct)">
+    <MudPaper Class="@Class" Style="@Style">
+        <MudGrid Class ="my-2">
+            <InputHeader xs="2" Text="Position"/>    
+            <InputHeader xs="2" Text="Vertical Depth"/>    
+            <MudSpacer/>
+            <MudIconButton Icon="@Icons.Material.Filled.AccountTree" OnClick="OnClickShowTreeStruct">View diagram</MudIconButton>
+        </MudGrid>
+        <MudGrid Class ="my-2">
+            <MudItem xs="2">
+                <MudInputWithUnitAdornment VariantType="Variant.Text"
+                    QuantityName="Length"
+                    SIValueNullable="position"
+                    SIValueNullableChanged="val => { UpdatePosition(val); }" />
+            </MudItem>
+            <MudItem xs="2">
+                <MudInputWithUnitAdornment VariantType="Variant.Text"
+                    QuantityName="DepthDrilling"
+                    SIValueNullable="verticalDepth"
+                    SIValueNullableChanged="val => { UpdateDepth(val); }" />
+            </MudItem>  
+        </MudGrid>
+        <MudDivider Class="my-1"/>    
+        <MudToolBar Class="ml-n6 my-n4 ">
+            <MudText Typo="Typo.body1"><b>First element</b></MudText>
+            <MudSpacer/>
+            <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Add" Color="Color.Secondary" OnClick="AddSideElementLine" Size="Size.Small"> Add line </MudButton>        
+            <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Remove"  Color="Color.Tertiary" OnClick="RemoveSideElementLine " Size="Size.Small"> Remove line</MudButton>                 
+        </MudToolBar>         
+        <FirstSideElementEdit 
+            SideElement="@firstSideElement" 
+            SideConnector="@SideConnectorInstance"/>
+        @if (SideElements != null && elementConnectivities != null)
+        {
+            @for (int i = 0; i < SideElements.Count; i += 1)
+            {   
+                int index = i;
+                <MudDivider Class="my-1"/>          
+                <SideElementConnectivityEdit 
+                    SideElement="@SideElements[index]" 
+                    index="@index" 
+                    SideConnector="SideConnectorInstance"
+                    AvailableElements="@AvailableSideElements"
+                    ElementConnectivity="@elementConnectivities"/>
+            }
+        }
+    </MudPaper>
+</div>
+
+<MudDivider Class="my-1"/>          
+@code{
+    [Parameter]
+    public string Class {get; set;} = "";
+    [Parameter]
+    public string Style {get; set;} = "";
+    [Parameter]
+    public SideConnector SideConnectorInstance {get; set;} = new SideConnector();
+    // Temporary values that will be edited and sent back on the side connector
+    private SideElement firstSideElement {get; set;} = new SideElement()
+        {
+            Name = "1st E",
+            Type = SideElementType.Unknown,
+            OD = ConversionsFromOSDC.DoubleToGaussian(null),
+            ID = ConversionsFromOSDC.DoubleToGaussian(null),
+            Length = ConversionsFromOSDC.DoubleToGaussian(null),
+            TopVerticalDepth = ConversionsFromOSDC.DoubleToGaussian(null)
+        };
+    private List<SideElement> SideElements {get; set;} = new List<SideElement>();
+    private List<SideElement> AvailableSideElements {get; set;} = new List<SideElement>();        
+    private ICollection<ElementConnectivity> elementConnectivities {get; set;} = new List<ElementConnectivity>();
+
+    private double? position = 0.0;
+    private double? verticalDepth = 0.0; 
+    int totalNumSideElements = 0;
+    bool? firstEditLoop = null;
+    private SideElementType sideElementType = new SideElementType();
+    private bool showTreeStruct = false;
+    //Tree plot variables
+    private ICollection<ElementConnectivity> treePlotConectitvities = new List<ElementConnectivity>();
+    private SideElement firstElementForPlot = new SideElement();
+    private bool updatebool = false;
+
+    protected override void OnInitialized()
+    {
+        position = ConversionsFromOSDC.GaussianToDouble(SideConnectorInstance.Position);
+        verticalDepth = ConversionsFromOSDC.GaussianToDouble(SideConnectorInstance.VerticalDepth);  
+        if (SideConnectorInstance != null)
+        {
+            //Load first side element and the list of available elements
+            if (SideConnectorInstance.FirstSideElement != null)
+            {
+                firstSideElement = SideConnectorInstance.FirstSideElement;
+                AvailableSideElements.Add(firstSideElement);
+            }
+            if (SideConnectorInstance.ElementConnectivities != null)
+            {
+                //  If the list already existed (as in edit mode), identify the first loop.
+                //this prevents duplicate instances in AvailableSideElements
+                firstEditLoop = true;
+                elementConnectivities = SideConnectorInstance.ElementConnectivities;
+                //Create a list of available, unique, elements
+                foreach(ElementConnectivity element in elementConnectivities)
+                {
+                    if( !AvailableSideElements.Contains(element.DownstreamElement))
+                    {
+                        totalNumSideElements += 1;
+                        AvailableSideElements.Add(element.DownstreamElement);
+                        SideElements.Add(element.DownstreamElement);
+                    }
+                }
+            }
+        }  
+    }
+    void OnClickShowTreeStruct()
+    {
+        firstElementForPlot = firstSideElement;
+        treePlotConectitvities = elementConnectivities;
+        showTreeStruct = true;
+        updatebool = true;
+    }
+    void OnClickHideStruct()
+    {
+        showTreeStruct = false;
+        updatebool = false;
+    }
+    void AddSideElementLine()
+    {
+        if (totalNumSideElements == 0 && firstEditLoop == null)
+        {
+            AvailableSideElements.Add(firstSideElement);
+        } 
+        else if (firstEditLoop == true)
+        {
+            firstEditLoop = false;
+        }
+        else
+        {   
+            //Elements available for connectivity test
+            AvailableSideElements.Add(SideElements[SideElements.Count-1]);            
+        }
+        totalNumSideElements += 1;
+        SideElement newSideElement = new SideElement()
+            {
+                Name = $"E#:{totalNumSideElements}",
+                Type = SideElementType.Unknown,
+                OD = ConversionsFromOSDC.DoubleToGaussian(null),
+                ID = ConversionsFromOSDC.DoubleToGaussian(null),
+                Length = ConversionsFromOSDC.DoubleToGaussian(null),
+                TopVerticalDepth = ConversionsFromOSDC.DoubleToGaussian(null)
+            };
+        SideConnectorInstance.FirstSideElement = firstSideElement;
+        SideElements.Add(newSideElement);  
+        elementConnectivities.Add(new ElementConnectivity()); 
+    }
+    void RemoveSideElementLine()
+    {
+        if (SideElements.Count > 0)
+        {      
+            totalNumSideElements -= 1;
+            SideElements.RemoveAt(SideElements.Count - 1);
+            elementConnectivities.Remove(elementConnectivities.ElementAt<ElementConnectivity>(elementConnectivities.Count - 1));
+            AvailableSideElements.RemoveAt(AvailableSideElements.Count - 1);
+        }
+    }
+    void UpdateConnector()
+    {
+        SideConnectorInstance.Position =  ConversionsFromOSDC.DoubleToGaussian(position);    
+        SideConnectorInstance.VerticalDepth =  ConversionsFromOSDC.DoubleToGaussian(verticalDepth);
+        SideConnectorInstance.FirstSideElement = firstSideElement;
+        SideConnectorInstance.ElementConnectivities = elementConnectivities; 
+    }
+    void UpdatePosition(double? val)
+    {
+        if(val != null){position = (double) val;}
+        SideConnectorInstance.Position = ConversionsFromOSDC.DoubleToGaussian(val);        
+    }    
+    void UpdateDepth(double? val)
+    {
+        if(val != null){verticalDepth = (double) val;}
+        SideConnectorInstance.VerticalDepth = ConversionsFromOSDC.DoubleToGaussian(val);        
+    }    
+    void UpdateConnectivityList(ElementConnectivity? elementConnectivity, int index)
+    {
+        if (elementConnectivity != null)
+        {
+            if (elementConnectivities is List<ElementConnectivity> list)
+            {
+                list[index] = elementConnectivity;
+                SideConnectorInstance.ElementConnectivities = elementConnectivities;
+            }
+        }
+    }
+    void UpdateFirstElement(SideElement? sideElement)
+    {
+        if (sideElement != null)
+        {
+            SideConnectorInstance.FirstSideElement = sideElement;
+        }
+    }
+
+}

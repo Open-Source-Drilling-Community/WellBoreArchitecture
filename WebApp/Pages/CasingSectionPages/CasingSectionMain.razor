@@ -1,0 +1,248 @@
+
+<MudPaper Class="@Class">
+    <MudToolBar Class="ml-n6 my-n4 ">
+        <MudText Typo="Typo.h6">Casing section properties</MudText>
+        <MudSpacer />
+        <MudCheckBox T="bool" Value="checkBoxOpenHole" ValueChanged="CheckUncheckBoxOpenHoleBox" Label="Open Hole Section" Color="Color.Primary"></MudCheckBox>
+        <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Add" Color="Color.Secondary" OnClick="AddCasingSectionLine" Size="Size.Small"> Add line </MudButton>
+        <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Remove" Color="Color.Tertiary" OnClick="RemoveCasingSectionLine" Size="Size.Small"> Remove line</MudButton>
+        <MudButton Class="mx-2" StartIcon="@expandIcon" OnClick="OpenAndCloseTab" Size="Size.Small"> @ShowHideText</MudButton>
+    </MudToolBar>
+    <MudCollapse Expanded="openPanel">
+        <MudDivider Class="mb-2" />
+        @if (CasingSections == null)
+        {
+            <!-- If no value arrives, initialize a new list with treatment in regard to
+            OSDC drilling properties.-->
+            CasingSections = new List<CasingSection>
+                {
+                new CasingSection()
+                {
+                CasingSectionElements = new List<CasingSectionElement>()
+                {
+                new CasingSectionElement()
+                {
+                BodyID = ConversionsFromOSDC.DoubleToGaussian(null),
+                BodyOD = ConversionsFromOSDC.DoubleToGaussian(null),
+                CollarOD = ConversionsFromOSDC.DoubleToGaussian(null),
+                JointLength = ConversionsFromOSDC.DoubleToGaussian(null)
+                }
+                },
+                Length = ConversionsFromOSDC.DoubleToGaussian(null),
+                TopCementDepth = ConversionsFromOSDC.DoubleToGaussian(null),
+                TopDepth = ConversionsFromOSDC.DoubleToGaussian(null),
+                CasingSectionSizeTable = new List<BoreHoleSize>
+                {
+                new BoreHoleSize
+                {
+                HoleSize = ConversionsFromOSDC.DoubleToGaussian(null),
+                Length = ConversionsFromOSDC.DoubleToGaussian(null)
+                }
+                },
+                OpenHoleSection = new OpenHoleSection
+                {
+                HoleSizes = new List<BoreHoleSize>
+                {
+                new BoreHoleSize
+                {
+                HoleSize = ConversionsFromOSDC.DoubleToGaussian(null),
+                Length = ConversionsFromOSDC.DoubleToGaussian(null)
+                }
+                }
+                }
+                }
+                };
+        }
+        @if (CasingSections != null && listCasingSectionElements != null)
+        {
+            @for (int i = 0; i < CasingSections.Count; i++)
+            {
+                @if (CasingSections.ElementAt<CasingSection>(i) != null && listCasingSectionElements.Count > i && listCasingSectionElements.ElementAt<ICollection<CasingSectionElement>>(i) != null)
+                {
+                    <CasingSectionEditor Class="py-2 px-4 my-4 mx-4" CasingSectionsInstance="CasingSections.ElementAt<CasingSection>(i)"
+                                         CasingSectionElements="listCasingSectionElements.ElementAt<ICollection<CasingSectionElement>>(i)" />
+                    CasingSections.ElementAt<CasingSection>(i).CasingSectionElements = listCasingSectionElements.ElementAt<ICollection<CasingSectionElement>>(i);
+                    if (CasingSections.Count > 1 && i < CasingSections.Count - 1)
+                    {
+                        <MudDivider Class="mb-2" />
+                    }
+                }
+            }
+
+        }
+        @if (showAlert)
+        {
+            <MudAlert Severity="Severity.Error" ContentAlignment="HorizontalAlignment.Center" ShowCloseIcon="true" CloseIconClicked="CloseAlert">At least one CasingSection is necessary!</MudAlert>
+        }
+        <OpenHoleSectionMain Class="py-2 px-4 my-4 mx-4" CasingSectionInstance="CasingSections.ElementAt<CasingSection>(CasingSections.Count - 1)"
+                             hasOpenHoleSection="@checkBoxOpenHole" />
+    </MudCollapse>
+
+</MudPaper>
+
+@code {
+    [Parameter]
+    public ICollection<CasingSection>? CasingSections { get; set; } = null;
+    [Parameter]
+    public string Class { get; set; } = "mb-4";
+    private ICollection<List<CasingSectionElement>> listCasingSectionElements { get; set; } = new List<List<CasingSectionElement>>();
+    private OpenHoleSection? openHoleSection;
+    int maxCasingSectionNumber = 1;
+    private bool showAlert = false;
+    private bool openPanel = true;
+    string expandIcon = Icons.Material.Filled.ExpandLess;
+    string ShowHideText = "Hide";
+    private bool checkBoxOpenHole = false;
+    protected override void OnInitialized()
+    {
+        if (CasingSections != null)
+        {
+            for (int i = 0; i < CasingSections.Count; i++)
+            {
+                //Load Casing Section Elements and directly repopulate temporary list
+                if (i < listCasingSectionElements.Count)
+                {
+                    if (listCasingSectionElements is IList<ICollection<CasingSectionElement>> list)
+                    {
+                        list[i] = CasingSections.ElementAt<CasingSection>(i).CasingSectionElements;
+                    }
+                }
+                else
+                {
+                    listCasingSectionElements.Add(CasingSections.ElementAt<CasingSection>(i).CasingSectionElements.ToList<CasingSectionElement>());
+                }
+            }
+            if (CasingSections.Count > 0)
+            {
+                openHoleSection = CasingSections.ElementAt<CasingSection>(CasingSections.Count - 1).OpenHoleSection;
+                if (CasingSections.ElementAt<CasingSection>(CasingSections.Count - 1).OpenHoleSection != null)
+                {
+                    checkBoxOpenHole = true;
+                }
+            }
+        }
+        for (int i = 0; i < listCasingSectionElements.Count; i++)
+        {
+            if (listCasingSectionElements.ElementAt<ICollection<CasingSectionElement>>(i) == null)
+            {
+                if (listCasingSectionElements is IList<IList<CasingSectionElement>> list)
+                {
+                    list[i] = new List<CasingSectionElement>()
+                    {
+                        new CasingSectionElement()
+                        {
+                            BodyID = ConversionsFromOSDC.DoubleToGaussian(null),
+                            BodyOD = ConversionsFromOSDC.DoubleToGaussian(null),
+                            CollarOD = ConversionsFromOSDC.DoubleToGaussian(null),
+                            JointLength = ConversionsFromOSDC.DoubleToGaussian(null)
+                        }
+                    };
+                }
+            }
+        }
+
+    }
+    void CheckUncheckBoxOpenHoleBox(bool val)
+    {
+        checkBoxOpenHole = val;
+        if (!checkBoxOpenHole)
+        {
+            CasingSections.ElementAt<CasingSection>(CasingSections.Count - 1).OpenHoleSection = null;
+        }
+    }
+    void OpenAndCloseTab()
+    {
+
+        if (openPanel)
+        {
+            expandIcon = Icons.Material.Filled.ExpandMore;
+            ShowHideText = "Show";
+        }
+        else
+        {
+            expandIcon = Icons.Material.Filled.ExpandLess;
+            ShowHideText = "Hide";
+        }
+        openPanel = !openPanel;
+    }
+    void AddCasingSectionLine()
+    {
+        openPanel = true;
+        expandIcon = Icons.Material.Filled.ExpandLess;
+        ShowHideText = "Hide";
+        maxCasingSectionNumber += 1;
+        if (CasingSections?.Count > 0)
+        {
+            //Copy open hole section
+            openHoleSection = CasingSections.ElementAt<CasingSection>(CasingSections.Count - 1).OpenHoleSection;
+            //Remove it from the last term
+            CasingSections.ElementAt<CasingSection>(CasingSections.Count - 1).OpenHoleSection = null;
+        }
+        //Add a new casing section with a copy of the last open hole section available
+        CasingSections.Add(
+            new CasingSection
+            {
+                //Create
+                CasingSectionElements = new List<CasingSectionElement>()
+                    {
+                         new CasingSectionElement()
+                        {
+                            BodyID = ConversionsFromOSDC.DoubleToGaussian(null),
+                            BodyOD = ConversionsFromOSDC.DoubleToGaussian(null),
+                            CollarOD = ConversionsFromOSDC.DoubleToGaussian(null),
+                            JointLength = ConversionsFromOSDC.DoubleToGaussian(null)
+                        }
+                    },
+                Length = ConversionsFromOSDC.DoubleToGaussian(null),
+                TopCementDepth = ConversionsFromOSDC.DoubleToGaussian(null),
+                TopDepth = ConversionsFromOSDC.DoubleToGaussian(null),
+                CasingSectionSizeTable = new List<BoreHoleSize>
+                {
+                    new BoreHoleSize
+                    {
+                        HoleSize = ConversionsFromOSDC.DoubleToGaussian(null),
+                        Length = ConversionsFromOSDC.DoubleToGaussian(null)
+                    }
+                },
+                OpenHoleSection = openHoleSection
+            }
+        );
+        //Add a list of casing sections
+        listCasingSectionElements.Add(new List<CasingSectionElement>
+            {
+                new CasingSectionElement()
+                {
+                    BodyID = ConversionsFromOSDC.DoubleToGaussian(null),
+                    BodyOD = ConversionsFromOSDC.DoubleToGaussian(null),
+                    CollarOD = ConversionsFromOSDC.DoubleToGaussian(null),
+                    JointLength = ConversionsFromOSDC.DoubleToGaussian(null)
+                }
+            });
+        showAlert = false;
+    }
+    void RemoveCasingSectionLine()
+    {
+        if (CasingSections.Count == 1)
+        {
+            showAlert = true;
+        }
+        else
+        {
+            maxCasingSectionNumber -= 1;
+            if (CasingSections is IList<CasingSection> list)
+            {
+                //Move the openhole section to the previous casing section
+                list[CasingSections.Count - 2].OpenHoleSection = list[CasingSections.Count - 1].OpenHoleSection;
+                list.RemoveAt(CasingSections.Count - 1);
+                if (listCasingSectionElements is IList<List<CasingSectionElement>> listCasing)
+                {
+                    listCasing.RemoveAt(listCasingSectionElements.Count - 1);
+                }
+            }
+        }
+    }
+    void CloseAlert()
+    {
+        showAlert = false;
+    }
+}

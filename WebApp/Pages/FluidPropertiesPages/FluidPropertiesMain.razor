@@ -1,0 +1,83 @@
+
+<MudPaper Class="@Class">
+    <MudToolBar Class="ml-n6 my-n4 ">
+        <MudText Typo="Typo.h6">Fluid properties (above ground)</MudText>
+        <MudSpacer />
+        <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Add" Color="Color.Secondary" OnClick="AddFluidLine" Size="Size.Small"> Add line </MudButton>
+        <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Remove" Color="Color.Tertiary" OnClick="RemoveFluidLine" Size="Size.Small"> Remove line</MudButton>
+        <MudButton Class="mx-2" StartIcon="@expandIcon" OnClick="OpenAndCloseTab" Size="Size.Small"> @ShowHideText</MudButton>
+    </MudToolBar>
+    <MudCollapse Expanded="openPanel">
+        <MudDivider Class="mb-2" />
+        @if (WellBoreArchitectureFluids != null)
+        {
+            @for (int i = 0; i < WellBoreArchitectureFluids.Count; i += 1)
+            {
+                <FluidPropertiesEditor WellBoreArchitectureFluidsInstance="@(WellBoreArchitectureFluids.ElementAt<WellBoreArchitectureFluid>(i))" />
+                @if (WellBoreArchitectureFluids.Count > 1 && i < WellBoreArchitectureFluids.Count - 1)
+                {
+                    <MudDivider Class="mb-2" />
+                }
+            }
+        }
+        @if (showAlert)
+        {
+            <MudAlert Severity="Severity.Error" ContentAlignment="HorizontalAlignment.Center" ShowCloseIcon="true" CloseIconClicked="CloseAlert">At least one fluid is necessary!</MudAlert>
+        }
+    </MudCollapse>
+</MudPaper>
+
+
+@code {
+    [Parameter]
+    public ICollection<WellBoreArchitectureFluid> WellBoreArchitectureFluids { get; set; } = new List<WellBoreArchitectureFluid>();
+    [Parameter]
+    public string Class { get; set; } = "mb-4";
+    int maxFluidNumber = 1;
+    private bool showAlert = false;
+    private bool openPanel = true;
+    string expandIcon = Icons.Material.Filled.ExpandLess;
+    string ShowHideText = "Hide";
+
+    void OpenAndCloseTab()
+    {
+
+        if (openPanel)
+        {
+            expandIcon = Icons.Material.Filled.ExpandMore;
+            ShowHideText = "Show";
+        }
+        else
+        {
+            expandIcon = Icons.Material.Filled.ExpandLess;
+            ShowHideText = "Hide";
+        }
+        openPanel = !openPanel;
+    }
+    void AddFluidLine()
+    {
+        openPanel = true;
+        expandIcon = Icons.Material.Filled.ExpandLess;
+        ShowHideText = "Hide";
+        maxFluidNumber += 1;
+        WellBoreArchitectureFluids.Add(new WellBoreArchitectureFluid());
+        showAlert = false;
+    }
+    void RemoveFluidLine()
+    {
+        if (WellBoreArchitectureFluids.Count == 1)
+        {
+            showAlert = true;
+        }
+        else
+        {
+            maxFluidNumber -= 1;
+            WellBoreArchitectureFluids.Remove(WellBoreArchitectureFluids.ElementAt<WellBoreArchitectureFluid>(WellBoreArchitectureFluids.Count - 1));
+        }
+    }
+    void CloseAlert()
+    {
+        showAlert = false;
+    }
+
+}

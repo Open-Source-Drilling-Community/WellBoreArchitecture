@@ -1,0 +1,129 @@
+
+<MudPaper Class="@Class">
+    <MudToolBar Class="ml-n6 my-n4 ">
+        <MudText Typo="Typo.body1"><b>Casing section elements properties</b></MudText>
+        <MudSpacer/>
+        <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Add" Color="Color.Secondary" OnClick="AddCasingSectionElementLine" Size="Size.Small"> Add line </MudButton>        
+        <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Remove"  Color="Color.Tertiary" OnClick="RemoveCasingSectionElementLine " Size="Size.Small"> Remove line</MudButton>       
+        <MudButton Class="mx-2" StartIcon="@expandIcon" OnClick="OpenAndCloseTab " Size="Size.Small"> @ShowHideText</MudButton>               
+    </MudToolBar>
+    <MudCollapse Expanded="openPanel" >
+        <MudDivider Class="mb-2"/>
+        @for (int i = 0; i <CasingSectionElements.Count; i +=1)
+        {      
+            int index = i;
+            <MudPaper Class="@Class" Style="@($"background:{createRowColor(i)};")" Elevation="0">
+                <CasingSectionElementEditor  
+                    CasingSectionElementInstance="CasingElementUpdate(index)" 
+                    index="index" 
+                    CasingSectionInstance="CasingSectionInstance"/>
+            </MudPaper>
+            @if(CasingSectionElements.Count>1 && i < CasingSectionElements.Count-1)
+            {
+                <MudDivider Class="mb-2"/> 
+            }
+        }
+        @if (showAlert)
+        {
+            <MudAlert Severity="Severity.Error" ContentAlignment="HorizontalAlignment.Center" ShowCloseIcon="true" CloseIconClicked="CloseAlert">At least one CasingSectionElement is necessary!</MudAlert>
+        }
+    </MudCollapse>
+</MudPaper>
+@code{
+    [Parameter]
+    public ICollection<CasingSectionElement> CasingSectionElements {get; set;} = new List<CasingSectionElement>()
+        {
+            new CasingSectionElement()
+            {
+                BodyID = ConversionsFromOSDC.DoubleToGaussian(null),
+                BodyOD = ConversionsFromOSDC.DoubleToGaussian(null),
+                CollarOD = ConversionsFromOSDC.DoubleToGaussian(null),
+                JointLength = ConversionsFromOSDC.DoubleToGaussian(null)                
+            }                        
+        };
+    [Parameter]
+    public CasingSection CasingSectionInstance {get; set;} = new CasingSection();
+    [Parameter]
+    public string Class {get; set;} = "mb-4";
+    [Parameter]
+    public string? Style {get; set;}
+
+    int maxCasingSectionElementNumber = 1;
+    private bool showAlert = false;
+    private bool openPanel = true;
+    private string expandIcon = Icons.Material.Filled.ExpandLess;
+    private string ShowHideText = "Hide";
+    protected override void OnInitialized()
+    {
+
+    }
+
+    private string createRowColor(int index)
+    {
+        if (2*(index/2) - index  == 0)
+        {
+            return Colors.Indigo.Lighten5;   
+        }
+        else
+        {
+            return Colors.Indigo.Lighten4;
+        }
+    }
+    CasingSectionElement CasingElementUpdate(int index)
+    {
+        CasingSectionInstance.CasingSectionElements = CasingSectionElements;
+        return CasingSectionElements.ElementAt<CasingSectionElement>(index);
+    }
+    void OpenAndCloseTab()
+    {   
+        if (openPanel)
+        {
+            expandIcon = Icons.Material.Filled.ExpandMore;
+            ShowHideText = "Show";
+        }    
+        else
+        {
+            expandIcon = Icons.Material.Filled.ExpandLess;
+            ShowHideText = "Hide";
+        }
+        openPanel = !openPanel;
+    }
+    void AddCasingSectionElementLine()
+    {
+        openPanel=true;
+        expandIcon = Icons.Material.Filled.ExpandLess;
+        ShowHideText = "Hide";
+        maxCasingSectionElementNumber += 1;
+        CasingSectionElements.Add(
+            new CasingSectionElement()
+            {
+                BodyID = ConversionsFromOSDC.DoubleToGaussian(null),
+                BodyOD = ConversionsFromOSDC.DoubleToGaussian(null),
+                CollarOD = ConversionsFromOSDC.DoubleToGaussian(null),
+                JointLength = ConversionsFromOSDC.DoubleToGaussian(null)                
+            }
+        );   
+        //Update instance of casing section
+        CasingSectionInstance.CasingSectionElements = CasingSectionElements;
+        showAlert = false;    
+    }
+    void RemoveCasingSectionElementLine()
+    {
+        if (CasingSectionElements.Count == 1)
+        {      
+            showAlert = true;      
+        }
+        else
+        {
+            maxCasingSectionElementNumber -= 1;
+            CasingSectionElements.Remove(CasingSectionElements.ElementAt<CasingSectionElement>(CasingSectionElements.Count - 1));
+            //Update instance of casing section
+            CasingSectionInstance.CasingSectionElements = CasingSectionElements;       
+        }
+    }
+    void CloseAlert()
+    {
+        showAlert = false;
+    }
+
+}   

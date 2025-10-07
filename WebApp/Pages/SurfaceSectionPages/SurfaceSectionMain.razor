@@ -1,0 +1,192 @@
+
+<MudPaper Class="@Class">
+    <MudToolBar Class="ml-n6 my-n4 ">
+        <MudText Typo="Typo.h6">Surface section properties</MudText>
+        <MudSpacer/>
+        <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Add" Color="Color.Secondary" OnClick="AddsSurfaceSectionLine" Size="Size.Small"> Add line </MudButton>        
+        <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Remove"  Color="Color.Tertiary" OnClick="RemoveSurfaceSectionLine " Size="Size.Small"> Remove line</MudButton>                 
+        <MudButton Class="mx-2" StartIcon="@expandIcon" OnClick="OpenAndCloseTab " Size="Size.Small"> @ShowHideText</MudButton>               
+    </MudToolBar>
+    <MudCollapse Expanded="openPanel">
+        <MudDivider Class="mb-2"/>   
+        @if (SurfaceSections != null)
+        {
+            @for (int i = 0; i < SurfaceSections.Count; i += 1)
+            {
+                SurfaceSection surfaceSection = SurfaceSections.ElementAt<SurfaceSection>(i);
+                if (surfaceSection != null)
+                {
+                    <SurfaceSectionEditor SurfaceSectionsInstance="surfaceSection" SideConnectors="listSideConnectors.ElementAt<ICollection<SideConnector>>(i)" />
+                    surfaceSection.SideConnectors = listSideConnectors.ElementAt<ICollection<SideConnector>>(i);
+
+                    @if (SurfaceSections.Count > 1 && i < SurfaceSections.Count - 1)
+                    {
+                        <MudDivider Class="mb-2"/>
+                    }
+
+                }
+            }
+        }
+        @if (showAlert)
+        {
+            <MudAlert Severity="Severity.Error" 
+                ContentAlignment="HorizontalAlignment.Center" 
+                ShowCloseIcon="true" 
+                CloseIconClicked="CloseAlert">
+                    At least one surface section is necessary!
+            </MudAlert>
+        }
+    </MudCollapse>
+</MudPaper>
+
+
+@code{
+    [Parameter]
+    public ICollection<SurfaceSection> SurfaceSections {get; set;} = new List<SurfaceSection>();
+    [Parameter]
+    public string Class {get; set;} = "mb-4";
+    //  Create a local list of side connectors to be edited and injected in SurfaceSections
+    // SurfaceSections already contains an empty value as default
+    private ICollection<List<SideConnector>> listSideConnectors = new List<List<SideConnector>>
+    {
+        new List<SideConnector>()
+            {
+                new SideConnector
+                {
+                    Position = ConversionsFromOSDC.DoubleToGaussian(null),
+                    VerticalDepth = ConversionsFromOSDC.DoubleToGaussian(null)
+                }
+            }
+    };
+    private int totalNumSurfSections = 1;
+    private SurfaceSectionType surfaceSectionType {get; set;} = new SurfaceSectionType();
+    // Show minimum surface sections alert boolean
+    private bool showAlert = false;
+    // Edition panel open boolean
+    private bool openPanel = true;
+    // Edition side connector panel boolean
+    private bool openSideConnectorPanel = false;
+    // Contains expansion icons for UI
+    string expandIcon = Icons.Material.Filled.ExpandLess;
+    string expandIconSideConnector = Icons.Material.Filled.ExpandMore;
+    string ShowHideText = "Hide";
+    string ShowHideTextSideConnector = "Show";
+    protected override void OnInitialized()
+    {
+        if (SurfaceSections != null)
+        {
+            for ( int i=0; i < SurfaceSections.Count; i++)
+            {
+                if (i < listSideConnectors.Count)
+                {
+                    if (listSideConnectors is List<ICollection<SideConnector>> list)
+                    {
+                        list[i] = SurfaceSections.ElementAt<SurfaceSection>(i).SideConnectors;
+                    }
+                }
+                else
+                {
+                    listSideConnectors.Add(SurfaceSections.ElementAt<SurfaceSection>(i).SideConnectors.ToList<SideConnector>());
+                }
+            }
+        }
+    }
+    void OpenAndCloseTab()
+    {
+
+        if (openPanel)
+        {
+            expandIcon = Icons.Material.Filled.ExpandMore;
+            ShowHideText = "Show";
+        }    
+        else
+        {
+            expandIcon = Icons.Material.Filled.ExpandLess;
+            ShowHideText = "Hide";
+        }
+        openPanel = !openPanel;
+    }
+
+    void OpenAndCloseSideConnectorTab()
+    {
+
+        if (openPanel)
+        {
+            expandIconSideConnector = Icons.Material.Filled.ExpandMore;
+            ShowHideTextSideConnector = "Show";
+        }    
+        else
+        {
+            expandIconSideConnector = Icons.Material.Filled.ExpandLess;
+            ShowHideTextSideConnector = "Hide";
+        }
+        openSideConnectorPanel = !openSideConnectorPanel;
+    }
+
+    void AddsSurfaceSectionLine()
+    {
+        openPanel=true;
+        expandIcon = Icons.Material.Filled.ExpandLess;
+        ShowHideText = "Hide";
+        totalNumSurfSections += 1;
+        SurfaceSections.Add(new SurfaceSection());
+        listSideConnectors.Add(
+            new List<SideConnector>{
+                new SideConnector 
+                    {
+                        Position = ConversionsFromOSDC.DoubleToGaussian(null),
+                        VerticalDepth = ConversionsFromOSDC.DoubleToGaussian(null)
+                    }
+            }    
+            );
+        showAlert = false;    
+    }
+    void RemoveSurfaceSectionLine()
+    {
+        if (SurfaceSections.Count == 1)
+        {      
+            showAlert = true;      
+        }
+        else
+        {
+            totalNumSurfSections -= 1;
+            SurfaceSections.Remove(SurfaceSections.ElementAt<SurfaceSection>(SurfaceSections.Count - 1));
+            if (listSideConnectors is IList<List<SideConnector>> list)
+            {
+                list.RemoveAt(listSideConnectors.Count - 1);
+            }
+        }
+    }
+    void CloseAlert()
+    {
+        showAlert = false;
+    }
+    // UPDATE VARIABLES FUNCTION WITH UNIT SYSTEM
+    
+    void ManageUnits(){}
+    ScalarDrillingProperty doubleToScalar(double? val)
+    {
+        if(val == null){ val = 0.0; }  
+        ScalarDrillingProperty scalValue = new ScalarDrillingProperty()
+        {
+            DiracDistributionValue = new DiracDistribution()
+            {
+                Value = val, 
+                MaxValue = (double) val, 
+                MinValue = (double)val
+            }
+        };
+        return scalValue;
+    }
+    GaussianDrillingProperty doubleToGaussian(double? val)
+    {
+        if(val == null){ val = 0.0; }
+          
+        GaussianDrillingProperty gaussValue = new GaussianDrillingProperty()
+        {
+            GaussianValue = new GaussianDistribution(){Mean = val}
+        };
+        return gaussValue;
+    }
+ 
+}

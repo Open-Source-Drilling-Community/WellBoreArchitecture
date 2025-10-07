@@ -1,0 +1,168 @@
+<PlotlyChart style="height: 60vh; min-height: 350px" @bind-Config="config" @bind-Layout="layout" @bind-Data="data" @ref="chart" />
+<br />
+
+@code{
+    [CascadingParameter]
+    private MudTheme Theme {get; set;}
+    [Parameter]
+    public SideElement FirstSideElement {get; set;}
+    [Parameter]
+    public ICollection<ElementConnectivity> ElementConnectivities { get; set; } = new List<ElementConnectivity>();
+    // Parameters control if there are relevant changes or not to avoid unnecessary calculations.
+    [Parameter]
+    public bool updatebool {get; set;}
+    // Plot related variables
+    private PlotlyChart chart;
+    private Config config;
+    private Layout layout = new();
+    private static Marker localMaker =  new Marker
+        {
+            Line = new Plotly.Blazor.Traces.ScatterLib.MarkerLib.Line 
+            {
+                Color = "black",
+                Width = 2
+            },
+            Color = "white",    // Named color or hex code like "#FF0000"
+            Size = 17
+        };
+    // Data referencing the first element
+    IList<ITrace> data = new List<ITrace>
+    {
+        new Scatter
+        {
+            Name = "ScatterTrace",
+            Mode = ModeFlag.Lines | ModeFlag.Markers,
+            Marker = localMaker,
+            Line = new Line
+                {
+                    Color = "blue",   // Color of connecting line if Mode includes Lines
+                    Width = 2
+                },
+            X = new List<object>{0},
+            Y = new List<object>{0}
+        }
+    };
+    protected override void OnInitialized()
+    {
+    }
+    int[] CorrectYCoordinates(Dictionary<string, int[]> keyCoord, int[] pos)
+    {
+        //     This function checks if there are elements overlaping in the display.
+        // If there is, it moves the element in the vertical direction.
+        bool containsCoord = false;
+        foreach(string key in keyCoord.Keys)
+        {
+            containsCoord = (keyCoord[key][0] == pos[0]) && (keyCoord[key][1] == pos[1]);
+            if (containsCoord)
+            {
+                  return CorrectYCoordinates(keyCoord, new int[]{pos[0], pos[1]+1});
+            }
+        }
+        return pos;      
+    }
+    protected override void OnParametersSet()
+    {
+        if(!(FirstSideElement.Name == null) && updatebool)
+        {
+            chart.Clear();
+            //  Creates a temporary dictionary which relates the name of the element with the position in the overall graph.
+            //the position is estimated by the layer (e.g.: what comes before it). For better visibility, the vertical position
+            //is then corrected with the function CorrectYCoordinates
+            Dictionary<string, int[]> posDict = new Dictionary<string, int[]>(){{FirstSideElement.Name, new int[]{0,0}}};        
+            Dictionary<string, int[]> connectsToDict = new Dictionary<string, int[]>(){{FirstSideElement.Name, new int[]{0,0}}};        
+         
+            //Add the position of the "FirstSideElement"
+            var annotation = new Annotation
+            {
+                Text = FirstSideElement.Name,
+                X = 0, // X-coordinate (e.g., in data units or paper units)
+                Y = 0, // Y-coordinate
+                ShowArrow = false
+            };
+            // Temporary variables
+
+            int xpos = 0;   
+            int ypos = 0;   
+            int layers = 1;
+            foreach (ElementConnectivity elementConnectivity in ElementConnectivities)
+            {
+                if(posDict.Keys.Contains(elementConnectivity.UpstreamElement.Name))
+                {
+                    int ystep = 1;
+                    //Check if the next one corresponds to the next of the list. If not, than changes positioning
+                    if (posDict.Keys.ToList()[posDict.Count-1] != elementConnectivity.UpstreamElement.Name) 
+                    {
+                        ystep = -1;
+                    }       
+                    // Get the new position of the element
+                    int[] newposition = new int[]{posDict[elementConnectivity.UpstreamElement.Name][0]+1, posDict[elementConnectivity.UpstreamElement.Name][1]+ystep};
+                    // Correct if there is an overlaping position 
+                    newposition = CorrectYCoordinates(posDict, newposition);
+                    //Extract the total number of layers 
+                    layers = Math.Max(layers, newposition[0]);
+                    //Update dictionary
+                    posDict.Add(elementConnectivity.DownstreamElement.Name, newposition);
+                    connectsToDict.Add(elementConnectivity.DownstreamElement.Name, new int[]{posDict[elementConnectivity.UpstreamElement.Name][0], posDict[elementConnectivity.UpstreamElement.Name][1]});                    
+                }
+                else
+                {
+                    //Correct if is not used. If everything goes well, this is not necessary!
+                    xpos += 1;
+                    ypos -= 1;
+                    posDict.Add(elementConnectivity.DownstreamElement.Name, new int[]{xpos, ypos});                                        
+                }
+            }            
+            //  Update plot by: creating a new scatter with a connection pair & an annotation with the
+            //upstream element
+            List<Annotation> annotations = new();
+            foreach (string key in posDict.Keys)
+            {
+                Annotation annotationAuxiliar = new Annotation
+                {
+                    Text = key,
+                    X = posDict[key][0], // X-coordinate (e.g., in data units or paper units)
+                    Y = posDict[key][1]+0.2, // Y-coordinate
+                    Font = new Plotly.Blazor.LayoutLib.AnnotationLib.Font
+                    {
+                        Size = 20,   // <--- Increase font size here
+                        Color = "black"
+                    },
+                    ShowArrow = false
+                };
+                //Add annotations
+                annotations.Add(annotationAuxiliar);
+                //Add coordinates of the pair
+                List<object> x = new List<object>{(object)posDict[key][0], (object)connectsToDict[key][0]};
+                List<object> y = new List<object>{(object)posDict[key][1], (object)connectsToDict[key][1]};
+                //Create a color gradient to help visualize
+                string rgbacolor = $"rgba({200*(1 - posDict[key][0]/layers)}, 0, {55 + 200*posDict[key][0]/layers}, 1)";
+                //Add data
+                chart.AddTrace(
+                    new Scatter
+                    {
+                        Name = key,
+                        Mode = ModeFlag.Lines | ModeFlag.Markers,
+                        Marker = localMaker,
+                        Line = new Line
+                            {
+                                Color = rgbacolor,   // Color of connecting line if Mode includes Lines
+                                Width = 2
+                            },
+                        X = x, // X-coordinate (e.g., in data units or paper units)
+                        Y = y, // Y-coordinate
+                 });
+                
+            }
+            //Update layout
+            layout.XAxis = new List<XAxis>{new XAxis { Visible = false }};
+            layout.YAxis = new List<YAxis>{new YAxis { Visible = false }};
+            layout.ShowLegend = false;
+            layout.Annotations = annotations;
+            chart.Relayout();
+        }
+
+        base.OnParametersSet();
+    }
+
+    
+}

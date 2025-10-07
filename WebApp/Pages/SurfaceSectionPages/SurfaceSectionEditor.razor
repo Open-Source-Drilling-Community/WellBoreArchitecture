@@ -1,0 +1,157 @@
+<!-- Create header for 1st input line -->
+<MudPaper Class="py-2 px-4 my-4 mx-4"  Style="@($"background:{Colors.Gray.Lighten4};")">
+    <MudGrid Class="my-2 mx-2">
+        <InputHeader xs="2" Text="Surface section"/>
+        <InputHeader xs="2" Text="Length"/>
+        <InputHeader xs="1" Text="Body OD"/>
+        <InputHeader xs="1" Text="Body ID"/>
+        <InputHeader xs="2" Text="Connection Type"/>
+        <InputHeader xs="2" Text="Grade"/>
+    </MudGrid>
+    <!-- 1st input line -->
+    <MudGrid Class="my-2 mx-2">                  
+        <MudItem xs="2">
+            <MudSelect @bind-Value="SurfaceSectionsInstance.Type" Dense="true">
+                @foreach (SurfaceSectionType surfaceSectionChoice in Enum.GetValues(typeof(SurfaceSectionType)))
+                    {
+                        <MudSelectItem Value="@surfaceSectionChoice">@surfaceSectionChoice</MudSelectItem>
+                    }  
+            </MudSelect>
+        </MudItem>            
+        <MudItem xs="2">
+            <MudInputWithUnitAdornment VariantType="Variant.Text"
+                QuantityName="Length"
+                SIValueNullable="length"
+                SIValueNullableChanged="val => { UpdateSectionLength(val); }" />
+        </MudItem>
+        <MudItem xs="1">
+            <MudInputWithUnitAdornment VariantType="Variant.Text"
+                QuantityName="DiameterPipeDrilling"
+                SIValueNullable="bodyOD"
+                SIValueNullableChanged="val => { UpdateBodyOD(val); }" />
+        </MudItem>
+        <MudItem xs="1">
+            <MudInputWithUnitAdornment VariantType="Variant.Text"
+                QuantityName="DiameterPipeDrilling"
+                SIValueNullable="bodyID"
+                SIValueNullableChanged="val => { UpdateBodyID(val); }" />
+        </MudItem>
+        <MudItem xs="2">
+            <MudTextField @bind-Value="SurfaceSectionsInstance.ConnectionType" Variant="Variant.Text"></MudTextField>            
+        </MudItem>
+        <MudItem xs="2">
+            <MudTextField @bind-Value="SurfaceSectionsInstance.Grade" Variant="Variant.Text"></MudTextField>            
+        </MudItem>
+    </MudGrid>
+    <!-- StartIcon side connectors editors -->
+    <SideConnectorMain Class="py-2 px-4 my-4 mx-4" SideConnectors="SideConnectors" SideConnectorsChanged="UpdateSideConnector"/>                     
+    @if (SideConnectors.Count > 0)
+    {
+        SurfaceSectionsInstance.SideConnectors = SideConnectors;
+    }
+</MudPaper>
+@code{
+    [Parameter]
+    public SurfaceSection SurfaceSectionsInstance {get; set;}
+    [Parameter]
+    public ICollection<SideConnector> SideConnectors {get; set;} = new List<SideConnector>(){new SideConnector()};
+    // Temporary variables used to safely populate surface section    
+    private double? length = 0.0;
+    private double? bodyOD = 0.0;
+    private double? bodyID = 0.0;
+    private double? materialDensity = 0.0;
+    private double? youngsModulus = 0.0; 
+    private double? linearWeight = 0.0;
+    private double? tensileStrength = 0.0;
+    private double? burstPressure = 0.0;
+    private double? collapsePressure = 0.0;    
+    private double? yieldStress = 0.0;
+    private double? recMakeUpTorque = 0.0;
+
+    // UPDATE VARIABLES FUNCTION WITH UNIT SYSTEM
+    
+    void ManageUnits(){}
+    protected override void OnInitialized()
+    {
+        // If there is something to be loaded, it will.
+        if (SurfaceSectionsInstance != null)
+        {
+            length = ConversionsFromOSDC.GaussianToDouble(SurfaceSectionsInstance.SectionLength);
+            bodyID = ConversionsFromOSDC.GaussianToDouble(SurfaceSectionsInstance.BodyID);
+            bodyOD = ConversionsFromOSDC.GaussianToDouble(SurfaceSectionsInstance.BodyOD);
+            materialDensity = ConversionsFromOSDC.GaussianToDouble(SurfaceSectionsInstance.MaterialDensity);
+            youngsModulus = ConversionsFromOSDC.GaussianToDouble(SurfaceSectionsInstance.YoungModulus);
+            linearWeight = ConversionsFromOSDC.GaussianToDouble(SurfaceSectionsInstance.LinearWeight);
+            tensileStrength = ConversionsFromOSDC.GaussianToDouble(SurfaceSectionsInstance.TensileStrength);
+            burstPressure = ConversionsFromOSDC.GaussianToDouble(SurfaceSectionsInstance.BurstPressure);
+            collapsePressure = ConversionsFromOSDC.GaussianToDouble(SurfaceSectionsInstance.CollapsePressure);
+            yieldStress = ConversionsFromOSDC.GaussianToDouble(SurfaceSectionsInstance.YieldStress);
+            recMakeUpTorque = ConversionsFromOSDC.ScalarToDouble(SurfaceSectionsInstance.MakeUpTorqueRecommended);   
+        }                                                             
+    }
+
+    void UpdateSectionLength(double? val)
+    {
+        {length = (double) val;}
+        SurfaceSectionsInstance.SectionLength = ConversionsFromOSDC.DoubleToGaussian(val);        
+    }        
+    void UpdateBodyOD(double? val)
+    {
+        if(val != null){bodyOD= (double) val;}
+        SurfaceSectionsInstance.BodyOD = ConversionsFromOSDC.DoubleToGaussian(val);        
+    }        
+    void UpdateBodyID(double? val)
+    {
+        if(val != null){bodyID= (double) val;}
+        SurfaceSectionsInstance.BodyID = ConversionsFromOSDC.DoubleToGaussian(val);        
+    }        
+    void UpdateMaterialDensity(double? val) 
+    {
+        if(val != null){materialDensity= (double) val;}
+        SurfaceSectionsInstance.MaterialDensity = ConversionsFromOSDC.DoubleToGaussian(val);           
+    }
+    void UpdateYoungsModulus(double? val) 
+    {
+        if(val != null){youngsModulus= (double) val;}
+        SurfaceSectionsInstance.YoungModulus = ConversionsFromOSDC.DoubleToGaussian(val);           
+    }
+    void UpdateLinearWeight(double? val) 
+    {
+        if(val != null){linearWeight= (double) val;}
+        SurfaceSectionsInstance.LinearWeight = ConversionsFromOSDC.DoubleToGaussian(val);           
+    }
+
+    void UpdateTensileStrength(double? val)
+    {
+        if(val != null){tensileStrength= (double) val;}
+        SurfaceSectionsInstance.TensileStrength = ConversionsFromOSDC.DoubleToGaussian(val);        
+    }        
+    void UpdateBurstPressure(double? val)
+    {
+        if(val != null){burstPressure= (double) val;}
+        SurfaceSectionsInstance.BurstPressure = ConversionsFromOSDC.DoubleToGaussian(val);        
+    }        
+    void UpdateCollapsePressure(double? val)
+    {
+        if(val != null){collapsePressure= (double) val;}
+        SurfaceSectionsInstance.CollapsePressure = ConversionsFromOSDC.DoubleToGaussian(val);        
+    }        
+
+    void UpdateYieldStress(double? val)
+    {
+        if(val != null){yieldStress= (double) val;}
+        SurfaceSectionsInstance.YieldStress = ConversionsFromOSDC.DoubleToGaussian(val);        
+    }     
+    void UpdateMakeUpTorque(double? val)
+    {
+        if(val != null){recMakeUpTorque= (double) val;}
+        SurfaceSectionsInstance.MakeUpTorqueRecommended = ConversionsFromOSDC.DoubleToScalar(val);        
+    }           
+    void UpdateSideConnector(ICollection<SideConnector>? sideConnectors)
+    {
+        if (sideConnectors != null)
+        {
+            SurfaceSectionsInstance.SideConnectors = sideConnectors;
+        }
+    }
+}

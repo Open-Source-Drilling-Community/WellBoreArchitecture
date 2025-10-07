@@ -1,0 +1,47 @@
+<MudGrid Class="my-2">
+        <InputHeader xs="2" Text="Fluid"/>
+        <InputHeader xs="2" Text="Depth"/>        
+</MudGrid>
+<MudGrid Class="my-2">
+    <MudItem xs="2">
+        <MudSelect @bind-Value="WellBoreArchitectureFluidsInstance.Fluid" Dense="true">
+            @foreach (FluidType fluidChoice in Enum.GetValues(typeof(FluidType)))
+                {
+                    <MudSelectItem Value="@fluidChoice">@fluidChoice</MudSelectItem>
+                }  
+        </MudSelect>
+    </MudItem>
+    <MudItem xs="2">
+        <MudInputWithUnitAdornment VariantType="Variant.Text"
+            QuantityName="DepthDrilling"
+            SIValueNullable="depth"
+            SIValueNullableChanged="val => { UpdateDepth(val); }" />
+    </MudItem>
+</MudGrid>
+
+
+
+@code{
+    [Parameter]
+    public WellBoreArchitectureFluid WellBoreArchitectureFluidsInstance {get; set;}
+    
+    private FluidType fluidType {get; set;} = new FluidType();
+    private double? depth = 0.0;
+    void ManageUnits(){}
+
+    protected override async Task OnInitializedAsync()
+    {
+        depth = ConversionsFromOSDC.GaussianToDouble(WellBoreArchitectureFluidsInstance.Depth);
+    }
+    void UpdateDepth(double? val)
+    {
+        if(val != null){depth = (double) val;}
+        WellBoreArchitectureFluidsInstance.Depth = ConversionsFromOSDC.DoubleToGaussian(val);        
+    }        
+    void OnFluidTypeUpdate()
+    {
+
+        
+    }
+
+}   

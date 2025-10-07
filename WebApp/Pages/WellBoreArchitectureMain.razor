@@ -1,0 +1,338 @@
+﻿@page "/WellBoreArchitecture"
+@inject NavigationManager Navigation
+@inject ILogger<WellBoreArchitectureMain> logger
+@inject ISnackbar Snackbar
+<MudUnitAndReferenceChoiceTag HttpHost=@APIUtils.HostNameUnitConversion
+                              HttpBasePath=@APIUtils.HostBasePathUnitConversion
+                              HttpController="UnitSystem/"
+                              UnitSystemName="@DataUtils.UnitAndReferenceParameters.UnitSystemName"
+                              UnitSystemNameChanged="@DataUtils.UpdateUnitSystemName">
+
+
+    @if (wellBoreArchitectureList == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        @if (displayMainPanel)
+        {
+            <MudText Typo="Typo.h4">Wellbore Architecture</MudText>
+            <br />
+            <MudDataGrid T="WellBoreArchitecture" MultiSelection="true" Items="@wellBoreArchitectureList" SelectedItemsChanged="@SelectedItemsChanged"
+                         SortMode="SortMode.Multiple" QuickFilter="@_wellBoreArchitectureFilter" RowClick="@RowClicked"
+                         Hideable="false" ReadOnly="false" EditMode="DataGridEditMode.Cell" Hover="true" Elevation="0">
+                <ToolBarContent>
+                    <MudButton StartIcon="@Icons.Material.Outlined.Add" Size="@Size.Large"
+                               OnClick="@OpenAddPanel" IconColor="@Color.Success" Class="add-item-btn">New</MudButton>
+                    <MudButton StartIcon="@Icons.Material.Outlined.Delete" Size="@Size.Large"
+                               OnClick="@DeleteSelectedWellBoreArchitecture" IconColor="@Color.Error" Class="add-item-btn">Delete selection</MudButton>
+                    <MudSpacer />
+                    <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                                  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                </ToolBarContent>
+                <Columns>
+                    <SelectColumn T="WellBoreArchitecture" />
+                    <PropertyColumn Property="x => x.Name" Title="Name" CellStyle="width: 10%;" Sortable="true" Editable="false" />
+                    <PropertyColumn Property="x => x.Description" Title="Description" CellStyle="width: 30%;" Sortable="false" Editable="false" />
+                    <PropertyColumn Property="x => (wellBoreDicts == null || x.WellBoreID == null || x.WellBoreID == Guid.Empty || !wellBoreDicts.ContainsKey(x.WellBoreID.Value) || wellBoreDicts[x.WellBoreID.Value] == null) ? string.Empty : wellBoreDicts[x.WellBoreID.Value].Name" Title="Wellbore" CellStyle="width: 15%;" Sortable="true" Editable="false" />
+                    <TemplateColumn CellStyle="width: 5%;">
+                        <EditTemplate>
+                            <MudToolBar>
+                                <MudIconButton Class="mx-2" Size="@Size.Medium" Icon="@Icons.Material.Outlined.Delete" OnClick="(() => DeleteWellBoreArchitecture(context.Item.MetaInfo.ID))" />
+                            </MudToolBar>
+                        </EditTemplate>
+                    </TemplateColumn>
+                </Columns>
+                <PagerContent>
+                    <MudDataGridPager T="WellBoreArchitecture" />
+                </PagerContent>
+            </MudDataGrid>
+        }
+        @if (displayAddPanel)
+        {
+            <WellBoreArchitetureAddPanel WellBoreArchitecture="@currentWellBoreArchitecture"
+                                         Fields="@fieldDicts"
+                                         Clusters="@clusterDicts"
+                                         Wells="@wellDicts"
+                                         WellBores="@wellBoreDicts"
+                                         OnUpdate="@ShowMainPanel" />
+        }
+        @if (displayEditPanel)
+        {
+            <WellBoreArchitetureEditPanel WellBoreArchitecture="@currentWellBoreArchitecture"
+                                          Fields="@fieldDicts"
+                                          Clusters="@clusterDicts"
+                                          Wells="@wellDicts"
+                                          WellBores="@wellBoreDicts"
+                                          OnUpdate="@ShowMainPanel" />
+        }
+    }
+
+</MudUnitAndReferenceChoiceTag>
+
+@code {
+    [Inject] private IDialogService DialogService { get; set; }
+
+    // WellBoreArchitecture related variables
+    private List<WellBoreArchitecture> wellBoreArchitectureList = new();
+    private List<WellBoreArchitecture> selectedWellBoreArchitectureList = new();
+    private WellBoreArchitecture? currentWellBoreArchitecture = null;
+
+    // Create dictionaries to collect the Guid and Name of auxiliary fields
+    private Dictionary<Guid, Field> fieldDicts = new();
+    private Dictionary<Guid, Cluster> clusterDicts = new();
+    private Dictionary<Guid, Well> wellDicts = new();
+    private Dictionary<Guid, WellBore> wellBoreDicts = new();
+
+    //UI related variables
+    public bool displayMainPanel = true;
+    public bool displayEditPanel = false;
+    private bool displayAddPanel = false;
+    private string? _searchString;
+
+    protected override async Task OnInitializedAsync()
+    {
+        //Show main panel
+        displayMainPanel = true;
+        displayAddPanel = false;
+        displayEditPanel = false;
+        await InitializeAsync();
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
+
+    private async Task InitializeAsync()
+    {
+        try
+        {
+            // Starting all loading tasks asynchronously
+            logger.LogInformation("Trying to load list of WellBoreArchitecture from client: " + APIUtils.HttpClientWellBoreArchitecture);
+            var wellBoreArchitectureTask = APIUtils.ClientWellBoreArchitecture.GetAllWellBoreArchitectureAsync();
+
+            List<Task> loadingTaskList = new List<Task>() { wellBoreArchitectureTask };
+            // Awaiting tasks and retrieve results as they become available
+            while (loadingTaskList.Count > 0)
+            {
+                Task finishedTask = await Task.WhenAny(loadingTaskList);
+                if (finishedTask == wellBoreArchitectureTask)
+                {
+                    // wellBoreArchitectureTask
+                    try
+                    {
+                        wellBoreArchitectureList = (List<WellBoreArchitecture>)await wellBoreArchitectureTask;
+                        if (wellBoreArchitectureList != null)
+                        {
+                            wellBoreArchitectureList.Sort((f1, f2) => f1.Name.CompareTo(f2.Name));
+                        }
+                        else
+                        {
+                            logger.LogWarning("Returned list of WellBoreArchitecture were null on initialization");
+                            Snackbar.Add("Returned list of WellBoreArchitecture were null on initialization", Severity.Warning);
+                        }
+                    }
+                    catch (ApiException ex)
+                    {
+                        logger.LogError(ex, "Impossible to load WellBoreArchitecture from client");
+                    }
+                }
+                await finishedTask;
+                loadingTaskList.Remove(finishedTask);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Impossible to load list of WellBoreArchitecture on initialization");
+        }
+        logger.LogInformation("Trying to load microservices through client: " + APIUtils.HttpClientField);
+        try
+        {
+            // get guid and name from external microservices
+            ICollection<Field> fields = await APIUtils.ClientField.GetAllFieldAsync();
+            foreach (Field field in fields)
+            {
+                if (!fieldDicts.ContainsKey(field.MetaInfo.ID))
+                {
+                    fieldDicts.Add(field.MetaInfo.ID, field);
+                }
+            }
+            ICollection<Cluster> clusters = await APIUtils.ClientCluster.GetAllClusterAsync();
+            foreach (Cluster cluster in clusters)
+            {
+                if (!clusterDicts.ContainsKey(cluster.MetaInfo.ID))
+                {
+                    clusterDicts.Add(cluster.MetaInfo.ID, cluster);
+                }
+            }
+            ICollection<Well> wells = await APIUtils.ClientWell.GetAllWellAsync();
+            foreach (Well well in wells)
+            {
+                if (!wellDicts.ContainsKey(well.MetaInfo.ID))
+                {
+                    wellDicts.Add(well.MetaInfo.ID, well);
+                }
+            }
+            ICollection<WellBore> wellBores = await APIUtils.ClientWellBore.GetAllWellBoreAsync();
+            foreach (WellBore wellBore in wellBores)
+            {
+                if (!wellBoreDicts.ContainsKey(wellBore.MetaInfo.ID))
+                {
+                    wellBoreDicts.Add(wellBore.MetaInfo.ID, wellBore);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Impossible to load microservices");
+        }
+    }
+
+    private void OpenAddPanel()
+    {
+        currentWellBoreArchitecture = new WellBoreArchitecture();
+        if (currentWellBoreArchitecture.WellHead == null)
+        {
+            currentWellBoreArchitecture.WellHead = APIUtils.DefaultWellHead();
+        }
+        if (currentWellBoreArchitecture.FluidsAboveGroundLevel == null)
+        {
+            currentWellBoreArchitecture.FluidsAboveGroundLevel = APIUtils.DefaultFluidsAboveGroundLevel();
+        }
+        if (currentWellBoreArchitecture.SurfaceSections == null)
+        {
+            currentWellBoreArchitecture.SurfaceSections = APIUtils.DefaultSurfaceSections();
+        }
+        if (currentWellBoreArchitecture.CasingSections == null)
+        {
+            currentWellBoreArchitecture.CasingSections = APIUtils.DefaultCasingSections();
+        }
+        displayMainPanel = false;
+        displayAddPanel = true;
+        displayEditPanel = false;
+    }
+    private async void ShowMainPanel()
+    {
+        currentWellBoreArchitecture = null;
+        displayMainPanel = true;
+        displayAddPanel = false;
+        displayEditPanel = false;
+        await InitializeAsync();
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
+
+    private async Task<bool> ConfirmDeletion()
+    {
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true
+        };
+        var dialog = await DialogService.ShowAsync<DialogDeleteTemplate>("DELETE", options);
+        var result = await dialog.Result;
+        StateHasChanged();
+        if (result == null)
+        {
+            return false;
+        }
+        else
+        {
+            return (!result.Canceled);
+        }
+    }
+    private async Task RowClicked(DataGridRowClickEventArgs<WellBoreArchitecture> args)
+    {
+        await EditWellBoreArchitecture(args.Item.MetaInfo.ID);
+    }
+
+    private async Task EditWellBoreArchitecture(Guid id)
+    {
+        try
+        {
+            currentWellBoreArchitecture = await APIUtils.ClientWellBoreArchitecture.GetWellBoreArchitectureByIdAsync(id);
+            if (currentWellBoreArchitecture != null)
+            {
+                displayMainPanel = false;
+                displayAddPanel = false;
+                displayEditPanel = true;
+                await InvokeAsync(() => { StateHasChanged(); });
+            }
+            else
+            {
+                logger.LogWarning("Impossible to load Wellbore Architecture");
+                Snackbar.Add("Impossible to load Wellbore Architecture", Severity.Warning);
+            }
+        }
+        catch (Exception ex)
+        {
+            currentWellBoreArchitecture = null;
+            logger.LogError(ex, "Impossible to load WellBore to be edited");
+        }
+    }
+
+    private async Task DeleteWellBoreArchitecture(Guid id)
+    {
+        try
+        {
+            bool confirmation = await ConfirmDeletion();
+            if (confirmation)
+            {
+                await APIUtils.ClientWellBoreArchitecture.DeleteWellBoreArchitectureByIdAsync(id);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Impossible to delete WellBoreArchitecture");
+        }
+        await OnInitializedAsync();
+    }
+
+    private async Task DeleteSelectedWellBoreArchitecture()
+    {
+        bool confirmation = await ConfirmDeletion();
+        if (confirmation)
+        {
+            foreach (WellBoreArchitecture wellBoreArchitecture in selectedWellBoreArchitectureList)
+            {
+                await APIUtils.ClientWellBoreArchitecture.DeleteWellBoreArchitectureByIdAsync(wellBoreArchitecture.MetaInfo.ID);
+            }
+            selectedWellBoreArchitectureList.Clear();
+            await OnInitializedAsync();
+        }
+    }
+
+    //Quick filter - filter gobally across multiple columns with the same input
+    private Func<WellBoreArchitecture, bool>
+        _wellBoreArchitectureFilter => x =>
+        {
+            if (string.IsNullOrWhiteSpace(_searchString))
+                return true;
+            if ($"{x.Name} {x.Description}".Contains(_searchString))
+                return true;
+
+            return false;
+        };
+
+    //Events
+    private void StartedEditingItem(WellBoreArchitecture item)
+    {
+        //Activating Edit event capture with parameter StartedEditingItem="@StartedEditingItem" in MudDataGrid; arguments are specified in OnClick="@context.Actions.StartedEditingItem(...)"
+    }
+
+    private void CancelledEditingItem(WellBoreArchitecture item)
+    {
+        //Activating Cancel event capture with parameter CancelledEditingItem = "@CancelledEditingItem" in MudDataGrid; arguments are specified in OnClick="@context.Actions.CancelledEditingItem(...)"
+    }
+
+    private void CommittedItemChanges(WellBoreArchitecture item)
+    {
+        //Activating Commit event capture with parameter CommittedItemChanges = "@CommittedItemChanges" in MudDataGrid; arguments are specified in OnClick="@context.Actions.CommittedEditingItem(...)"
+    }
+
+    void SelectedItemsChanged(HashSet<WellBoreArchitecture>
+        items)
+    {
+        selectedWellBoreArchitectureList.Clear();
+        selectedWellBoreArchitectureList.InsertRange(0, items);
+    }
+
+}

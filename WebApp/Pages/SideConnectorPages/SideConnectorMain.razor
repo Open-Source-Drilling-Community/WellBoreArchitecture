@@ -1,0 +1,147 @@
+<MudPaper Class="@Class">
+    <MudToolBar Class="ml-n6 my-n4 ">
+        <MudText Typo="Typo.body1"><b>Side connectors</b></MudText>
+        <MudSpacer/>
+        <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Add" Color="Color.Secondary" OnClick="AddSideConnectorLine" Size="Size.Small"> Add line </MudButton>        
+        <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Remove"  Color="Color.Tertiary" OnClick="RemoveSideConnectorLine " Size="Size.Small"> Remove line</MudButton>                 
+        <MudButton Class="mx-2" StartIcon="@expandIcon" OnClick="OpenAndCloseTab " Size="Size.Small"> @ShowHideText</MudButton>               
+    </MudToolBar>            
+    <MudCollapse Expanded="openPanel">
+        <MudDivider Class="mb-2"/>
+        @for (int i = 0;  i < SideConnectors.Count; i +=1)
+        {
+            int index = i;
+            SideConnector connector = SideConnectors.ElementAt<SideConnector>(index);
+            if (connector != null) 
+            {
+                <SideConnectorEdit Class="@Class"
+                                   SideConnectorInstance="@connector"
+                                   Style="@($"background:{createRowColor(index)};")"/>
+            }
+        }
+        @if (showAlert)
+        {
+            <MudAlert Severity="Severity.Error" ContentAlignment="HorizontalAlignment.Center" ShowCloseIcon="true" CloseIconClicked="CloseAlert">Should not be empty!</MudAlert>
+        }
+    </MudCollapse>
+</MudPaper>
+@code{
+    [Parameter]
+    public ICollection<SideConnector> SideConnectors {get; set;}
+    [Parameter]
+    public string Class {get; set;} = "mb-4";
+    [Parameter]
+    public EventCallback<ICollection<SideConnector>> SideConnectorsChanged { get; set; }
+
+    private bool showAlert = false;
+    private int totalNumSideConnectors;
+    //Panel control
+    private bool openPanel = true;
+    string expandIcon = Icons.Material.Filled.ExpandLess;
+    string ShowHideText = "Hide";
+    protected override void OnInitialized()
+    {
+        if(SideConnectors == null)
+        {
+            SideConnectors  = new List<SideConnector>()
+            {
+                new SideConnector
+                {
+                    Position = ConversionsFromOSDC.DoubleToGaussian(null),
+                    VerticalDepth = ConversionsFromOSDC.DoubleToGaussian(null),
+                    FirstSideElement = new SideElement()
+                    {
+                        Name = "FirstElement",
+                        Type = SideElementType.Unknown,
+                        OD = ConversionsFromOSDC.DoubleToGaussian(null),
+                        ID = ConversionsFromOSDC.DoubleToGaussian(null),
+                        Length = ConversionsFromOSDC.DoubleToGaussian(null),
+                        TopVerticalDepth = ConversionsFromOSDC.DoubleToGaussian(null)
+                    }
+                }
+            };
+        }
+    }
+    void OpenAndCloseTab()
+    {
+
+        if (openPanel)
+        {
+            expandIcon = Icons.Material.Filled.ExpandMore;
+            ShowHideText = "Show";
+        }    
+        else
+        {
+            expandIcon = Icons.Material.Filled.ExpandLess;
+            ShowHideText = "Hide";
+        }
+        openPanel = !openPanel;
+    }
+    void AddSideConnectorLine()
+    {
+        openPanel=true;
+        expandIcon = Icons.Material.Filled.ExpandLess;
+        ShowHideText = "Hide";
+        totalNumSideConnectors += 1;
+        SideConnectors.Add(
+            new SideConnector
+            {
+                Position = ConversionsFromOSDC.DoubleToGaussian(null),
+                VerticalDepth = ConversionsFromOSDC.DoubleToGaussian(null),
+                FirstSideElement = new SideElement()
+                {
+                    Name = "FirstElement",
+                    Type = SideElementType.Unknown,
+                    OD = ConversionsFromOSDC.DoubleToGaussian(null),
+                    ID = ConversionsFromOSDC.DoubleToGaussian(null),
+                    Length = ConversionsFromOSDC.DoubleToGaussian(null),
+                    TopVerticalDepth = ConversionsFromOSDC.DoubleToGaussian(null)
+                }
+            }            
+        );   
+        showAlert = false;    
+    }
+    void RemoveSideConnectorLine()
+    {
+        if (SideConnectors.Count == 1)
+        {      
+            showAlert = true;      
+        }
+        else
+        {
+            totalNumSideConnectors -= 1;
+            SideConnectors.Remove(SideConnectors.ElementAt<SideConnector>(SideConnectors.Count - 1));
+        }
+    }
+
+    private string createRowColor(int index)
+    {
+        if (2*(index/2) - index  == 0)
+        {
+            return Colors.Indigo.Lighten5;   
+        }
+        else
+        {
+            return Colors.Indigo.Lighten4;
+        }
+    }
+    void CloseAlert()
+    {
+        showAlert = false;
+    }
+    void UpdateSideConnector(SideConnector? sideConnector, int index)
+    {
+        SideConnectorsChanged.InvokeAsync(SideConnectors);
+        if (sideConnector != null)
+        {
+            if (SideConnectors is IList<SideConnector> list)
+            {
+                list[index] = sideConnector;
+            }
+        }
+    } 
+    public async Task ManagedChangedValue()
+    {
+         await SideConnectorsChanged.InvokeAsync(SideConnectors);
+    }
+}
