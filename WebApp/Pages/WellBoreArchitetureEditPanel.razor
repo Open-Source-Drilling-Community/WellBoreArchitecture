@@ -1,124 +1,132 @@
 @inject ILogger<WellBoreArchitectureMain> logger
 @inject ISnackbar Snackbar
 
-<MudPaper Class="py-2 px-4">
-    <MudText Typo="Typo.h6">Wellbore architecture</MudText>
-    <MudDivider Class="mb-2" />
-    <MudGrid Class="my-2">
-        <InputHeader xs="3" Text="Creation date" />
-        <InputHeader xs="3" Text="Last modification date" />
-    </MudGrid>
-    <MudGrid Class="my-2">
-        <MudItem xs="3">
-            <MudText Typo="Typo.body1">@creationDate</MudText>
-        </MudItem>
-        <MudItem xs="3">
-            <MudText Typo="Typo.body1">@modificationDate</MudText>
-        </MudItem>
-    </MudGrid>
-
-    <MudGrid Class="my-2">
-        <InputHeader xs="2" Text="Name" />
-        <InputHeader xs="2" Text="Description" />
-        <InputHeader xs="2" Text="Field" />
-        <InputHeader xs="2" Text="Cluster" />
-        <InputHeader xs="2" Text="Well" />
-        <InputHeader xs="2" Text="Wellbore" />
-    </MudGrid>
-
-    <MudGrid Class="my-2">
-        <MudItem xs="2">
-            <MudTextField @bind-Value="wbaName" Variant="Variant.Text"></MudTextField>
-        </MudItem>
-        <MudItem xs="2">
-            <MudTextField @bind-Value="wbaDescription" Variant="Variant.Text"></MudTextField>
-        </MudItem>
-        @if (Fields != null)
-        {
-            <MudItem xs="2">
-                <MudSelect Label="Field" @bind-Value="@_selectedField" Dense="true" ToStringFunc="@(s => s?.Name)">
-                    @foreach (var fieldKPV in Fields)
-                    {
-                        if (fieldKPV.Key != Guid.Empty && fieldKPV.Value != null && !string.IsNullOrEmpty(fieldKPV.Value.Name))
-                        {
-                            <MudSelectItem Value="@fieldKPV.Value">@fieldKPV.Value.Name</MudSelectItem>
-                        }
-                    }
-                </MudSelect>
-            </MudItem>
-        }
-        else
-        {
-            <MudItem xs="2" />
-        }
-        @if (Clusters != null && _selectedField != null)
-        {
-            <MudItem xs="2">
-                <MudSelect Label="Cluster" @bind-Value="@_selectedCluster" Dense="true" ToStringFunc="@(s => s?.Name)">
-                    @foreach (var clusterKVP in Clusters.Where(x => (x.Value != null && x.Value.FieldID != null && _selectedField != null && _selectedField.MetaInfo != null && _selectedField.MetaInfo.ID == x.Value.FieldID && !x.Value.IsSingleWell)))
-                    {
-                        <MudSelectItem Value="@clusterKVP.Value">@clusterKVP.Value.Name</MudSelectItem>
-                    }
-                </MudSelect>
-            </MudItem>
-        }
-        else
-        {
-            <MudItem xs="2" />
-        }
-        @if (Wells != null)
-        {
-            <MudItem xs="2">
-                <MudSelect Label="Well" @bind-Value="@_selectedWell" Dense="true" ToStringFunc="@(s => s?.Name)">
-                    @foreach (var wellKVP in Wells.Where(x => (x.Value != null && ((x.Value.ClusterID != null && _selectedCluster != null && _selectedCluster.MetaInfo != null && _selectedCluster.MetaInfo.ID == x.Value.ClusterID && !x.Value.IsSingleWell) || (x.Value.IsSingleWell)))))
-                    {
-                        <MudSelectItem Value="@wellKVP.Value">@wellKVP.Value.Name</MudSelectItem>
-                    }
-                </MudSelect>
-            </MudItem>
-        }
-        else
-        {
-            <MudItem xs="2" />
-        }
-        @if (WellBores != null && _selectedWell != null)
-        {
-            <MudItem xs="2">
-                <MudSelect Label="Wellbore" @bind-Value="@_selectedWellBore" Dense="true" ToStringFunc="@(s => s?.Name)">
-                    @foreach (var wellBoreKVP in WellBores.Where(x => (x.Value != null && x.Value.WellID != null && _selectedWell != null && _selectedWell.MetaInfo != null && _selectedWell.MetaInfo.ID == x.Value.WellID)))
-                    {
-                        <MudSelectItem Value="@wellBoreKVP.Value">@wellBoreKVP.Value.Name</MudSelectItem>
-                    }
-                </MudSelect>
-            </MudItem>
-        }
-        else
-        {
-            <MudItem xs="2" />
-        }
-    </MudGrid>
-</MudPaper>
-@if (WellBoreArchitecture != null && WellBoreArchitecture.WellHead != null)
+@if (WellBoreArchitecture != null)
 {
-    <WellHeadEditor Class="py-2 px-4 mt-4" WellHead="@WellBoreArchitecture.WellHead" />
-}
-@if (WellBoreArchitecture != null && WellBoreArchitecture.FluidsAboveGroundLevel != null)
-{
-    <FluidPropertiesMain Class="py-2 px-4 mt-4" WellBoreArchitectureFluids="@WellBoreArchitecture.FluidsAboveGroundLevel" />
-}
-@if (WellBoreArchitecture != null && WellBoreArchitecture.SurfaceSections != null)
-{
-    <SurfaceSectionMain Class="py-2 px-4 mt-4" SurfaceSections="@WellBoreArchitecture.SurfaceSections" />
-}
-@if (WellBoreArchitecture != null && WellBoreArchitecture.CasingSections != null)
-{
-    <CasingSectionMain Class="py-2 px-4 mt-4" CasingSections="@WellBoreArchitecture.CasingSections" />
-}
-<MudToolBar>
+    <MudText Typo="Typo.h6"> <b>Wellbore Architecture Editor</b></MudText>
     <MudSpacer />
-    <MudButton IconColor="@Color.Primary" StartIcon="@Icons.Material.Filled.Save" Size="@Size.Medium" OnClick="@SaveWellBoreArchitecture">Save</MudButton>
-    <MudButton IconColor="@Color.Primary" StartIcon="@Icons.Material.Filled.Cancel" Size="@Size.Medium" OnClick="@CloseWellBoreArchitecture">Cancel</MudButton>
-</MudToolBar>
+    <MudToolBar>
+        <MudSpacer />
+        <MudButton IconColor="@Color.Primary" StartIcon="@Icons.Material.Filled.Save" Size="@Size.Medium" OnClick="@SaveWellBoreArchitecture">Save</MudButton>
+        <MudButton IconColor="@Color.Primary" StartIcon="@Icons.Material.Filled.Cancel" Size="@Size.Medium" OnClick="@CloseWellBoreArchitecture">Cancel</MudButton>
+    </MudToolBar>
+    <MudPaper Class="py-2 px-4">
+        <MudGrid Class="my-2">
+            <InputHeader xs="3" Text="Creation date" />
+            <InputHeader xs="3" Text="Last modification date" />
+        </MudGrid>
+        <MudGrid Class="my-2">
+            <MudItem xs="3">
+                <MudText Typo="Typo.body1">@WellBoreArchitecture.CreationDate</MudText>
+            </MudItem>
+            <MudItem xs="3">
+                <MudText Typo="Typo.body1">@WellBoreArchitecture.LastModificationDate</MudText>
+            </MudItem>
+        </MudGrid>
+
+        <MudGrid Class="my-2">
+            <InputHeader xs="2" Text="Name" />
+            <InputHeader xs="2" Text="Description" />
+            <InputHeader xs="2" Text="Field" />
+            <InputHeader xs="2" Text="Cluster" />
+            <InputHeader xs="2" Text="Well" />
+            <InputHeader xs="2" Text="Wellbore" />
+        </MudGrid>
+
+        <MudGrid Class="my-2">
+            <MudItem xs="2">
+                <MudTextField @bind-Value="@WellBoreArchitecture.Name" Variant="Variant.Text"></MudTextField>
+            </MudItem>
+            <MudItem xs="2">
+                <MudTextField @bind-Value="@WellBoreArchitecture.Description" Variant="Variant.Text"></MudTextField>
+            </MudItem>
+            @if (Fields != null)
+            {
+                <MudItem xs="2">
+                    <MudSelect Label="Field" @bind-Value="@_selectedField" Dense="true" ToStringFunc="@(s => s?.Name)">
+                        @foreach (var fieldKPV in Fields)
+                        {
+                            if (fieldKPV.Key != Guid.Empty && fieldKPV.Value != null && !string.IsNullOrEmpty(fieldKPV.Value.Name))
+                            {
+                                <MudSelectItem Value="@fieldKPV.Value">@fieldKPV.Value.Name</MudSelectItem>
+                            }
+                        }
+                    </MudSelect>
+                </MudItem>
+            }
+            else
+            {
+                <MudItem xs="2" />
+            }
+            @if (Clusters != null && _selectedField != null)
+            {
+                <MudItem xs="2">
+                    <MudSelect Label="Cluster" @bind-Value="@_selectedCluster" Dense="true" ToStringFunc="@(s => s?.Name)">
+                        @foreach (var clusterKVP in Clusters.Where(x => (x.Value != null && x.Value.FieldID != null && _selectedField != null && _selectedField.MetaInfo != null && _selectedField.MetaInfo.ID == x.Value.FieldID && !x.Value.IsSingleWell)))
+                        {
+                            <MudSelectItem Value="@clusterKVP.Value">@clusterKVP.Value.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+            }
+            else
+            {
+                <MudItem xs="2" />
+            }
+            @if (Wells != null)
+            {
+                <MudItem xs="2">
+                    <MudSelect Label="Well" @bind-Value="@_selectedWell" Dense="true" ToStringFunc="@(s => s?.Name)">
+                        @foreach (var wellKVP in Wells.Where(x => (x.Value != null && ((x.Value.ClusterID != null && _selectedCluster != null && _selectedCluster.MetaInfo != null && _selectedCluster.MetaInfo.ID == x.Value.ClusterID && !x.Value.IsSingleWell) || (x.Value.IsSingleWell)))))
+                        {
+                            <MudSelectItem Value="@wellKVP.Value">@wellKVP.Value.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+            }
+            else
+            {
+                <MudItem xs="2" />
+            }
+            @if (WellBores != null && _selectedWell != null)
+            {
+                <MudItem xs="2">
+                    <MudSelect Label="Wellbore" @bind-Value="@_selectedWellBore" Dense="true" ToStringFunc="@(s => s?.Name)">
+                        @foreach (var wellBoreKVP in WellBores.Where(x => (x.Value != null && x.Value.WellID != null && _selectedWell != null && _selectedWell.MetaInfo != null && _selectedWell.MetaInfo.ID == x.Value.WellID)))
+                        {
+                            <MudSelectItem Value="@wellBoreKVP.Value">@wellBoreKVP.Value.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+            }
+            else
+            {
+                <MudItem xs="2" />
+            }
+        </MudGrid>
+    </MudPaper>
+    @if (WellBoreArchitecture.WellHead != null)
+    {
+        <WellHeadEditor Class="py-2 px-4 mt-4" WellHead="@WellBoreArchitecture.WellHead" />
+    }
+    @if (WellBoreArchitecture.FluidsAboveGroundLevel != null)
+    {
+        <FluidPropertiesMain Class="py-2 px-4 mt-4" WellBoreArchitectureFluids="@WellBoreArchitecture.FluidsAboveGroundLevel" />
+    }
+    @if (WellBoreArchitecture.SurfaceSections != null)
+    {
+        <SurfaceSectionMain Class="py-2 px-4 mt-4" SurfaceSections="@WellBoreArchitecture.SurfaceSections" />
+    }
+    @if (WellBoreArchitecture.CasingSections != null)
+    {
+        <CasingSectionMain Class="py-2 px-4 mt-4" CasingSections="@WellBoreArchitecture.CasingSections" />
+    }
+    <MudToolBar>
+        <MudSpacer />
+        <MudButton IconColor="@Color.Primary" StartIcon="@Icons.Material.Filled.Save" Size="@Size.Medium" OnClick="@SaveWellBoreArchitecture">Save</MudButton>
+        <MudButton IconColor="@Color.Primary" StartIcon="@Icons.Material.Filled.Cancel" Size="@Size.Medium" OnClick="@CloseWellBoreArchitecture">Cancel</MudButton>
+    </MudToolBar>
+}
 
 @code {
     [CascadingParameter]
@@ -141,16 +149,6 @@
     private Well? _selectedWell = null;
     private WellBore? _selectedWellBore = null;
 
-    private bool showPage = true;
-
-    // Create local copy of the relevant information
-    private string? wbaName;
-    private string? wbaDescription;
-
-    private string? wbaTypeName;
-    private string? creationDate = "NA";
-    private string? modificationDate = "NA";
-
     double depth;
     GaussianDrillingProperty doubleToGaussian(double? val)
     {
@@ -168,10 +166,6 @@
         if (WellBoreArchitecture != null)
         {
             //Grab old values for well bore architecture
-            wbaName = WellBoreArchitecture.Name;
-            wbaDescription = WellBoreArchitecture.Description;
-            creationDate = WellBoreArchitecture.CreationDate?.ToString();
-            modificationDate = WellBoreArchitecture.LastModificationDate?.ToString();
             if (WellBoreArchitecture.WellHead == null)
             {
                 WellBoreArchitecture.WellHead = APIUtils.DefaultWellHead();
@@ -195,7 +189,7 @@
                 if (wellBore != null && wellBore.WellID != null && wellBore.WellID != Guid.Empty)
                 {
                     _selectedWellBore = wellBore;
-                    Well well = await APIUtils.ClientWell.GetWellByIdAsync(wellBore.WellID.Value);                  
+                    Well well = await APIUtils.ClientWell.GetWellByIdAsync(wellBore.WellID.Value);
                     if (well != null && well.ClusterID != null && well.ClusterID != Guid.Empty)
                     {
                         _selectedWell = well;
@@ -231,14 +225,6 @@
                     }
                 }
             }
-            else
-            {
-                wbaTypeName = "NA";
-            }
-        }
-        else
-        {
-            showPage = false;
         }
     }
 
@@ -249,9 +235,7 @@
             if (WellBoreArchitecture != null)
             {
                 DateTimeOffset modificationDate = DateTimeOffset.UtcNow;
-                WellBoreArchitecture.Name = wbaName;
                 WellBoreArchitecture.WellBoreID = (_selectedWellBore != null && _selectedWellBore.MetaInfo != null && _selectedWellBore.MetaInfo.ID != Guid.Empty) ? _selectedWellBore.MetaInfo.ID : null;
-                WellBoreArchitecture.Description = wbaDescription;
                 WellBoreArchitecture.LastModificationDate = modificationDate;
                 await APIUtils.ClientWellBoreArchitecture.PutWellBoreArchitectureByIdAsync(WellBoreArchitecture.MetaInfo.ID, WellBoreArchitecture);
                 logger.LogInformation("Wellbore Architecture updated successfully");
