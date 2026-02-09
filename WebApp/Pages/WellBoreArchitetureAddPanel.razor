@@ -25,7 +25,7 @@
             @if (Fields != null)
             {
                 <MudItem xs="2">
-                    <MudSelect Label="Field" @bind-Value="@_selectedField" Dense="true" ToStringFunc="@(s => s?.Name)">
+                    <MudSelect @bind-Value="@_selectedField" Dense="true" ToStringFunc="@(s => s?.Name)">
                         @foreach (var fieldKPV in Fields)
                         {
                             if (fieldKPV.Key != Guid.Empty && fieldKPV.Value != null && !string.IsNullOrEmpty(fieldKPV.Value.Name))
@@ -43,7 +43,7 @@
             @if (Clusters != null && _selectedField != null)
             {
                 <MudItem xs="2">
-                    <MudSelect Label="Cluster" @bind-Value="@_selectedCluster" Dense="true" ToStringFunc="@(s => s?.Name)">
+                    <MudSelect @bind-Value="@_selectedCluster" Dense="true" ToStringFunc="@(s => s?.Name)">
                         @foreach (var clusterKVP in Clusters.Where(x => (x.Value != null && x.Value.FieldID != null && _selectedField != null && _selectedField.MetaInfo != null && _selectedField.MetaInfo.ID == x.Value.FieldID && !x.Value.IsSingleWell)))
                         {
                             <MudSelectItem Value="@clusterKVP.Value">@clusterKVP.Value.Name</MudSelectItem>
@@ -58,7 +58,7 @@
             @if (Wells != null)
             {
                 <MudItem xs="2">
-                    <MudSelect Label="Well" @bind-Value="@_selectedWell" Dense="true" ToStringFunc="@(s => s?.Name)">
+                    <MudSelect @bind-Value="@_selectedWell" Dense="true" ToStringFunc="@(s => s?.Name)">
                         @foreach (var wellKVP in Wells.Where(x => (x.Value != null && ((x.Value.ClusterID != null && _selectedCluster != null && _selectedCluster.MetaInfo != null && _selectedCluster.MetaInfo.ID == x.Value.ClusterID && !x.Value.IsSingleWell) || (x.Value.IsSingleWell)))))
                         {
                             <MudSelectItem Value="@wellKVP.Value">@wellKVP.Value.Name</MudSelectItem>
@@ -73,7 +73,7 @@
             @if (WellBores != null && _selectedWell != null)
             {
                 <MudItem xs="2">
-                    <MudSelect Label="Wellbore" @bind-Value="@_selectedWellBore" Dense="true" ToStringFunc="@(s => s?.Name)">
+                    <MudSelect @bind-Value="@_selectedWellBore" Dense="true" ToStringFunc="@(s => s?.Name)">
                         @foreach (var wellBoreKVP in WellBores.Where(x => (x.Value != null && x.Value.WellID != null && _selectedWell != null && _selectedWell.MetaInfo != null && _selectedWell.MetaInfo.ID == x.Value.WellID)))
                         {
                             <MudSelectItem Value="@wellBoreKVP.Value">@wellBoreKVP.Value.Name</MudSelectItem>
