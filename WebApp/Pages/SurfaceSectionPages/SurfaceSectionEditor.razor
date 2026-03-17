@@ -2,9 +2,9 @@
 <MudPaper Class="py-2 px-4 my-4 mx-4"  Style="@($"background:{Colors.Gray.Lighten4};")">
     <MudGrid Class="my-2 mx-2">
         <InputHeader xs="2" Text="Surface section"/>
-        <InputHeader xs="2" Text="Length"/>
-        <InputHeader xs="1" Text="Body OD"/>
-        <InputHeader xs="1" Text="Body ID"/>
+        <InputHeader xs="2" Text="@LengthLabel"/>
+        <InputHeader xs="1" Text="@OuterDiameterLabel"/>
+        <InputHeader xs="1" Text="@InnerDiameterLabel"/>
         <InputHeader xs="2" Text="Connection Type"/>
         <InputHeader xs="2" Text="Grade"/>
     </MudGrid>
@@ -67,6 +67,10 @@
     private double? collapsePressure = 0.0;    
     private double? yieldStress = 0.0;
     private double? recMakeUpTorque = 0.0;
+    private bool IsBop => SurfaceSectionsInstance?.Type == SurfaceSectionType.BOP;
+    private string LengthLabel => IsBop ? "Height" : "Length";
+    private string OuterDiameterLabel => IsBop ? "Max OD" : "Body OD";
+    private string InnerDiameterLabel => IsBop ? "Min ID" : "Body ID";
 
     // UPDATE VARIABLES FUNCTION WITH UNIT SYSTEM
     

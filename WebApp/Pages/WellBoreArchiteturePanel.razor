@@ -1,0 +1,3142 @@
+@inject ILogger<WellBoreArchitectureMain> logger
+@inject ISnackbar Snackbar
+@inject IJSRuntime JSRuntime
+
+@if (WellBoreArchitecture != null)
+{
+    <MudText Typo="Typo.h6"><b>@PanelTitle</b></MudText>
+    <MudToolBar Class="px-0">
+        <MudButton Variant="@(EditorMode == ArchitectureEditorMode.Simplified ? Variant.Filled : Variant.Outlined)"
+                   Color="Color.Primary"
+                   OnClick="@(() => SetEditorMode(ArchitectureEditorMode.Simplified))">
+            Simplified
+        </MudButton>
+        <MudButton Class="ml-2"
+                   Variant="@(EditorMode == ArchitectureEditorMode.Detailed ? Variant.Filled : Variant.Outlined)"
+                   Color="Color.Primary"
+                   OnClick="@(() => SetEditorMode(ArchitectureEditorMode.Detailed))">
+            Detailed
+        </MudButton>
+        <MudSpacer />
+        <MudButton IconColor="@Color.Primary" StartIcon="@Icons.Material.Filled.Save" Size="@Size.Medium" OnClick="@SaveWellBoreArchitecture">@PrimaryActionText</MudButton>
+        <MudButton IconColor="@Color.Primary" StartIcon="@CancelIcon" Size="@Size.Medium" OnClick="@CloseWellBoreArchitecture">@SecondaryActionText</MudButton>
+    </MudToolBar>
+
+    <MudGrid Class="mt-2">
+    @if (EditorMode == ArchitectureEditorMode.Detailed)
+    {
+        <MudItem xs="12" md="8">
+        @if (IsEditMode)
+        {
+            <MudPaper Class="py-2 px-4 mb-4">
+                <MudGrid Class="my-2">
+                    <InputHeader xs="3" Text="Creation date" />
+                    <InputHeader xs="3" Text="Last modification date" />
+                </MudGrid>
+                <MudGrid Class="my-2">
+                    <MudItem xs="3">
+                        <MudText Typo="Typo.body1">@WellBoreArchitecture.CreationDate</MudText>
+                    </MudItem>
+                    <MudItem xs="3">
+                        <MudText Typo="Typo.body1">@WellBoreArchitecture.LastModificationDate</MudText>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        }
+
+        <MudPaper Class="py-2 px-4">
+            @RenderNamingSection()
+        </MudPaper>
+
+        @if (WellBoreArchitecture.WellHead != null)
+        {
+            <WellHeadEditor Class="py-2 px-4 mt-4" WellHead="@WellBoreArchitecture.WellHead" />
+        }
+        @if (WellBoreArchitecture.FluidsAboveGroundLevel != null)
+        {
+            <FluidPropertiesMain Class="py-2 px-4 mt-4" WellBoreArchitectureFluids="@WellBoreArchitecture.FluidsAboveGroundLevel" />
+        }
+        @if (WellBoreArchitecture.SurfaceSections != null)
+        {
+            <SurfaceSectionMain Class="py-2 px-4 mt-4" SurfaceSections="@WellBoreArchitecture.SurfaceSections" />
+        }
+        @if (WellBoreArchitecture.CasingSections != null)
+        {
+            <CasingSectionMain Class="py-2 px-4 mt-4" CasingSections="@WellBoreArchitecture.CasingSections" />
+        }
+        </MudItem>
+    }
+    else
+    {
+            <MudItem xs="12" md="8">
+                <MudPaper Class="py-2 px-4 mb-4">
+                    @RenderNamingSection()
+                </MudPaper>
+
+                @if (WellBoreArchitecture.WellHead != null)
+                {
+                    <WellHeadEditor Class="py-2 px-4 mb-4" WellHead="@WellBoreArchitecture.WellHead" />
+                }
+
+                <MudPaper Class="py-2 px-4 mb-4">
+                    <MudText Typo="Typo.h6">Fluid properties above @MudLineLabel.ToLowerInvariant()</MudText>
+                    <MudDivider Class="mb-2" />
+                    @if (CurrentSurfaceConfiguration == SurfaceConfiguration.Onshore)
+                    {
+                        <MudGrid Class="my-2">
+                            <InputHeader xs="4" Text="Fluid" />
+                            <InputHeader xs="4" Text="Ground depth" />
+                        </MudGrid>
+                        <MudGrid Class="my-2">
+                            <MudItem xs="4">
+                                <MudText Typo="Typo.body2">Air</MudText>
+                            </MudItem>
+                            <MudItem xs="4">
+                                <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                           QuantityName="DepthDrilling"
+                                                           SIValueNullable="@GetGroundOrMudLineDepth()"
+                                                           SIValueNullableChanged="@OnGroundOrMudLineDepthChanged" />
+                            </MudItem>
+                        </MudGrid>
+                    }
+                    else
+                    {
+                        @if (CurrentSurfaceConfiguration == SurfaceConfiguration.OffshoreFixed)
+                        {
+                            <MudGrid Class="my-1">
+                                <MudItem xs="12">
+                                    <MudCheckBox T="bool"
+                                                 Value="@_includeWaterAboveMudLine"
+                                                 ValueChanged="@OnWaterAboveMudLineChanged"
+                                                 Label="Include water above mud line"
+                                                 Color="Color.Primary" />
+                                </MudItem>
+                            </MudGrid>
+                        }
+
+                        <MudGrid Class="my-2">
+                            <InputHeader xs="4" Text="Mud line level" />
+                            @if (ShouldShowWaterAboveMudLine)
+                            {
+                                <InputHeader xs="4" Text="Top of water depth" />
+                            }
+                        </MudGrid>
+                        <MudGrid Class="my-2">
+                            <MudItem xs="4">
+                                <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                           QuantityName="DepthDrilling"
+                                                           SIValueNullable="@GetGroundOrMudLineDepth()"
+                                                           SIValueNullableChanged="@OnGroundOrMudLineDepthChanged" />
+                            </MudItem>
+                            @if (ShouldShowWaterAboveMudLine)
+                            {
+                                <MudItem xs="4">
+                                    <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                               QuantityName="DepthDrilling"
+                                                               SIValueNullable="@GetTopWaterDepth()"
+                                                               SIValueNullableChanged="@OnTopWaterDepthChanged" />
+                                </MudItem>
+                            }
+                        </MudGrid>
+                    }
+                </MudPaper>
+
+                <MudPaper Class="py-2 px-4 mb-4">
+                    <MudText Typo="Typo.h6">Surface architecture</MudText>
+                    <MudText Typo="Typo.caption" Class="d-block mb-2">@SurfaceConfigurationDescription</MudText>
+                    @if (IsFloatingRig)
+                    {
+                        <MudGrid Class="my-1">
+                            <MudItem xs="12">
+                                <MudCheckBox T="bool"
+                                             Value="@_includeMarineRiser"
+                                             ValueChanged="@OnMarineRiserToggleChanged"
+                                             Label="Include marine riser"
+                                             Color="Color.Primary" />
+                            </MudItem>
+                        </MudGrid>
+                        @if (!_includeMarineRiser)
+                        {
+                            <MudGrid Class="my-1">
+                                <MudItem xs="12">
+                                    <MudCheckBox T="bool"
+                                                 Value="@_includeBop"
+                                                 ValueChanged="@OnBopToggleChanged"
+                                                 Label="Include BOP"
+                                                 Color="Color.Primary" />
+                                </MudItem>
+                            </MudGrid>
+                        }
+                    }
+                    <MudDivider Class="mb-2" />
+                    <MudGrid Class="my-2">
+                        <InputHeader xs="3" Text="Element" />
+                        <InputHeader xs="3" Text="OD" />
+                        <InputHeader xs="3" Text="ID" />
+                        <InputHeader xs="3" Text="Length" />
+                    </MudGrid>
+                    @for (var i = 0; i < SurfaceSectionDescriptors.Count; i++)
+                    {
+                        var index = i;
+                        var descriptor = SurfaceSectionDescriptors[i];
+                        var section = GetSurfaceSectionAt(i);
+                        var isBopRow = descriptor.Type == SurfaceSectionType.BOP;
+                        @if (isBopRow)
+                        {
+                            <MudGrid Class="my-1">
+                                <MudItem xs="3" />
+                                <MudItem xs="3">
+                                    <MudText Typo="Typo.caption"><b>Max OD</b></MudText>
+                                </MudItem>
+                                <MudItem xs="3">
+                                    <MudText Typo="Typo.caption"><b>Min ID</b></MudText>
+                                </MudItem>
+                                <MudItem xs="3">
+                                    <MudText Typo="Typo.caption"><b>Height</b></MudText>
+                                </MudItem>
+                            </MudGrid>
+                        }
+                        <MudGrid Class="my-2">
+                            <MudItem xs="3">
+                                <MudText Typo="Typo.body2">@descriptor.Label</MudText>
+                            </MudItem>
+                            <MudItem xs="3">
+                                <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                           QuantityName="DiameterPipeDrilling"
+                                                           SIValueNullable="@GetGaussianValue(section.BodyOD)"
+                                                           SIValueNullableChanged="value => UpdateSurfaceSectionOd(index, value)" />
+                            </MudItem>
+                            <MudItem xs="3">
+                                <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                           QuantityName="DiameterPipeDrilling"
+                                                           SIValueNullable="@GetGaussianValue(section.BodyID)"
+                                                           SIValueNullableChanged="value => UpdateSurfaceSectionId(index, value)" />
+                            </MudItem>
+                            <MudItem xs="3">
+                                <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                           QuantityName="DepthDrilling"
+                                                           SIValueNullable="@GetGaussianValue(section.SectionLength)"
+                                                           SIValueNullableChanged="value => UpdateSurfaceSectionLength(index, value)" />
+                            </MudItem>
+                        </MudGrid>
+                        @if (descriptor.Type == SurfaceSectionType.LowPressureRiser || descriptor.Type == SurfaceSectionType.MarineRiser)
+                        {
+                            <MudGrid Class="my-1">
+                                <MudItem xs="12">
+                                    <MudCheckBox T="bool"
+                                                 Value="@_includeBop"
+                                                 ValueChanged="@OnBopToggleChanged"
+                                                 Label="Include BOP"
+                                                 Color="Color.Primary" />
+                                </MudItem>
+                            </MudGrid>
+                        }
+                        @if (ShouldRenderFloatingConnectorSectionAfter(descriptor.Type))
+                        {
+                            <MudGrid Class="my-2">
+                                <InputHeader xs="4" Text="Choke line depth" />
+                                <InputHeader xs="4" Text="Kill line depth" />
+                                @if (ShouldShowBoosterLineDepth())
+                                {
+                                    <InputHeader xs="4" Text="Booster line depth" />
+                                }
+                            </MudGrid>
+                            <MudGrid Class="my-2">
+                                @if (_includeBop)
+                                {
+                                    <MudItem xs="4">
+                                        <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                                   QuantityName="DepthDrilling"
+                                                                   SIValueNullable="@GetChokeLineDepth()"
+                                                                   SIValueNullableChanged="@OnChokeLineDepthChanged" />
+                                    </MudItem>
+                                    <MudItem xs="4">
+                                        <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                                   QuantityName="DepthDrilling"
+                                                                   SIValueNullable="@GetKillLineDepth()"
+                                                                   SIValueNullableChanged="@OnKillLineDepthChanged" />
+                                    </MudItem>
+                                }
+                                else
+                                {
+                                    <MudItem xs="4" />
+                                    <MudItem xs="4" />
+                                }
+                                @if (ShouldShowBoosterLineDepth())
+                                {
+                                    <MudItem xs="4">
+                                        <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                                   QuantityName="DepthDrilling"
+                                                                   SIValueNullable="@GetBoosterLineDepth()"
+                                                                   SIValueNullableChanged="@OnBoosterLineDepthChanged" />
+                                    </MudItem>
+                                }
+                            </MudGrid>
+                            @if (CanHostLiftPump())
+                            {
+                                <MudGrid Class="my-1">
+                                    <MudItem xs="12">
+                                        <MudCheckBox T="bool"
+                                                     Value="@_includeLiftPump"
+                                                     ValueChanged="@OnLiftPumpToggleChanged"
+                                                     Label="Include lift pump"
+                                                     Color="Color.Primary" />
+                                    </MudItem>
+                                </MudGrid>
+                                @if (_includeLiftPump)
+                                {
+                                    <MudGrid Class="my-2">
+                                        <InputHeader xs="4" Text="Lift pump depth" />
+                                    </MudGrid>
+                                    <MudGrid Class="my-2">
+                                        <MudItem xs="4">
+                                            <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                                       QuantityName="DepthDrilling"
+                                                                       SIValueNullable="@GetLiftPumpDepth()"
+                                                                       SIValueNullableChanged="@OnLiftPumpDepthChanged" />
+                                        </MudItem>
+                                    </MudGrid>
+                                }
+                            }
+                        }
+                    }
+                </MudPaper>
+
+                <MudPaper Class="py-2 px-4 mb-4">
+                    <MudToolBar Class="px-0">
+                        <MudText Typo="Typo.h6">Downhole architecture</MudText>
+                        <MudSpacer />
+                        <MudButton StartIcon="@Icons.Material.Filled.Add" Size="@Size.Small" OnClick="@AddCasingSection">Add row</MudButton>
+                    </MudToolBar>
+                    <MudDivider Class="mb-2" />
+                    <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:0.75rem;align-items:center;" class="my-2">
+                        <MudText Typo="Typo.caption"><b>Suspension depth</b></MudText>
+                        <MudText Typo="Typo.caption"><b>Final depth</b></MudText>
+                        <MudText Typo="Typo.caption"><b>OD</b></MudText>
+                        <MudText Typo="Typo.caption"><b>ID</b></MudText>
+                        <MudText Typo="Typo.caption"><b>Borehole OD</b></MudText>
+                        <MudText Typo="Typo.caption"><b>Cement</b></MudText>
+                        <MudText Typo="Typo.caption"><b>Actions</b></MudText>
+                    </div>
+                    @for (var i = 0; i < SimplifiedCasingRows.Count; i++)
+                    {
+                        var index = i;
+                        var row = SimplifiedCasingRows[i];
+                        <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:0.75rem;align-items:center;" class="my-2">
+                            <div>
+                                <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                           QuantityName="DepthDrilling"
+                                                           SIValueNullable="@row.SuspensionDepth"
+                                                           SIValueNullableChanged="value => UpdateCasingSuspensionDepth(index, value)" />
+                            </div>
+                            <div>
+                                <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                           QuantityName="DepthDrilling"
+                                                           SIValueNullable="@row.FinalDepth"
+                                                           SIValueNullableChanged="value => UpdateCasingFinalDepth(index, value)" />
+                            </div>
+                            <div>
+                                <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                           QuantityName="DiameterPipeDrilling"
+                                                           SIValueNullable="@row.OD"
+                                                           SIValueNullableChanged="value => UpdateCasingOd(index, value)" />
+                            </div>
+                            <div>
+                                <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                           QuantityName="DiameterPipeDrilling"
+                                                           SIValueNullable="@row.ID"
+                                                           SIValueNullableChanged="value => UpdateCasingId(index, value)" />
+                            </div>
+                            <div>
+                                <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                           QuantityName="DiameterPipeDrilling"
+                                                           SIValueNullable="@row.BoreholeOD"
+                                                           SIValueNullableChanged="value => UpdateCasingBoreholeOd(index, value)" />
+                            </div>
+                            <div>
+                                <MudCheckBox T="bool"
+                                             Value="@row.HasCement"
+                                             ValueChanged="value => UpdateCasingCement(index, value)"
+                                             Color="Color.Primary" />
+                            </div>
+                            <div>
+                                <MudIconButton Icon="@Icons.Material.Filled.ArrowUpward" Disabled="@(index == 0)" OnClick="@(() => MoveCasingSection(index, -1))" />
+                                <MudIconButton Icon="@Icons.Material.Filled.ArrowDownward" Disabled="@(index == SimplifiedCasingRows.Count - 1)" OnClick="@(() => MoveCasingSection(index, 1))" />
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Disabled="@(SimplifiedCasingRows.Count == 1)" OnClick="@(() => RemoveCasingSection(index))" />
+                            </div>
+                        </div>
+                    }
+                </MudPaper>
+
+                <MudPaper Class="py-2 px-4 mb-4">
+                    <MudToolBar Class="px-0">
+                        <MudText Typo="Typo.h6">Open hole section</MudText>
+                        <MudSpacer />
+                        <MudButton StartIcon="@Icons.Material.Filled.Add" Size="@Size.Small" OnClick="@AddOpenHoleRow">Add row</MudButton>
+                    </MudToolBar>
+                    <MudDivider Class="mb-2" />
+                    <MudGrid Class="my-2">
+                        <InputHeader xs="4" Text="OD" />
+                        <InputHeader xs="4" Text="Length" />
+                        <InputHeader xs="4" Text="Actions" />
+                    </MudGrid>
+                    @for (var i = 0; i < OpenHoleRows.Count; i++)
+                    {
+                        var index = i;
+                        var row = OpenHoleRows[i];
+                        <MudGrid Class="my-2">
+                            <MudItem xs="4">
+                                <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                           QuantityName="DiameterPipeDrilling"
+                                                           SIValueNullable="@GetGaussianValue(row.HoleSize)"
+                                                           SIValueNullableChanged="value => UpdateOpenHoleOd(index, value)" />
+                            </MudItem>
+                            <MudItem xs="4">
+                                <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                           QuantityName="DepthDrilling"
+                                                           SIValueNullable="@GetGaussianValue(row.Length)"
+                                                           SIValueNullableChanged="value => UpdateOpenHoleLength(index, value)" />
+                            </MudItem>
+                            <MudItem xs="4">
+                                <MudIconButton Icon="@Icons.Material.Filled.ArrowUpward" Disabled="@(index == 0)" OnClick="@(() => MoveOpenHoleRow(index, -1))" />
+                                <MudIconButton Icon="@Icons.Material.Filled.ArrowDownward" Disabled="@(index == OpenHoleRows.Count - 1)" OnClick="@(() => MoveOpenHoleRow(index, 1))" />
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Disabled="@(OpenHoleRows.Count == 1)" OnClick="@(() => RemoveOpenHoleRow(index))" />
+                            </MudItem>
+                        </MudGrid>
+                    }
+                </MudPaper>
+            </MudItem>
+    }
+
+            <MudItem xs="12" md="4">
+                <MudPaper Class="py-2 px-4 mb-4" Style="position:sticky;top:1rem;">
+                    <MudText Typo="Typo.h6">Schematic</MudText>
+                    <MudText Typo="Typo.caption" Class="d-block mb-2">Not to scale. Relative diameters and lengths are preserved within each zone.</MudText>
+                    <MudDivider Class="mb-2" />
+                    <svg viewBox="0 0 320 900" style="width:100%;height:auto;background:#f5f5f5;border:1px solid #ddd;border-radius:8px;">
+                        <defs>
+                            <pattern id="rock-hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
+                                <line x1="0" y1="0" x2="0" y2="8" stroke="#8c7554" stroke-width="2" />
+                            </pattern>
+                            <pattern id="water-waves" width="24" height="12" patternUnits="userSpaceOnUse">
+                                <path d="M0 8 C4 2, 8 2, 12 8 S20 14, 24 8" fill="none" stroke="#4f9ea8" stroke-width="1.4" />
+                            </pattern>
+                        </defs>
+                        <rect x="0" y="0" width="320" height="900" fill="#dbeefe" />
+                        @if (ShouldShowWaterAboveMudLine)
+                        {
+                            <rect x="0" y="112" width="320" height="113" fill="#8fc7c3" />
+                            <rect x="0" y="112" width="320" height="113" fill="url(#water-waves)" opacity="0.45" />
+                            <line x1="0" y1="112" x2="320" y2="112" stroke="#1f7ea0" stroke-width="2.5" />
+                        }
+                        <rect x="0" y="225" width="320" height="675" fill="#c6aa7d" />
+                        <rect x="0" y="225" width="320" height="675" fill="url(#rock-hatch)" opacity="0.55" />
+
+                        <line x1="120" y1="@Svg(DrillFloorY)" x2="200" y2="@Svg(DrillFloorY)" stroke="#111" stroke-width="8" stroke-linecap="round" />
+                        <line x1="92" y1="@Svg(DrillFloorY)" x2="120" y2="@Svg(DrillFloorY)" stroke="#111" stroke-width="1.5" stroke-dasharray="5 4" />
+
+                        <line x1="133.33" y1="@Svg(DrillFloorY)" x2="146.66" y2="@Svg(DerrickTopY)" stroke="#666" stroke-width="2.2" />
+                        <line x1="186.67" y1="@Svg(DrillFloorY)" x2="173.34" y2="@Svg(DerrickTopY)" stroke="#666" stroke-width="2.2" />
+                        <line x1="133.33" y1="@Svg(DrillFloorY)" x2="186.67" y2="@Svg(DrillFloorY)" stroke="#666" stroke-width="2.2" />
+                        <line x1="138.33" y1="@Svg(DerrickFirstFloorY)" x2="181.67" y2="@Svg(DerrickFirstFloorY)" stroke="#666" stroke-width="1.8" />
+                        <line x1="141.67" y1="@Svg(DerrickSecondFloorY)" x2="178.33" y2="@Svg(DerrickSecondFloorY)" stroke="#666" stroke-width="1.8" />
+                        <line x1="145" y1="@Svg(DerrickThirdFloorY)" x2="175" y2="@Svg(DerrickThirdFloorY)" stroke="#666" stroke-width="1.8" />
+                        <line x1="146.66" y1="@Svg(DerrickTopY)" x2="173.34" y2="@Svg(DerrickTopY)" stroke="#666" stroke-width="1.8" />
+                        <line x1="133.33" y1="@Svg(DrillFloorY)" x2="181.67" y2="@Svg(DerrickFirstFloorY)" stroke="#7a7a7a" stroke-width="1.7" />
+                        <line x1="186.67" y1="@Svg(DrillFloorY)" x2="138.33" y2="@Svg(DerrickFirstFloorY)" stroke="#7a7a7a" stroke-width="1.7" />
+                        <line x1="138.33" y1="@Svg(DerrickFirstFloorY)" x2="178.33" y2="@Svg(DerrickSecondFloorY)" stroke="#7a7a7a" stroke-width="1.7" />
+                        <line x1="181.67" y1="@Svg(DerrickFirstFloorY)" x2="141.67" y2="@Svg(DerrickSecondFloorY)" stroke="#7a7a7a" stroke-width="1.7" />
+                        <line x1="141.67" y1="@Svg(DerrickSecondFloorY)" x2="175" y2="@Svg(DerrickThirdFloorY)" stroke="#7a7a7a" stroke-width="1.7" />
+                        <line x1="178.33" y1="@Svg(DerrickSecondFloorY)" x2="145" y2="@Svg(DerrickThirdFloorY)" stroke="#7a7a7a" stroke-width="1.7" />
+                        <line x1="145" y1="@Svg(DerrickThirdFloorY)" x2="173.34" y2="@Svg(DerrickTopY)" stroke="#7a7a7a" stroke-width="1.7" />
+                        <line x1="175" y1="@Svg(DerrickThirdFloorY)" x2="146.66" y2="@Svg(DerrickTopY)" stroke="#7a7a7a" stroke-width="1.7" />
+
+                        <line x1="160" y1="42" x2="160" y2="860" stroke="#222" stroke-width="2" stroke-dasharray="3 5" />
+                        <line x1="@Svg(WellHeadLeftOuterX)" y1="@Svg(WellHeadTopY)" x2="@Svg(WellHeadLeftInnerX)" y2="@Svg(WellHeadTopY)" stroke="#1e5bb8" stroke-width="@Svg(WellHeadSymbolStrokeWidth)" stroke-linecap="square" />
+                        <line x1="@Svg(WellHeadLeftInnerX)" y1="@Svg(WellHeadTopY)" x2="@Svg(WellHeadLeftInnerX)" y2="@Svg(WellHeadBottomY)" stroke="#1e5bb8" stroke-width="@Svg(WellHeadSymbolStrokeWidth)" stroke-linecap="square" />
+                        <line x1="@Svg(WellHeadRightInnerX)" y1="@Svg(WellHeadTopY)" x2="@Svg(WellHeadRightOuterX)" y2="@Svg(WellHeadTopY)" stroke="#1e5bb8" stroke-width="@Svg(WellHeadSymbolStrokeWidth)" stroke-linecap="square" />
+                        <line x1="@Svg(WellHeadRightInnerX)" y1="@Svg(WellHeadTopY)" x2="@Svg(WellHeadRightInnerX)" y2="@Svg(WellHeadBottomY)" stroke="#1e5bb8" stroke-width="@Svg(WellHeadSymbolStrokeWidth)" stroke-linecap="square" />
+                        @if (ShouldShowWaterAboveMudLine)
+                        {
+                            <line x1="0" y1="112" x2="320" y2="112" stroke="#f7fbff" stroke-width="0.7" stroke-dasharray="6 4" />
+                            <svg:text x="16" y="106" font-size="12" fill="#0f4f7d">Top of water: @TopWaterDepthDisplayText</svg:text>
+                        }
+                        <line x1="0" y1="@MudLineY" x2="320" y2="@MudLineY" stroke="#b08935" stroke-width="3" />
+                        <svg:text x="16" y="@(MudLineY - 7)" font-size="13" fill="#6d4c41">@MudLineLabel: @MudLineDepthDisplayText</svg:text>
+                        <svg:text x="16" y="246" font-size="12" fill="#7a5b36">Formation rock</svg:text>
+
+                        @foreach (var equipment in SchematicEquipment)
+                        {
+                            @if (equipment.IsBop)
+                            {
+                                var connectorHeight = equipment.Height * 0.12;
+                                var annularHeight = equipment.Height * 0.24;
+                                var taperHeight = equipment.Height * 0.12;
+                                var ramHeight = equipment.Height * 0.14;
+                                var gapHeight = equipment.Height * 0.05;
+                                var bodyX = equipment.X + equipment.Width * 0.18;
+                                var bodyWidth = equipment.Width * 0.64;
+                                var ramX = equipment.X;
+                                var ramWidth = equipment.Width;
+                                var neckX = equipment.X + equipment.Width * 0.28;
+                                var neckWidth = equipment.Width * 0.44;
+                                var y0 = equipment.Y;
+                                var y1 = y0 + connectorHeight;
+                                var y2 = y1 + annularHeight;
+                                var y3 = y2 + taperHeight;
+                                var y4 = y3 + ramHeight;
+                                var y5 = y4 + gapHeight;
+                                var y6 = y5 + ramHeight;
+                                var y7 = y6 + gapHeight;
+                                var y8 = y7 + ramHeight;
+                                var y9 = y8 + gapHeight;
+                                <rect x="@Svg(neckX)" y="@Svg(y0)" width="@Svg(neckWidth)" height="@Svg(connectorHeight)" fill="#ef2f2f" stroke="#981b1b" stroke-width="1.2" />
+                                <rect x="@Svg(bodyX)" y="@Svg(y0)" width="@Svg(bodyWidth)" height="@Svg(connectorHeight)" fill="rgba(255,255,255,0.28)" />
+                                <rect x="@Svg(ramX)" y="@Svg(y1)" width="@Svg(ramWidth)" height="@Svg(annularHeight)" fill="#ef2f2f" stroke="#981b1b" stroke-width="1.2" />
+                                <rect x="@Svg(bodyX)" y="@Svg(y1)" width="@Svg(bodyWidth)" height="@Svg(annularHeight)" fill="rgba(255,255,255,0.22)" />
+                                <polygon points="@($"{Svg(equipment.X + equipment.Width * 0.18)},{Svg(y2)} {Svg(equipment.X + equipment.Width * 0.82)},{Svg(y2)} {Svg(equipment.X + equipment.Width * 0.68)},{Svg(y3)} {Svg(equipment.X + equipment.Width * 0.32)},{Svg(y3)}")"
+                                         fill="#ef2f2f" stroke="#981b1b" stroke-width="1.2" />
+                                <rect x="@Svg(ramX)" y="@Svg(y3)" width="@Svg(ramWidth)" height="@Svg(ramHeight)" fill="#ef2f2f" stroke="#981b1b" stroke-width="1.2" />
+                                <rect x="@Svg(ramX)" y="@Svg(y5)" width="@Svg(ramWidth)" height="@Svg(ramHeight)" fill="#ef2f2f" stroke="#981b1b" stroke-width="1.2" />
+                                <rect x="@Svg(ramX)" y="@Svg(y7)" width="@Svg(ramWidth)" height="@Svg(ramHeight)" fill="#ef2f2f" stroke="#981b1b" stroke-width="1.2" />
+                                <rect x="@Svg(bodyX)" y="@Svg(y3)" width="@Svg(bodyWidth)" height="@Svg(ramHeight)" fill="rgba(255,255,255,0.22)" />
+                                <rect x="@Svg(bodyX)" y="@Svg(y5)" width="@Svg(bodyWidth)" height="@Svg(ramHeight)" fill="rgba(255,255,255,0.22)" />
+                                <rect x="@Svg(bodyX)" y="@Svg(y7)" width="@Svg(bodyWidth)" height="@Svg(ramHeight)" fill="rgba(255,255,255,0.22)" />
+                                <rect x="@Svg(neckX)" y="@Svg(y9)" width="@Svg(neckWidth)" height="@Svg(connectorHeight)" fill="#ef2f2f" stroke="#981b1b" stroke-width="1.2" />
+                                <rect x="@Svg(bodyX)" y="@Svg(y9)" width="@Svg(bodyWidth)" height="@Svg(connectorHeight)" fill="rgba(255,255,255,0.28)" />
+                            }
+                            else
+                            {
+                                <rect x="@Svg(equipment.X)" y="@Svg(equipment.Y)" width="@Svg(equipment.Width)" height="@Svg(equipment.Height)" rx="3" fill="@equipment.Fill" stroke="@equipment.Stroke" stroke-width="1.5" />
+                            }
+                            <svg:text x="@Svg(equipment.X + equipment.Width + 8)" y="@Svg(equipment.Y + equipment.Height - 2)" font-size="11" fill="#222">@equipment.Label</svg:text>
+                        }
+
+                        @for (var boreHoleIndex = 0; boreHoleIndex < SchematicBoreHoleSegments.Count; boreHoleIndex++)
+                        {
+                            var boreHoleSegment = SchematicBoreHoleSegments[boreHoleIndex];
+                            var leftPoints = BuildJaggedOpenHolePointList(boreHoleSegment.CenterX - boreHoleSegment.Width / 2.0, boreHoleSegment.TopY, boreHoleSegment.BottomY, true);
+                            var rightPoints = BuildJaggedOpenHolePointList(boreHoleSegment.CenterX + boreHoleSegment.Width / 2.0, boreHoleSegment.TopY, boreHoleSegment.BottomY, false);
+                            var leftPointString = string.Join(" ", leftPoints.Select(point => $"{Svg(point.X)},{Svg(point.Y)}"));
+                            var rightPointString = string.Join(" ", rightPoints.Select(point => $"{Svg(point.X)},{Svg(point.Y)}"));
+                            var boreHolePolygonPoints = string.Join(" ", leftPoints.Concat(rightPoints.AsEnumerable().Reverse()).Select(point => $"{Svg(point.X)},{Svg(point.Y)}"));
+                            var clipId = $"borehole-clip-{boreHoleIndex}";
+                            var leftAnnotationX = boreHoleSegment.CenterX - boreHoleSegment.Width / 2.0 - 8;
+                            <defs>
+                                <clipPath id="@clipId">
+                                    <polygon points="@boreHolePolygonPoints" />
+                                </clipPath>
+                            </defs>
+                            <polygon points="@boreHolePolygonPoints" fill="#e4e4e4" stroke="none" opacity="0.95" />
+                            @if (boreHoleSegment.CementTopY.HasValue)
+                            {
+                                <rect x="@Svg(boreHoleSegment.CenterX - boreHoleSegment.Width / 2.0)"
+                                      y="@Svg(boreHoleSegment.CementTopY.Value)"
+                                      width="@Svg(boreHoleSegment.Width)"
+                                      height="@Svg(Math.Max(0.0, boreHoleSegment.BottomY - boreHoleSegment.CementTopY.Value))"
+                                      fill="#b0b0b0"
+                                      clip-path="@($"url(#{clipId})")"
+                                      opacity="0.9" />
+                                <svg:text x="@Svg(leftAnnotationX)"
+                                          y="@Svg(Math.Max(boreHoleSegment.TopY + 12.0, boreHoleSegment.CementTopY.Value + 2.0))"
+                                          font-size="10"
+                                          text-anchor="end"
+                                          fill="#444">@boreHoleSegment.TocDepthAnnotation</svg:text>
+                            }
+                            <polyline points="@leftPointString" fill="none" stroke="#8c8c8c" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="square" />
+                            <polyline points="@rightPointString" fill="none" stroke="#8c8c8c" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="square" />
+                            <line x1="@Svg(boreHoleSegment.CenterX - boreHoleSegment.Width / 2.0)" y1="@Svg(boreHoleSegment.TopY)" x2="@Svg(boreHoleSegment.CenterX + boreHoleSegment.Width / 2.0)" y2="@Svg(boreHoleSegment.TopY)" stroke="#a0a0a0" stroke-width="1.1" />
+                            <line x1="@Svg(boreHoleSegment.CenterX - boreHoleSegment.Width / 2.0)" y1="@Svg(boreHoleSegment.BottomY)" x2="@Svg(boreHoleSegment.CenterX + boreHoleSegment.Width / 2.0)" y2="@Svg(boreHoleSegment.BottomY)" stroke="#a0a0a0" stroke-width="1.1" />
+                            <svg:text x="@Svg(leftAnnotationX)"
+                                      y="@Svg(boreHoleSegment.BottomY - 14)"
+                                      font-size="10"
+                                      text-anchor="end"
+                                      fill="#444">
+                                <tspan x="@Svg(leftAnnotationX)" dy="0">@boreHoleSegment.DepthAnnotation</tspan>
+                                <tspan x="@Svg(leftAnnotationX)" dy="11">@boreHoleSegment.DiameterAnnotation</tspan>
+                            </svg:text>
+                        }
+
+                        @foreach (var casingString in SchematicCasingStrings)
+                        {
+                            var firstSegment = casingString.Segments.FirstOrDefault();
+                            var lastSegment = casingString.Segments.LastOrDefault();
+                            if (firstSegment == null || lastSegment == null)
+                            {
+                                continue;
+                            }
+
+                            for (var i = 0; i < casingString.Segments.Count; i++)
+                            {
+                                var segment = casingString.Segments[i];
+                                var wallThickness = Math.Max(3.0, Math.Min(6.0, (segment.OuterWidth - segment.InnerWidth) / 2.0));
+                                var leftWallX = segment.X;
+                                var rightWallX = segment.X + segment.OuterWidth - wallThickness;
+                                var innerX = segment.X + wallThickness;
+                                var innerWidth = Math.Max(2.0, segment.OuterWidth - wallThickness * 2.0);
+                                var segmentHeight = Math.Max(8.0, segment.BottomY - segment.TopY);
+
+                                <rect x="@Svg(innerX)"
+                                      y="@Svg(segment.TopY)"
+                                      width="@Svg(innerWidth)"
+                                      height="@Svg(segmentHeight)"
+                                      fill="#fbfbfb" />
+                                <rect x="@Svg(leftWallX)"
+                                      y="@Svg(segment.TopY)"
+                                      width="@Svg(wallThickness)"
+                                      height="@Svg(segmentHeight)"
+                                      fill="#111" />
+                                <rect x="@Svg(rightWallX)"
+                                      y="@Svg(segment.TopY)"
+                                      width="@Svg(wallThickness)"
+                                      height="@Svg(segmentHeight)"
+                                      fill="#111" />
+
+                                @if (i > 0)
+                                {
+                                    var previousSegment = casingString.Segments[i - 1];
+                                    var previousWallThickness = Math.Max(3.0, Math.Min(6.0, (previousSegment.OuterWidth - previousSegment.InnerWidth) / 2.0));
+                                    var previousRightWallX = previousSegment.X + previousSegment.OuterWidth - previousWallThickness;
+                                    var previousInnerX = previousSegment.X + previousWallThickness;
+                                    var previousInnerWidth = Math.Max(2.0, previousSegment.OuterWidth - previousWallThickness * 2.0);
+                                    var previousInnerRightX = previousInnerX + previousInnerWidth;
+                                    var currentInnerRightX = innerX + innerWidth;
+                                    var bridgeY = segment.TopY - wallThickness / 2.0;
+                                    var leftBridgeX = Math.Min(previousSegment.X, segment.X);
+                                    var leftBridgeWidth = Math.Abs(segment.X - previousSegment.X) + wallThickness;
+                                    var rightBridgeX = Math.Min(previousRightWallX, rightWallX);
+                                    var rightBridgeWidth = Math.Abs(rightWallX - previousRightWallX) + wallThickness;
+                                    var innerBridgeHeight = Math.Max(1.4, Math.Min(previousWallThickness, wallThickness));
+
+                                    <rect x="@Svg(leftBridgeX)"
+                                          y="@Svg(bridgeY)"
+                                          width="@Svg(leftBridgeWidth)"
+                                          height="@Svg(wallThickness)"
+                                          fill="#111" />
+                                    <rect x="@Svg(rightBridgeX)"
+                                          y="@Svg(bridgeY)"
+                                          width="@Svg(rightBridgeWidth)"
+                                          height="@Svg(wallThickness)"
+                                          fill="#111" />
+
+                                    @if (Math.Abs(previousInnerX - innerX) > 0.01)
+                                    {
+                                        <rect x="@Svg(Math.Min(previousInnerX, innerX))"
+                                              y="@Svg(segment.TopY - innerBridgeHeight / 2.0)"
+                                              width="@Svg(Math.Abs(innerX - previousInnerX))"
+                                              height="@Svg(innerBridgeHeight)"
+                                              fill="#111" />
+                                    }
+
+                                    @if (Math.Abs(previousInnerRightX - currentInnerRightX) > 0.01)
+                                    {
+                                        <rect x="@Svg(Math.Min(previousInnerRightX, currentInnerRightX))"
+                                              y="@Svg(segment.TopY - innerBridgeHeight / 2.0)"
+                                              width="@Svg(Math.Abs(currentInnerRightX - previousInnerRightX))"
+                                              height="@Svg(innerBridgeHeight)"
+                                              fill="#111" />
+                                    }
+                                }
+                            }
+
+                            var firstWallThickness = Math.Max(3.0, Math.Min(6.0, (firstSegment.OuterWidth - firstSegment.InnerWidth) / 2.0));
+                            var lastWallThickness = Math.Max(3.0, Math.Min(6.0, (lastSegment.OuterWidth - lastSegment.InnerWidth) / 2.0));
+                            var shoeHeight = GetCasingShoeHeight(lastWallThickness);
+                            var shoeWidth = GetCasingMarkerWidth(lastSegment.OuterWidth);
+                            var hangerHeight = GetCasingMarkerHeight(firstWallThickness);
+                            <rect x="@Svg(firstSegment.X - shoeWidth)"
+                                  y="@Svg(firstSegment.TopY)"
+                                  width="@Svg(shoeWidth)"
+                                  height="@Svg(hangerHeight)"
+                                  fill="#111" />
+                            <rect x="@Svg(firstSegment.X + firstSegment.OuterWidth)"
+                                  y="@Svg(firstSegment.TopY)"
+                                  width="@Svg(shoeWidth)"
+                                  height="@Svg(hangerHeight)"
+                                  fill="#111" />
+
+                            <polygon points="@($"{Svg(lastSegment.X - shoeWidth)},{Svg(lastSegment.BottomY)} {Svg(lastSegment.X)},{Svg(lastSegment.BottomY - shoeHeight)} {Svg(lastSegment.X)},{Svg(lastSegment.BottomY)}")"
+                                     fill="#111" />
+                            <polygon points="@($"{Svg(lastSegment.X + lastSegment.OuterWidth)},{Svg(lastSegment.BottomY - shoeHeight)} {Svg(lastSegment.X + lastSegment.OuterWidth + shoeWidth)},{Svg(lastSegment.BottomY)} {Svg(lastSegment.X + lastSegment.OuterWidth)},{Svg(lastSegment.BottomY)}")"
+                                     fill="#111" />
+
+                            @foreach (var segment in casingString.Segments)
+                            {
+                                <svg:text x="@Svg(segment.X + segment.OuterWidth + shoeWidth + 8)"
+                                          y="@Svg(segment.BottomY - 14)"
+                                          font-size="10"
+                                          fill="#444">
+                                    <tspan x="@Svg(segment.X + segment.OuterWidth + shoeWidth + 8)" dy="0">@segment.DepthAnnotation</tspan>
+                                    <tspan x="@Svg(segment.X + segment.OuterWidth + shoeWidth + 8)" dy="11">@segment.DiameterAnnotation</tspan>
+                                </svg:text>
+                            }
+                        }
+
+                        @foreach (var openHoleSegment in SchematicOpenHoleSegments)
+                        {
+                            var leftPoints = BuildJaggedOpenHolePointList(openHoleSegment.CenterX - openHoleSegment.Width / 2.0, openHoleSegment.TopY, openHoleSegment.BottomY, true);
+                            var rightPoints = BuildJaggedOpenHolePointList(openHoleSegment.CenterX + openHoleSegment.Width / 2.0, openHoleSegment.TopY, openHoleSegment.BottomY, false);
+                            var leftPointString = string.Join(" ", leftPoints.Select(point => $"{Svg(point.X)},{Svg(point.Y)}"));
+                            var rightPointString = string.Join(" ", rightPoints.Select(point => $"{Svg(point.X)},{Svg(point.Y)}"));
+                            var openHolePolygonPoints = string.Join(" ", leftPoints.Concat(rightPoints.AsEnumerable().Reverse()).Select(point => $"{Svg(point.X)},{Svg(point.Y)}"));
+                            <polygon points="@openHolePolygonPoints" fill="#fbfbfb" stroke="none" />
+                            <polyline points="@leftPointString" fill="none" stroke="#2f2f2f" stroke-width="1.8" stroke-linejoin="miter" stroke-linecap="square" />
+                            <polyline points="@rightPointString" fill="none" stroke="#2f2f2f" stroke-width="1.8" stroke-linejoin="miter" stroke-linecap="square" />
+                            <line x1="@Svg(openHoleSegment.CenterX - openHoleSegment.Width / 2.0)" y1="@Svg(openHoleSegment.TopY)" x2="@Svg(openHoleSegment.CenterX + openHoleSegment.Width / 2.0)" y2="@Svg(openHoleSegment.TopY)" stroke="#2f2f2f" stroke-width="1.5" />
+                            <line x1="@Svg(openHoleSegment.CenterX - openHoleSegment.Width / 2.0)" y1="@Svg(openHoleSegment.BottomY)" x2="@Svg(openHoleSegment.CenterX + openHoleSegment.Width / 2.0)" y2="@Svg(openHoleSegment.BottomY)" stroke="#2f2f2f" stroke-width="1.5" />
+                            <svg:text x="@Svg(openHoleSegment.CenterX + openHoleSegment.Width / 2.0 + 8)"
+                                      y="@Svg(openHoleSegment.BottomY - 14)"
+                                      font-size="10"
+                                      fill="#444">
+                                <tspan x="@Svg(openHoleSegment.CenterX + openHoleSegment.Width / 2.0 + 8)" dy="0">@openHoleSegment.DepthAnnotation</tspan>
+                                <tspan x="@Svg(openHoleSegment.CenterX + openHoleSegment.Width / 2.0 + 8)" dy="11">@openHoleSegment.DiameterAnnotation</tspan>
+                            </svg:text>
+                        }
+
+                        @foreach (var segment in SchematicTubes)
+                        {
+                            <rect x="@Svg(segment.X)" y="@Svg(segment.Y)" width="@Svg(segment.OuterWidth)" height="@Svg(segment.Height)" fill="@segment.Fill" stroke="@segment.Stroke" stroke-width="1.2" />
+                            @if (segment.InnerWidth > 2)
+                            {
+                                <rect x="@Svg(segment.X + (segment.OuterWidth - segment.InnerWidth) / 2.0)"
+                                      y="@Svg(segment.Y)"
+                                      width="@Svg(segment.InnerWidth)"
+                                      height="@Svg(segment.Height)"
+                                      fill="#fbfbfb"
+                                      stroke="#d0d0d0"
+                                      stroke-width="0.6" />
+                            }
+                            @if (segment.ShowShoulder)
+                            {
+                                <rect x="@Svg(segment.X - 4)" y="@Svg(segment.Y)" width="4" height="8" fill="#ffffff" stroke="#c0c0c0" stroke-width="0.8" />
+                                <rect x="@Svg(segment.X + segment.OuterWidth)" y="@Svg(segment.Y)" width="4" height="8" fill="#ffffff" stroke="#c0c0c0" stroke-width="0.8" />
+                            }
+                            <svg:text x="18" y="@Svg(segment.Y + 14)" font-size="11" fill="#222">@segment.Label</svg:text>
+                        }
+                    </svg>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+
+    <MudToolBar>
+        <MudSpacer />
+        <MudButton IconColor="@Color.Primary" StartIcon="@Icons.Material.Filled.Save" Size="@Size.Medium" OnClick="@SaveWellBoreArchitecture">@PrimaryActionText</MudButton>
+        <MudButton IconColor="@Color.Primary" StartIcon="@CancelIcon" Size="@Size.Medium" OnClick="@CloseWellBoreArchitecture">@SecondaryActionText</MudButton>
+    </MudToolBar>
+}
+
+@code {
+    [CascadingParameter]
+    private MudUnitAndReferenceChoiceTag? Parent { get; set; }
+
+    [Parameter]
+    public WellBoreArchitecture? WellBoreArchitecture { get; set; }
+
+    [Parameter]
+    public Dictionary<Guid, Field>? Fields { get; set; }
+
+    [Parameter]
+    public Dictionary<Guid, Cluster>? Clusters { get; set; }
+
+    [Parameter]
+    public Dictionary<Guid, Well>? Wells { get; set; }
+
+    [Parameter]
+    public Dictionary<Guid, RigLight>? Rigs { get; set; }
+
+    [Parameter]
+    public Dictionary<Guid, WellBore>? WellBores { get; set; }
+
+    [Parameter]
+    public Action? OnUpdate { get; set; }
+
+    private ArchitectureEditorMode EditorMode { get; set; } = ArchitectureEditorMode.Simplified;
+
+    private Field? _selectedField;
+    private Cluster? _selectedCluster;
+    private Cluster? _resolvedCluster;
+    private Rig? _resolvedRig;
+    private Well? _selectedWell;
+    private WellBore? _selectedWellBore;
+    private Guid? _initializedArchitectureId;
+    private List<SimplifiedCasingRow> _simplifiedCasingRows = new();
+    private bool _includeBop = true;
+    private bool _includeMarineRiser = true;
+    private bool _includeLiftPump;
+    private bool _includeWaterAboveMudLine = true;
+    private const double CasingGroupingTolerance = 0.01;
+
+    private bool IsEditMode => WellBoreArchitecture?.MetaInfo?.ID != null && WellBoreArchitecture.MetaInfo.ID != Guid.Empty;
+    private string PanelTitle => IsEditMode ? "Wellbore Architecture Editor" : "Wellbore architecture";
+    private string PrimaryActionText => IsEditMode ? "Save" : "Save and Close";
+    private string SecondaryActionText => IsEditMode ? "Cancel" : "Close";
+    private string CancelIcon => IsEditMode ? Icons.Material.Filled.Cancel : Icons.Material.Filled.Close;
+    private SurfaceConfiguration CurrentSurfaceConfiguration => GetSurfaceConfiguration();
+    private bool IsFloatingRig => CurrentSurfaceConfiguration == SurfaceConfiguration.OffshoreFloater;
+    private string SurfaceConfigurationDescription => CurrentSurfaceConfiguration switch
+    {
+        SurfaceConfiguration.Onshore => "Onshore configuration inferred from the selected cluster.",
+        SurfaceConfiguration.OffshoreFixed => "Offshore fixed-platform configuration inferred from the selected cluster.",
+        SurfaceConfiguration.OffshoreFloater => "Offshore floater configuration inferred from the selected cluster.",
+        _ => "Configuration is unknown. Using the onshore surface layout until a cluster/well is selected."
+    };
+    private string MudLineLabel => IsOffshoreConfiguration(CurrentSurfaceConfiguration) ? "Mud line" : "Ground level";
+    private string MudLineDepthDisplayText => FormatDepthForDisplay(GetGroundOrMudLineDepth());
+    private string TopWaterDepthDisplayText => FormatDepthForDisplay(GetTopWaterDepth());
+    private const double MudLineY = 225.0;
+    private const double WellHeadTopY = 228.0;
+    private const double TopsideZoneTopY = 0.0;
+    private const double TopsideZoneHeight = 225.0;
+    private const double DerrickTopClearance = 18.0;
+    private const double SurfaceBottomGap = 0.0;
+    private double DrillFloorY => GetDrillFloorY();
+    private double DerrickTopY => DrillFloorY - GetRigHeightPixels();
+    private double DerrickFirstFloorY => DrillFloorY - GetRigHeightPixels() * 0.276;
+    private double DerrickSecondFloorY => DrillFloorY - GetRigHeightPixels() * 0.552;
+    private double DerrickThirdFloorY => DrillFloorY - GetRigHeightPixels() * 0.828;
+    private double TopsideY => DrillFloorY;
+    private double TopsideHeight => Math.Max(24.0, WellHeadTopY - TopsideY - SurfaceBottomGap);
+    private double WellHeadSymbolStrokeWidth => GetRiserDisplayWidth(Math.Max(1.0, GetMaxDiameter()));
+    private double WellHeadInnerGap => GetOuterMostCasingHangerWidth();
+    private double WellHeadArmLength => Math.Max(18.0, WellHeadSymbolStrokeWidth * 1.55);
+    private double WellHeadLegHeight => Math.Max(14.0, WellHeadSymbolStrokeWidth * 1.8);
+    private double WellHeadLeftInnerX => 160.0 - WellHeadInnerGap / 2.0;
+    private double WellHeadLeftOuterX => WellHeadLeftInnerX - WellHeadArmLength;
+    private double WellHeadRightInnerX => 160.0 + WellHeadInnerGap / 2.0;
+    private double WellHeadRightOuterX => WellHeadRightInnerX + WellHeadArmLength;
+    private double WellHeadBottomY => WellHeadTopY + WellHeadLegHeight;
+
+    private List<SurfaceSectionDescriptor> SurfaceSectionDescriptors => GetSurfaceSectionDescriptors(CurrentSurfaceConfiguration);
+    private List<CasingSection> CasingSectionsList => EnsureCasingSectionsList();
+    private List<SimplifiedCasingRow> SimplifiedCasingRows => EnsureSimplifiedCasingRows();
+    private List<BoreHoleSize> OpenHoleRows => EnsureOpenHoleRows();
+    private List<SchematicCasingString> SchematicCasingStrings => BuildSchematicCasingStrings();
+    private List<SchematicBoreHoleSegment> SchematicBoreHoleSegments => BuildSchematicBoreHoleSegments();
+    private List<SchematicOpenHoleSegment> SchematicOpenHoleSegments => BuildSchematicOpenHoleSegments();
+    private List<SchematicTube> SchematicTubes => BuildSchematicTubes();
+    private List<SchematicEquipmentBlock> SchematicEquipment => BuildSchematicEquipment();
+    private IEqualityComparer<Field> FieldComparer { get; } = new MetaInfoIdComparer<Field>(item => item?.MetaInfo?.ID);
+    private IEqualityComparer<Cluster> ClusterComparer { get; } = new MetaInfoIdComparer<Cluster>(item => item?.MetaInfo?.ID);
+    private IEqualityComparer<Well> WellComparer { get; } = new MetaInfoIdComparer<Well>(item => item?.MetaInfo?.ID);
+    private IEqualityComparer<WellBore> WellBoreComparer { get; } = new MetaInfoIdComparer<WellBore>(item => item?.MetaInfo?.ID);
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await InitializeArchitectureAsync();
+        SyncDepthReferenceSources();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        SyncDepthReferenceSources();
+    }
+
+    private void SetEditorMode(ArchitectureEditorMode mode)
+    {
+        if (mode == ArchitectureEditorMode.Detailed)
+        {
+            ApplySimplifiedRowsToDetailedSections();
+        }
+
+        EditorMode = mode;
+        if (mode == ArchitectureEditorMode.Simplified)
+        {
+            EnsureSurfaceSectionsForCurrentConfiguration();
+            EnsureFluidsForCurrentConfiguration();
+            _simplifiedCasingRows = BuildSimplifiedRowsFromDetailedSections();
+            EnsureSimplifiedCasingRows();
+        }
+    }
+
+    private RenderFragment RenderNamingSection() => @<div>
+        <MudText Typo="Typo.h6">Naming section</MudText>
+        <MudDivider Class="mb-2" />
+        <MudGrid Class="my-2">
+            <InputHeader xs="2" Text="Name" />
+            <InputHeader xs="2" Text="Description" />
+            <InputHeader xs="2" Text="Field" />
+            <InputHeader xs="2" Text="Cluster" />
+            <InputHeader xs="2" Text="Well" />
+            <InputHeader xs="2" Text="Wellbore" />
+        </MudGrid>
+        <MudGrid Class="my-2">
+            <MudItem xs="2">
+                <MudTextField @bind-Value="WellBoreArchitecture!.Name" Variant="Variant.Text"></MudTextField>
+            </MudItem>
+            <MudItem xs="2">
+                <MudTextField @bind-Value="WellBoreArchitecture!.Description" Variant="Variant.Text"></MudTextField>
+            </MudItem>
+            @if (Fields != null)
+            {
+                <MudItem xs="2">
+                    <MudSelect T="Guid?" Value="@(_selectedField?.MetaInfo?.ID)" ValueChanged="@OnSelectedFieldIdChanged" Dense="true">
+                        @foreach (var fieldKPV in Fields)
+                        {
+                            if (fieldKPV.Key != Guid.Empty && fieldKPV.Value != null && !string.IsNullOrEmpty(fieldKPV.Value.Name))
+                            {
+                                <MudSelectItem Value="@((Guid?)fieldKPV.Key)">@fieldKPV.Value.Name</MudSelectItem>
+                            }
+                        }
+                    </MudSelect>
+                </MudItem>
+            }
+            else
+            {
+                <MudItem xs="2" />
+            }
+            @if (Clusters != null && _selectedField != null)
+            {
+                <MudItem xs="2">
+                    <MudSelect T="Guid?" Value="@(_selectedCluster?.MetaInfo?.ID)" ValueChanged="@OnSelectedClusterIdChanged" Dense="true">
+                        @foreach (var clusterKVP in Clusters.Where(x => x.Value != null
+                            && x.Value.FieldID != null
+                            && _selectedField.MetaInfo != null
+                            && _selectedField.MetaInfo.ID == x.Value.FieldID
+                            && !x.Value.IsSingleWell))
+                        {
+                            <MudSelectItem Value="@((Guid?)clusterKVP.Key)">@clusterKVP.Value.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+            }
+            else
+            {
+                <MudItem xs="2" />
+            }
+            @if (Wells != null)
+            {
+                <MudItem xs="2">
+                    <MudSelect T="Guid?" Value="@(_selectedWell?.MetaInfo?.ID)" ValueChanged="@OnSelectedWellIdChanged" Dense="true">
+                        @foreach (var wellKVP in Wells.Where(x => x.Value != null
+                            && ((_selectedCluster != null
+                                && _selectedCluster.MetaInfo != null
+                                && x.Value.ClusterID != null
+                                && _selectedCluster.MetaInfo.ID == x.Value.ClusterID
+                                && !x.Value.IsSingleWell)
+                                || x.Value.IsSingleWell)))
+                        {
+                            <MudSelectItem Value="@((Guid?)wellKVP.Key)">@wellKVP.Value.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+            }
+            else
+            {
+                <MudItem xs="2" />
+            }
+            @if (WellBores != null && _selectedWell != null)
+            {
+                <MudItem xs="2">
+                    <MudSelect T="Guid?" Value="@(_selectedWellBore?.MetaInfo?.ID)" ValueChanged="@OnSelectedWellBoreIdChanged" Dense="true">
+                        @foreach (var wellBoreKVP in WellBores.Where(x => x.Value != null
+                            && x.Value.WellID != null
+                            && _selectedWell.MetaInfo != null
+                            && _selectedWell.MetaInfo.ID == x.Value.WellID))
+                        {
+                            <MudSelectItem Value="@((Guid?)wellBoreKVP.Key)">@wellBoreKVP.Value.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+            }
+            else
+            {
+                <MudItem xs="2" />
+            }
+        </MudGrid>
+    </div>;
+
+    private async Task InitializeArchitectureAsync()
+    {
+        if (WellBoreArchitecture == null)
+        {
+            return;
+        }
+
+        EnsureDefaults();
+
+        var currentArchitectureId = WellBoreArchitecture.MetaInfo?.ID;
+        if (_initializedArchitectureId == currentArchitectureId && HasInitializedSelectionState())
+        {
+            return;
+        }
+
+        _initializedArchitectureId = currentArchitectureId;
+        _selectedField = null;
+        _selectedCluster = null;
+        _resolvedCluster = null;
+        _resolvedRig = null;
+        _selectedWell = null;
+        _selectedWellBore = null;
+        _includeBop = WellBoreArchitecture.SurfaceSections?.Any(section => section.Type == SurfaceSectionType.BOP) ?? true;
+        _includeMarineRiser = WellBoreArchitecture.SurfaceSections?.Any(section => section.Type == SurfaceSectionType.MarineRiser) ?? true;
+        _includeLiftPump = HasNamedSideConnector(GetMarineRiserSection(), "LiftPump") || HasNamedSideConnector(GetBopSurfaceSection(), "LiftPump");
+        _includeWaterAboveMudLine = WellBoreArchitecture.FluidsAboveGroundLevel?.Any(fluid => fluid.Fluid == FluidType.Water) ?? false;
+
+        var wellBoreId = WellBoreArchitecture.WellBoreID;
+        var wellBore = await ResolveWellBoreAsync(wellBoreId);
+        if (wellBore == null)
+        {
+            EnsureSurfaceSectionsForCurrentConfiguration();
+            EnsureFluidsForCurrentConfiguration();
+            await ResolveRigAsync();
+            return;
+        }
+
+        _selectedWellBore = wellBore;
+
+        var well = await ResolveWellAsync(wellBore.WellID);
+        if (well == null)
+        {
+            EnsureSurfaceSectionsForCurrentConfiguration();
+            EnsureFluidsForCurrentConfiguration();
+            await ResolveRigAsync();
+            return;
+        }
+
+        _selectedWell = well;
+
+        var cluster = await ResolveClusterAsync(well.ClusterID);
+        if (cluster == null)
+        {
+            EnsureSurfaceSectionsForCurrentConfiguration();
+            EnsureFluidsForCurrentConfiguration();
+            await ResolveRigAsync();
+            return;
+        }
+
+        _resolvedCluster = cluster;
+        ApplyClusterReferenceValues(cluster);
+
+        if (!cluster.IsSingleWell)
+        {
+            _selectedCluster = cluster;
+        }
+
+        var field = await ResolveFieldAsync(cluster.FieldID);
+        if (field != null)
+        {
+            _selectedField = field;
+        }
+
+        EnsureSurfaceSectionsForCurrentConfiguration();
+        EnsureFluidsForCurrentConfiguration();
+        await ResolveRigAsync();
+    }
+
+    private async Task<WellBore?> ResolveWellBoreAsync(Guid? wellBoreId)
+    {
+        if (!wellBoreId.HasValue || wellBoreId == Guid.Empty)
+        {
+            return null;
+        }
+
+        if (WellBores != null && WellBores.TryGetValue(wellBoreId.Value, out var dictionaryWellBore) && dictionaryWellBore != null)
+        {
+            return dictionaryWellBore;
+        }
+
+        try
+        {
+            return await APIUtils.ClientWellBore.GetWellBoreByIdAsync(wellBoreId.Value);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Impossible to resolve WellBore details for wellbore id {WellBoreId}", wellBoreId.Value);
+            return null;
+        }
+    }
+
+    private async Task<Well?> ResolveWellAsync(Guid? wellId)
+    {
+        if (!wellId.HasValue || wellId == Guid.Empty)
+        {
+            return null;
+        }
+
+        if (Wells != null && Wells.TryGetValue(wellId.Value, out var dictionaryWell) && dictionaryWell != null)
+        {
+            return dictionaryWell;
+        }
+
+        try
+        {
+            return await APIUtils.ClientWell.GetWellByIdAsync(wellId.Value);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Impossible to resolve Well details for well id {WellId}", wellId.Value);
+            return null;
+        }
+    }
+
+    private async Task<Cluster?> ResolveClusterAsync(Guid? clusterId)
+    {
+        if (!clusterId.HasValue || clusterId == Guid.Empty)
+        {
+            return null;
+        }
+
+        if (Clusters != null && Clusters.TryGetValue(clusterId.Value, out var dictionaryCluster) && dictionaryCluster != null)
+        {
+            return dictionaryCluster;
+        }
+
+        try
+        {
+            return await APIUtils.ClientCluster.GetClusterByIdAsync(clusterId.Value);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Impossible to resolve Cluster details for cluster id {ClusterId}", clusterId.Value);
+            return null;
+        }
+    }
+
+    private async Task<Field?> ResolveFieldAsync(Guid? fieldId)
+    {
+        if (!fieldId.HasValue || fieldId == Guid.Empty)
+        {
+            return null;
+        }
+
+        if (Fields != null && Fields.TryGetValue(fieldId.Value, out var dictionaryField) && dictionaryField != null)
+        {
+            return dictionaryField;
+        }
+
+        try
+        {
+            return await APIUtils.ClientField.GetFieldByIdAsync(fieldId.Value);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Impossible to resolve Field details for field id {FieldId}", fieldId.Value);
+            return null;
+        }
+    }
+
+    private bool HasInitializedSelectionState()
+    {
+        if (WellBoreArchitecture == null)
+        {
+            return false;
+        }
+
+        var wellBoreId = WellBoreArchitecture.WellBoreID;
+        if (wellBoreId == null || wellBoreId == Guid.Empty)
+        {
+            return true;
+        }
+
+        return _selectedWellBore?.MetaInfo?.ID == wellBoreId.Value;
+    }
+
+    private void EnsureDefaults()
+    {
+        if (WellBoreArchitecture == null)
+        {
+            return;
+        }
+
+        WellBoreArchitecture.WellHead ??= APIUtils.DefaultWellHead();
+        WellBoreArchitecture.FluidsAboveGroundLevel ??= APIUtils.DefaultFluidsAboveGroundLevel();
+        WellBoreArchitecture.SurfaceSections ??= APIUtils.DefaultSurfaceSections();
+        WellBoreArchitecture.CasingSections ??= APIUtils.DefaultCasingSections();
+        EnsureCasingSectionsList();
+        EnsureSimplifiedCasingRows();
+        EnsureOpenHoleRows();
+        EnsureFluidsForCurrentConfiguration();
+    }
+
+    private static void ApplyClusterReferenceValues(Cluster cluster)
+    {
+        if (cluster.ReferenceDepth?.GaussianValue?.Mean != null)
+        {
+            DataUtils.UnitAndReferenceParameters.WellHeadDepthReferenceSource.WellHeadDepthReference = cluster.ReferenceDepth.GaussianValue.Mean;
+        }
+
+        if (cluster.GroundMudLineDepth?.GaussianValue?.Mean != null)
+        {
+            DataUtils.UnitAndReferenceParameters.GroundMudLineDepthReferenceSource.GroundMudLineDepthReference = cluster.GroundMudLineDepth.GaussianValue.Mean;
+        }
+
+        if (cluster.TopWaterDepth?.GaussianValue?.Mean != null)
+        {
+            DataUtils.UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource.SeaWaterLevelDepthReference = cluster.TopWaterDepth.GaussianValue.Mean;
+        }
+    }
+
+    private void SyncDepthReferenceSources()
+    {
+        DataUtils.UnitAndReferenceParameters.GroundMudLineDepthReferenceSource.GroundMudLineDepthReference = GetGroundOrMudLineDepth();
+        DataUtils.UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource.SeaWaterLevelDepthReference = GetSeaWaterLevelReferenceDepth();
+        DataUtils.UnitAndReferenceParameters.WellHeadDepthReferenceSource.WellHeadDepthReference = GetWellHeadReferenceDepth();
+        DataUtils.UnitAndReferenceParameters.RotaryTableDepthReferenceSource.RotaryTableDepthReference = GetRotaryTableReferenceDepth();
+    }
+
+    private double? GetSeaWaterLevelReferenceDepth() => ShouldShowWaterAboveMudLine ? GetTopWaterDepth() : null;
+
+    private double? GetWellHeadReferenceDepth()
+    {
+        var architectureWellHeadDepth = ConversionsFromOSDC.GaussianToDouble(WellBoreArchitecture?.WellHead?.Depth);
+        if (architectureWellHeadDepth.HasValue)
+        {
+            return architectureWellHeadDepth;
+        }
+
+        return _resolvedCluster?.ReferenceDepth?.GaussianValue?.Mean;
+    }
+
+    private double? GetRotaryTableReferenceDepth()
+    {
+        if (_resolvedRig?.DrillFloorElevation != null)
+        {
+            return _resolvedRig.DrillFloorElevation;
+        }
+
+        return null;
+    }
+
+    private Task OnSelectedFieldChanged(Field? field)
+    {
+        _selectedField = field;
+        _selectedCluster = null;
+        _resolvedCluster = null;
+        _resolvedRig = null;
+        _selectedWell = null;
+        _selectedWellBore = null;
+        EnsureSurfaceSectionsForCurrentConfiguration();
+        EnsureFluidsForCurrentConfiguration();
+        return Task.CompletedTask;
+    }
+
+    private Task OnSelectedFieldIdChanged(Guid? fieldId)
+    {
+        Field? field = null;
+        if (fieldId.HasValue && fieldId.Value != Guid.Empty && Fields != null)
+        {
+            Fields.TryGetValue(fieldId.Value, out field);
+        }
+
+        return OnSelectedFieldChanged(field);
+    }
+
+    private async Task OnSelectedClusterChanged(Cluster? cluster)
+    {
+        _selectedCluster = cluster;
+        _resolvedCluster = cluster;
+        _resolvedRig = null;
+        _selectedWell = null;
+        _selectedWellBore = null;
+
+        if (cluster != null)
+        {
+            ApplyClusterReferenceValues(cluster);
+            EnsureSurfaceSectionsForCurrentConfiguration();
+            EnsureFluidsForCurrentConfiguration();
+            await ResolveRigAsync();
+        }
+
+        return;
+    }
+
+    private Task OnSelectedClusterIdChanged(Guid? clusterId)
+    {
+        Cluster? cluster = null;
+        if (clusterId.HasValue && clusterId.Value != Guid.Empty && Clusters != null)
+        {
+            Clusters.TryGetValue(clusterId.Value, out cluster);
+        }
+
+        return OnSelectedClusterChanged(cluster);
+    }
+
+    private async Task OnSelectedWellChanged(Well? well)
+    {
+        _selectedWell = well;
+        _selectedWellBore = null;
+        _resolvedCluster = null;
+        _resolvedRig = null;
+
+        if (well?.ClusterID != null && well.ClusterID != Guid.Empty && Clusters != null && Clusters.TryGetValue(well.ClusterID.Value, out var cluster))
+        {
+            _resolvedCluster = cluster;
+            if (!cluster.IsSingleWell)
+            {
+                _selectedCluster = cluster;
+            }
+
+            ApplyClusterReferenceValues(cluster);
+
+            if (cluster.FieldID != null && cluster.FieldID != Guid.Empty && Fields != null && Fields.TryGetValue(cluster.FieldID.Value, out var field))
+            {
+                _selectedField = field;
+            }
+        }
+
+        EnsureSurfaceSectionsForCurrentConfiguration();
+        EnsureFluidsForCurrentConfiguration();
+        await ResolveRigAsync();
+        return;
+    }
+
+    private Task OnSelectedWellIdChanged(Guid? wellId)
+    {
+        Well? well = null;
+        if (wellId.HasValue && wellId.Value != Guid.Empty && Wells != null)
+        {
+            Wells.TryGetValue(wellId.Value, out well);
+        }
+
+        return OnSelectedWellChanged(well);
+    }
+
+    private async Task OnSelectedWellBoreChanged(WellBore? wellBore)
+    {
+        _selectedWellBore = wellBore;
+        EnsureFluidsForCurrentConfiguration();
+        await ResolveRigAsync();
+        return;
+    }
+
+    private Task OnSelectedWellBoreIdChanged(Guid? wellBoreId)
+    {
+        WellBore? wellBore = null;
+        if (wellBoreId.HasValue && wellBoreId.Value != Guid.Empty && WellBores != null)
+        {
+            WellBores.TryGetValue(wellBoreId.Value, out wellBore);
+        }
+
+        return OnSelectedWellBoreChanged(wellBore);
+    }
+
+    private List<WellBoreArchitectureFluid> EnsureFluidsList()
+    {
+        if (WellBoreArchitecture == null)
+        {
+            return new List<WellBoreArchitectureFluid>();
+        }
+
+        if (WellBoreArchitecture.FluidsAboveGroundLevel is not List<WellBoreArchitectureFluid> list)
+        {
+            list = WellBoreArchitecture.FluidsAboveGroundLevel?.ToList() ?? new List<WellBoreArchitectureFluid>();
+            WellBoreArchitecture.FluidsAboveGroundLevel = list;
+        }
+
+        return list;
+    }
+
+    private bool ShouldShowWaterAboveMudLine =>
+        CurrentSurfaceConfiguration == SurfaceConfiguration.OffshoreFloater ||
+        (CurrentSurfaceConfiguration == SurfaceConfiguration.OffshoreFixed && _includeWaterAboveMudLine);
+
+    private void EnsureFluidsForCurrentConfiguration()
+    {
+        if (WellBoreArchitecture == null)
+        {
+            return;
+        }
+
+        var current = EnsureFluidsList();
+        var airDepth = current.FirstOrDefault(fluid => fluid.Fluid == FluidType.Air)?.Depth;
+        var waterDepth = current.FirstOrDefault(fluid => fluid.Fluid == FluidType.Water)?.Depth;
+
+        if (CurrentSurfaceConfiguration == SurfaceConfiguration.Onshore)
+        {
+            _includeWaterAboveMudLine = false;
+            WellBoreArchitecture.FluidsAboveGroundLevel = new List<WellBoreArchitectureFluid>
+            {
+                new()
+                {
+                    Fluid = FluidType.Air,
+                    Depth = airDepth ?? ConversionsFromOSDC.DoubleToGaussian(DataUtils.UnitAndReferenceParameters.GroundMudLineDepthReferenceSource.GroundMudLineDepthReference)
+                }
+            };
+            return;
+        }
+
+        if (CurrentSurfaceConfiguration == SurfaceConfiguration.OffshoreFloater)
+        {
+            _includeWaterAboveMudLine = true;
+        }
+
+        var fluids = new List<WellBoreArchitectureFluid>();
+        if (ShouldShowWaterAboveMudLine)
+        {
+            fluids.Add(new WellBoreArchitectureFluid
+            {
+                Fluid = FluidType.Water,
+                Depth = waterDepth ?? ConversionsFromOSDC.DoubleToGaussian(DataUtils.UnitAndReferenceParameters.GroundMudLineDepthReferenceSource.GroundMudLineDepthReference)
+            });
+            fluids.Add(new WellBoreArchitectureFluid
+            {
+                Fluid = FluidType.Air,
+                Depth = airDepth ?? ConversionsFromOSDC.DoubleToGaussian(DataUtils.UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource.SeaWaterLevelDepthReference)
+            });
+        }
+        else
+        {
+            fluids.Add(new WellBoreArchitectureFluid
+            {
+                Fluid = FluidType.Air,
+                Depth = airDepth ?? ConversionsFromOSDC.DoubleToGaussian(DataUtils.UnitAndReferenceParameters.GroundMudLineDepthReferenceSource.GroundMudLineDepthReference)
+            });
+        }
+
+        WellBoreArchitecture.FluidsAboveGroundLevel = fluids;
+    }
+
+    private double? GetGroundOrMudLineDepth()
+    {
+        var fluids = EnsureFluidsList();
+        if (ShouldShowWaterAboveMudLine)
+        {
+            return ConversionsFromOSDC.GaussianToDouble(fluids.FirstOrDefault(fluid => fluid.Fluid == FluidType.Water)?.Depth);
+        }
+
+        return ConversionsFromOSDC.GaussianToDouble(fluids.FirstOrDefault(fluid => fluid.Fluid == FluidType.Air)?.Depth);
+    }
+
+    private Task OnGroundOrMudLineDepthChanged(double? value)
+    {
+        var gaussian = ConversionsFromOSDC.DoubleToGaussian(value);
+        var fluids = EnsureFluidsList();
+        if (ShouldShowWaterAboveMudLine)
+        {
+            var water = fluids.FirstOrDefault(fluid => fluid.Fluid == FluidType.Water);
+            if (water != null)
+            {
+                water.Depth = gaussian;
+            }
+        }
+        else
+        {
+            var air = fluids.FirstOrDefault(fluid => fluid.Fluid == FluidType.Air);
+            if (air != null)
+            {
+                air.Depth = gaussian;
+            }
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private double? GetTopWaterDepth() =>
+        ConversionsFromOSDC.GaussianToDouble(EnsureFluidsList().FirstOrDefault(fluid => fluid.Fluid == FluidType.Air)?.Depth);
+
+    private Task OnTopWaterDepthChanged(double? value)
+    {
+        var air = EnsureFluidsList().FirstOrDefault(fluid => fluid.Fluid == FluidType.Air);
+        if (air != null)
+        {
+            air.Depth = ConversionsFromOSDC.DoubleToGaussian(value);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task OnWaterAboveMudLineChanged(bool value)
+    {
+        _includeWaterAboveMudLine = value;
+        EnsureFluidsForCurrentConfiguration();
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    private string FormatDepthForDisplay(double? depth)
+    {
+        if (depth == null)
+        {
+            return "-";
+        }
+
+        var depthReference = DataUtils.UnitAndReferenceParameters.DepthReferenceName ?? "reference";
+        var formatted = FormatDepthQuantityWithUnit(depth.Value);
+        if (depthReference.Contains("rotary table", StringComparison.OrdinalIgnoreCase))
+        {
+            return formatted;
+        }
+
+        return $"{formatted} ({depthReference})";
+    }
+
+    private static string Svg(double value) => value.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+
+    private double GetDrillFloorY()
+    {
+        var rigHeight = GetRigHeightPixels();
+        var minDrillFloorY = TopsideZoneTopY + DerrickTopClearance + rigHeight;
+        var maxDrillFloorY = WellHeadTopY - 24.0 - SurfaceBottomGap;
+        return Math.Clamp(minDrillFloorY, 72.0, maxDrillFloorY);
+    }
+
+    private double GetRigHeightPixels()
+    {
+        const double rigHeightMeters = 50.0;
+        var surfaceLength = GetSurfaceArchitectureLength();
+        var totalLength = rigHeightMeters + Math.Max(0.0, surfaceLength);
+        var availableHeight = TopsideZoneHeight - DerrickTopClearance - SurfaceBottomGap - 24.0;
+        if (totalLength <= 0.0 || availableHeight <= 0.0)
+        {
+            return 96.0;
+        }
+
+        var scaledHeight = availableHeight * (rigHeightMeters / totalLength);
+        return Math.Clamp(scaledHeight, 72.0, 140.0);
+    }
+
+    private double GetSurfaceArchitectureLength()
+    {
+        var totalLength = EnsureSurfaceSectionsList()
+            .Select(section => GetGaussianValue(section.SectionLength))
+            .Where(length => length.HasValue && length.Value > 0.0)
+            .Sum(length => length!.Value);
+
+        return totalLength > 0.0 ? totalLength : Math.Max(1.0, EnsureSurfaceSectionsList().Count * 10.0);
+    }
+
+    private async Task ResolveRigAsync()
+    {
+        _resolvedRig = null;
+
+        var rigId = _selectedWellBore?.RigID;
+        if ((!rigId.HasValue || rigId == Guid.Empty) && _resolvedCluster?.MetaInfo?.ID is Guid clusterId && clusterId != Guid.Empty)
+        {
+            rigId = Rigs?
+                .Values
+                .FirstOrDefault(rig => rig?.ClusterID == clusterId)
+                ?.MetaInfo?.ID;
+        }
+
+        if (!rigId.HasValue || rigId == Guid.Empty)
+        {
+            return;
+        }
+
+        try
+        {
+            _resolvedRig = await APIUtils.ClientRig.GetRigByIdAsync(rigId.Value);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Impossible to resolve Rig details for rig id {RigId}", rigId.Value);
+        }
+    }
+
+    private double? GetDrillFloorDepth() => _resolvedRig?.DrillFloorElevation;
+
+    private List<SurfaceSection> EnsureSurfaceSectionsList()
+    {
+        if (WellBoreArchitecture == null)
+        {
+            return new List<SurfaceSection>();
+        }
+
+        if (WellBoreArchitecture.SurfaceSections is not List<SurfaceSection> list)
+        {
+            list = WellBoreArchitecture.SurfaceSections?.ToList() ?? new List<SurfaceSection>();
+            WellBoreArchitecture.SurfaceSections = list;
+        }
+
+        if (list.Count == 0)
+        {
+            list.Add(CreateSurfaceSection(SurfaceSectionType.Unknown));
+        }
+
+        return list;
+    }
+
+    private void EnsureSurfaceSectionsForCurrentConfiguration()
+    {
+        if (WellBoreArchitecture == null)
+        {
+            return;
+        }
+
+        var current = EnsureSurfaceSectionsList();
+        var existingByType = current
+            .GroupBy(section => section.Type)
+            .ToDictionary(group => group.Key, group => group.First());
+
+        var desired = new List<SurfaceSection>();
+        foreach (var descriptor in SurfaceSectionDescriptors)
+        {
+            if (existingByType.TryGetValue(descriptor.Type, out var existing))
+            {
+                desired.Add(existing);
+            }
+            else
+            {
+                desired.Add(CreateSurfaceSection(descriptor.Type));
+            }
+        }
+
+        WellBoreArchitecture.SurfaceSections = desired;
+        EnsureOptionalSideConnectors();
+    }
+
+    private SurfaceSection GetSurfaceSectionAt(int index)
+    {
+        var list = EnsureSurfaceSectionsList();
+        while (list.Count <= index)
+        {
+            list.Add(CreateSurfaceSection(SurfaceSectionDescriptors[Math.Min(index, SurfaceSectionDescriptors.Count - 1)].Type));
+        }
+
+        return list[index];
+    }
+
+    private static SurfaceSection CreateSurfaceSection(SurfaceSectionType type)
+    {
+        return new SurfaceSection
+        {
+            Type = type,
+            BodyOD = ConversionsFromOSDC.DoubleToGaussian(null),
+            BodyID = ConversionsFromOSDC.DoubleToGaussian(null),
+            SectionLength = ConversionsFromOSDC.DoubleToGaussian(null),
+            SideConnectors = new List<SideConnector>()
+        };
+    }
+
+    private List<SurfaceSectionDescriptor> GetSurfaceSectionDescriptors(SurfaceConfiguration configuration)
+    {
+        var descriptors = new List<SurfaceSectionDescriptor>();
+
+        switch (configuration)
+        {
+            case SurfaceConfiguration.OffshoreFixed:
+                descriptors.Add(new SurfaceSectionDescriptor("Low pressure riser", SurfaceSectionType.LowPressureRiser));
+                if (_includeBop)
+                {
+                    descriptors.Add(new SurfaceSectionDescriptor("BOP", SurfaceSectionType.BOP));
+                }
+
+                descriptors.Add(new SurfaceSectionDescriptor("High pressure riser", SurfaceSectionType.HighPressureRiser));
+                break;
+
+            case SurfaceConfiguration.OffshoreFloater:
+                if (_includeMarineRiser)
+                {
+                    descriptors.Add(new SurfaceSectionDescriptor("Marine riser", SurfaceSectionType.MarineRiser));
+                }
+                if (_includeBop)
+                {
+                    descriptors.Add(new SurfaceSectionDescriptor("Marine BOP", SurfaceSectionType.BOP));
+                }
+
+                break;
+
+            default:
+                descriptors.Add(new SurfaceSectionDescriptor("Low pressure riser", SurfaceSectionType.LowPressureRiser));
+                if (_includeBop)
+                {
+                    descriptors.Add(new SurfaceSectionDescriptor("BOP", SurfaceSectionType.BOP));
+                }
+
+                break;
+        }
+
+        return descriptors;
+    }
+
+    private SurfaceConfiguration GetSurfaceConfiguration()
+    {
+        if (_resolvedCluster == null)
+        {
+            return SurfaceConfiguration.Onshore;
+        }
+
+        if (!IsOffshoreCluster(_resolvedCluster))
+        {
+            return SurfaceConfiguration.Onshore;
+        }
+
+        return _resolvedCluster.IsFixedPlatform ? SurfaceConfiguration.OffshoreFixed : SurfaceConfiguration.OffshoreFloater;
+    }
+
+    private Task OnBopToggleChanged(bool value)
+    {
+        _includeBop = value;
+        if (!_includeBop && !_includeMarineRiser)
+        {
+            _includeLiftPump = false;
+        }
+
+        EnsureSurfaceSectionsForCurrentConfiguration();
+        if (!_includeBop)
+        {
+            RemoveOptionalSideConnectors();
+        }
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    private Task OnMarineRiserToggleChanged(bool value)
+    {
+        var liftPumpDepth = GetLiftPumpDepth();
+        _includeMarineRiser = value;
+        if (!_includeMarineRiser && !_includeBop)
+        {
+            _includeLiftPump = false;
+        }
+
+        EnsureSurfaceSectionsForCurrentConfiguration();
+        if (_includeLiftPump)
+        {
+            UpdateLiftPumpDepth(liftPumpDepth);
+        }
+
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    private void EnsureOptionalSideConnectors()
+    {
+        if (_includeBop)
+        {
+            EnsureNamedSideConnector(GetBopSurfaceSection(), "ChokeLine", SideElementType.Choke);
+            EnsureNamedSideConnector(GetBopSurfaceSection(), "KillLine", SideElementType.Pipe);
+        }
+        else
+        {
+            RemoveNamedSideConnector(GetBopSurfaceSection(), "ChokeLine");
+            RemoveNamedSideConnector(GetBopSurfaceSection(), "KillLine");
+        }
+
+        if (ShouldShowBoosterLineDepth())
+        {
+            EnsureNamedSideConnector(GetMarineRiserSection(), "BoosterLine", SideElementType.Pipe);
+        }
+        else
+        {
+            RemoveNamedSideConnector(GetMarineRiserSection(), "BoosterLine");
+        }
+
+        SyncLiftPumpConnector();
+    }
+
+    private void RemoveOptionalSideConnectors()
+    {
+        RemoveNamedSideConnector(GetBopSurfaceSection(), "ChokeLine");
+        RemoveNamedSideConnector(GetBopSurfaceSection(), "KillLine");
+        RemoveNamedSideConnector(GetMarineRiserSection(), "BoosterLine");
+        RemoveNamedSideConnector(GetMarineRiserSection(), "LiftPump");
+        RemoveNamedSideConnector(GetBopSurfaceSection(), "LiftPump");
+    }
+
+    private SurfaceSection? GetBopSurfaceSection() =>
+        EnsureSurfaceSectionsList().FirstOrDefault(section => section.Type == SurfaceSectionType.BOP);
+
+    private SurfaceSection? GetMarineRiserSection() =>
+        EnsureSurfaceSectionsList().FirstOrDefault(section => section.Type == SurfaceSectionType.MarineRiser);
+
+    private static SideConnector EnsureNamedSideConnector(SurfaceSection? section, string name, SideElementType sideElementType)
+    {
+        if (section == null)
+        {
+            return new SideConnector();
+        }
+
+        if (section.SideConnectors is not List<SideConnector> connectors)
+        {
+            connectors = section.SideConnectors?.ToList() ?? new List<SideConnector>();
+            section.SideConnectors = connectors;
+        }
+
+        var connector = connectors.FirstOrDefault(connector => connector?.FirstSideElement?.Name == name);
+        if (connector != null)
+        {
+            return connector;
+        }
+
+        connector = new SideConnector
+        {
+            Position = ConversionsFromOSDC.DoubleToGaussian(null),
+            VerticalDepth = ConversionsFromOSDC.DoubleToGaussian(null),
+            FirstSideElement = new SideElement
+            {
+                Name = name,
+                Type = sideElementType,
+                OD = ConversionsFromOSDC.DoubleToGaussian(null),
+                ID = ConversionsFromOSDC.DoubleToGaussian(null),
+                Length = ConversionsFromOSDC.DoubleToGaussian(null),
+                TopVerticalDepth = ConversionsFromOSDC.DoubleToGaussian(null)
+            },
+            ElementConnectivities = new List<ElementConnectivity>()
+        };
+        connectors.Add(connector);
+        return connector;
+    }
+
+    private static void RemoveNamedSideConnector(SurfaceSection? section, string name)
+    {
+        if (section?.SideConnectors is not IList<SideConnector> connectors)
+        {
+            return;
+        }
+
+        var connector = connectors.FirstOrDefault(item => item?.FirstSideElement?.Name == name);
+        if (connector != null)
+        {
+            connectors.Remove(connector);
+        }
+    }
+
+    private static bool HasNamedSideConnector(SurfaceSection? section, string name) =>
+        section?.SideConnectors?.Any(item => item?.FirstSideElement?.Name == name) ?? false;
+
+    private double? GetBopConnectorDepth(string name)
+    {
+        var connector = GetBopSurfaceSection()?.SideConnectors?.FirstOrDefault(item => item?.FirstSideElement?.Name == name);
+        return ConversionsFromOSDC.GaussianToDouble(connector?.VerticalDepth);
+    }
+
+    private double? GetChokeLineDepth() => GetBopConnectorDepth("ChokeLine");
+
+    private double? GetKillLineDepth() => GetBopConnectorDepth("KillLine");
+
+    private void UpdateBopConnectorDepth(string name, double? value)
+    {
+        var type = name == "ChokeLine" ? SideElementType.Choke : SideElementType.Pipe;
+        var connector = EnsureNamedSideConnector(GetBopSurfaceSection(), name, type);
+        connector.Position = ConversionsFromOSDC.DoubleToGaussian(value);
+        connector.VerticalDepth = ConversionsFromOSDC.DoubleToGaussian(value);
+        if (connector.FirstSideElement != null)
+        {
+            connector.FirstSideElement.TopVerticalDepth = ConversionsFromOSDC.DoubleToGaussian(value);
+        }
+    }
+
+    private Task OnChokeLineDepthChanged(double? value)
+    {
+        UpdateBopConnectorDepth("ChokeLine", value);
+        return Task.CompletedTask;
+    }
+
+    private Task OnKillLineDepthChanged(double? value)
+    {
+        UpdateBopConnectorDepth("KillLine", value);
+        return Task.CompletedTask;
+    }
+
+    private double? GetBoosterLineDepth()
+    {
+        var connector = GetMarineRiserSection()?.SideConnectors?.FirstOrDefault(item => item?.FirstSideElement?.Name == "BoosterLine");
+        return ConversionsFromOSDC.GaussianToDouble(connector?.VerticalDepth);
+    }
+
+    private void UpdateBoosterLineDepth(double? value)
+    {
+        var connector = EnsureNamedSideConnector(GetMarineRiserSection(), "BoosterLine", SideElementType.Pipe);
+        connector.Position = ConversionsFromOSDC.DoubleToGaussian(value);
+        connector.VerticalDepth = ConversionsFromOSDC.DoubleToGaussian(value);
+        if (connector.FirstSideElement != null)
+        {
+            connector.FirstSideElement.TopVerticalDepth = ConversionsFromOSDC.DoubleToGaussian(value);
+        }
+    }
+
+    private Task OnBoosterLineDepthChanged(double? value)
+    {
+        UpdateBoosterLineDepth(value);
+        return Task.CompletedTask;
+    }
+
+    private double? GetLiftPumpDepth()
+    {
+        var connector = GetLiftPumpHostSection()?.SideConnectors?.FirstOrDefault(item => item?.FirstSideElement?.Name == "LiftPump");
+        return ConversionsFromOSDC.GaussianToDouble(connector?.VerticalDepth);
+    }
+
+    private void UpdateLiftPumpDepth(double? value)
+    {
+        var connector = EnsureNamedSideConnector(GetLiftPumpHostSection(), "LiftPump", SideElementType.Pipe);
+        connector.Position = ConversionsFromOSDC.DoubleToGaussian(value);
+        connector.VerticalDepth = ConversionsFromOSDC.DoubleToGaussian(value);
+        if (connector.FirstSideElement != null)
+        {
+            connector.FirstSideElement.TopVerticalDepth = ConversionsFromOSDC.DoubleToGaussian(value);
+        }
+    }
+
+    private Task OnLiftPumpToggleChanged(bool value)
+    {
+        _includeLiftPump = value && CanHostLiftPump();
+        SyncLiftPumpConnector();
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    private Task OnLiftPumpDepthChanged(double? value)
+    {
+        UpdateLiftPumpDepth(value);
+        return Task.CompletedTask;
+    }
+
+    private SurfaceSection? GetLiftPumpHostSection() =>
+        _includeMarineRiser && IsFloatingRig
+            ? GetMarineRiserSection()
+            : GetBopSurfaceSection();
+
+    private bool CanHostLiftPump() => IsFloatingRig && GetLiftPumpHostSection() != null;
+
+    private bool ShouldShowBoosterLineDepth() => IsFloatingRig && _includeMarineRiser;
+
+    private bool ShouldRenderFloatingConnectorSectionAfter(SurfaceSectionType descriptorType)
+    {
+        if (_includeBop && descriptorType == SurfaceSectionType.BOP)
+        {
+            return true;
+        }
+
+        return !_includeBop && IsFloatingRig && _includeMarineRiser && descriptorType == SurfaceSectionType.MarineRiser;
+    }
+
+    private void SyncLiftPumpConnector()
+    {
+        var marineRiserSection = GetMarineRiserSection();
+        var bopSection = GetBopSurfaceSection();
+        var existingDepth =
+            ConversionsFromOSDC.GaussianToDouble(marineRiserSection?.SideConnectors?.FirstOrDefault(item => item?.FirstSideElement?.Name == "LiftPump")?.VerticalDepth) ??
+            ConversionsFromOSDC.GaussianToDouble(bopSection?.SideConnectors?.FirstOrDefault(item => item?.FirstSideElement?.Name == "LiftPump")?.VerticalDepth);
+
+        RemoveNamedSideConnector(marineRiserSection, "LiftPump");
+        RemoveNamedSideConnector(bopSection, "LiftPump");
+
+        if (!_includeLiftPump || !CanHostLiftPump())
+        {
+            return;
+        }
+
+        UpdateLiftPumpDepth(existingDepth);
+    }
+
+    private static bool IsOffshoreConfiguration(SurfaceConfiguration configuration) =>
+        configuration == SurfaceConfiguration.OffshoreFixed || configuration == SurfaceConfiguration.OffshoreFloater;
+
+    private static bool IsOffshoreCluster(Cluster cluster)
+    {
+        var topWaterDepth = cluster.TopWaterDepth?.GaussianValue?.Mean ?? 0.0;
+        return topWaterDepth > 0.0;
+    }
+
+    private void UpdateSurfaceSectionOd(int index, double? value)
+    {
+        GetSurfaceSectionAt(index).BodyOD = ConversionsFromOSDC.DoubleToGaussian(value);
+    }
+
+    private void UpdateSurfaceSectionId(int index, double? value)
+    {
+        GetSurfaceSectionAt(index).BodyID = ConversionsFromOSDC.DoubleToGaussian(value);
+    }
+
+    private void UpdateSurfaceSectionLength(int index, double? value)
+    {
+        GetSurfaceSectionAt(index).SectionLength = ConversionsFromOSDC.DoubleToGaussian(value);
+    }
+
+    private List<CasingSection> EnsureCasingSectionsList()
+    {
+        if (WellBoreArchitecture == null)
+        {
+            return new List<CasingSection>();
+        }
+
+        if (WellBoreArchitecture.CasingSections is not List<CasingSection> list)
+        {
+            list = WellBoreArchitecture.CasingSections?.ToList() ?? new List<CasingSection>();
+            WellBoreArchitecture.CasingSections = list;
+        }
+
+        if (list.Count == 0)
+        {
+            list.Add(CreateDefaultCasingSection());
+        }
+
+        foreach (var section in list)
+        {
+            EnsureCasingSectionElement(section);
+            EnsureCasingSectionSizeTable(section);
+        }
+
+        return list;
+    }
+
+    private static CasingSection CreateDefaultCasingSection()
+    {
+        return new CasingSection
+        {
+            TopDepth = ConversionsFromOSDC.DoubleToGaussian(null),
+            Length = ConversionsFromOSDC.DoubleToGaussian(null),
+            TopCementDepth = ConversionsFromOSDC.DoubleToGaussian(null),
+            CasingSectionElements = new List<CasingSectionElement> { CreateDefaultCasingSectionElement() },
+            CasingSectionSizeTable = new List<BoreHoleSize> { CreateDefaultCasingSectionSizeRow() },
+            OpenHoleSection = null
+        };
+    }
+
+    private static BoreHoleSize CreateDefaultCasingSectionSizeRow()
+    {
+        return new BoreHoleSize
+        {
+            HoleSize = ConversionsFromOSDC.DoubleToGaussian(null),
+            Length = ConversionsFromOSDC.DoubleToGaussian(null)
+        };
+    }
+
+    private static CasingSectionElement CreateDefaultCasingSectionElement()
+    {
+        return new CasingSectionElement
+        {
+            BodyOD = ConversionsFromOSDC.DoubleToGaussian(null),
+            BodyID = ConversionsFromOSDC.DoubleToGaussian(null),
+            CollarOD = ConversionsFromOSDC.DoubleToGaussian(null),
+            JointLength = ConversionsFromOSDC.DoubleToGaussian(null),
+            SectionLength = ConversionsFromOSDC.DoubleToGaussian(null)
+        };
+    }
+
+    private static CasingSectionElement EnsureCasingSectionElement(CasingSection section)
+    {
+        if (section.CasingSectionElements is not List<CasingSectionElement> elements)
+        {
+            elements = section.CasingSectionElements?.ToList() ?? new List<CasingSectionElement>();
+            section.CasingSectionElements = elements;
+        }
+
+        if (elements.Count == 0)
+        {
+            elements.Add(CreateDefaultCasingSectionElement());
+        }
+
+        return elements[0];
+    }
+
+    private static void EnsureCasingSectionSizeTable(CasingSection section)
+    {
+        if (section.CasingSectionSizeTable is not List<BoreHoleSize> rows)
+        {
+            rows = section.CasingSectionSizeTable?.ToList() ?? new List<BoreHoleSize>();
+            section.CasingSectionSizeTable = rows;
+        }
+
+        if (rows.Count == 0)
+        {
+            rows.Add(CreateDefaultCasingSectionSizeRow());
+        }
+    }
+
+    private void EnsureOpenHoleAttachedToLastCasing()
+    {
+        var casingSections = WellBoreArchitecture?.CasingSections?.ToList();
+        if (casingSections == null || casingSections.Count == 0)
+        {
+            return;
+        }
+        var retainedOpenHole = casingSections.Select(section => section.OpenHoleSection).LastOrDefault(section => section != null) ?? CreateDefaultOpenHoleSection();
+        foreach (var section in casingSections)
+        {
+            section.OpenHoleSection = null;
+        }
+
+        casingSections[^1].OpenHoleSection = retainedOpenHole;
+        WellBoreArchitecture!.CasingSections = casingSections;
+    }
+
+    private static OpenHoleSection CreateDefaultOpenHoleSection()
+    {
+        return new OpenHoleSection
+        {
+            HoleSizes = new List<BoreHoleSize> { CreateDefaultOpenHoleRow() }
+        };
+    }
+
+    private static BoreHoleSize CreateDefaultOpenHoleRow()
+    {
+        return new BoreHoleSize
+        {
+            HoleSize = ConversionsFromOSDC.DoubleToGaussian(null),
+            Length = ConversionsFromOSDC.DoubleToGaussian(null)
+        };
+    }
+
+    private List<BoreHoleSize> EnsureOpenHoleRows()
+    {
+        EnsureOpenHoleAttachedToLastCasing();
+        var lastCasing = EnsureCasingSectionsList().Last();
+        lastCasing.OpenHoleSection ??= CreateDefaultOpenHoleSection();
+        if (lastCasing.OpenHoleSection.HoleSizes is not List<BoreHoleSize> rows)
+        {
+            rows = lastCasing.OpenHoleSection.HoleSizes?.ToList() ?? new List<BoreHoleSize>();
+            lastCasing.OpenHoleSection.HoleSizes = rows;
+        }
+
+        if (rows.Count == 0)
+        {
+            rows.Add(CreateDefaultOpenHoleRow());
+        }
+
+        return rows;
+    }
+
+    private List<SimplifiedCasingRow> EnsureSimplifiedCasingRows()
+    {
+        if (_simplifiedCasingRows.Count == 0)
+        {
+            _simplifiedCasingRows = BuildSimplifiedRowsFromDetailedSections();
+        }
+
+        if (_simplifiedCasingRows.Count == 0)
+        {
+            _simplifiedCasingRows.Add(CreateDefaultSimplifiedCasingRow());
+        }
+
+        return _simplifiedCasingRows;
+    }
+
+    private List<SimplifiedCasingRow> BuildSimplifiedRowsFromDetailedSections()
+    {
+        var rows = new List<SimplifiedCasingRow>();
+        foreach (var section in EnsureCasingSectionsList())
+        {
+            var sectionTop = GetGaussianValue(section.TopDepth) ?? 0.0;
+            var sectionLength = GetGaussianValue(section.Length) ?? 0.0;
+            var elements = section.CasingSectionElements?.ToList() ?? new List<CasingSectionElement>();
+            var sizeRows = (section.CasingSectionSizeTable?.ToList() ?? new List<BoreHoleSize>())
+                .Where(IsMeaningfulBoreHoleSizeRow)
+                .ToList();
+
+            if (elements.Count == 0 && sizeRows.Count == 0)
+            {
+                rows.Add(new SimplifiedCasingRow
+                {
+                    SuspensionDepth = sectionTop,
+                    FinalDepth = sectionTop + sectionLength,
+                    HasCement = GetGaussianValue(section.TopCementDepth) is double topCementDepthFallback && topCementDepthFallback <= sectionTop + CasingGroupingTolerance
+                });
+                continue;
+            }
+
+            var intervalEnds = new HashSet<double> { sectionTop, sectionTop + sectionLength };
+            AddIntervalBoundaries(intervalEnds, sectionTop, sectionLength, elements.Select(element => GetGaussianValue(element.SectionLength)));
+            AddIntervalBoundaries(intervalEnds, sectionTop, sectionLength, sizeRows.Select(row => GetGaussianValue(row.Length)));
+            var topCementDepth = GetGaussianValue(section.TopCementDepth);
+            if (topCementDepth.HasValue
+                && topCementDepth.Value > sectionTop + CasingGroupingTolerance
+                && topCementDepth.Value < sectionTop + sectionLength - CasingGroupingTolerance)
+            {
+                intervalEnds.Add(topCementDepth.Value);
+            }
+
+            var boundaries = intervalEnds
+                .Where(boundary => boundary >= sectionTop - CasingGroupingTolerance && boundary <= sectionTop + sectionLength + CasingGroupingTolerance)
+                .Distinct()
+                .OrderBy(boundary => boundary)
+                .ToList();
+
+            if (boundaries.Count < 2)
+            {
+                rows.Add(new SimplifiedCasingRow
+                {
+                    SuspensionDepth = sectionTop,
+                    FinalDepth = sectionTop + sectionLength,
+                    OD = GetGaussianValue(elements.FirstOrDefault()?.BodyOD),
+                    ID = GetGaussianValue(elements.FirstOrDefault()?.BodyID),
+                    BoreholeOD = GetGaussianValue(sizeRows.FirstOrDefault()?.HoleSize),
+                    HasCement = GetGaussianValue(section.TopCementDepth) is double topCementDepthFallback && topCementDepthFallback <= sectionTop + CasingGroupingTolerance
+                });
+                continue;
+            }
+
+            for (var i = 0; i < boundaries.Count - 1; i++)
+            {
+                var intervalTop = boundaries[i];
+                var intervalBottom = boundaries[i + 1];
+                if (intervalBottom - intervalTop <= CasingGroupingTolerance)
+                {
+                    continue;
+                }
+
+                var intervalProbeDepth = intervalTop + ((intervalBottom - intervalTop) / 2.0);
+                var element = GetSectionElementAtDepth(elements, sectionTop, sectionLength, intervalProbeDepth);
+                var sizeRow = GetBoreHoleSizeAtDepth(sizeRows, sectionTop, sectionLength, intervalProbeDepth);
+                rows.Add(new SimplifiedCasingRow
+                {
+                    SuspensionDepth = intervalTop,
+                    FinalDepth = intervalBottom,
+                    OD = GetGaussianValue(element?.BodyOD),
+                    ID = GetGaussianValue(element?.BodyID),
+                    BoreholeOD = GetGaussianValue(sizeRow?.HoleSize),
+                    HasCement = topCementDepth.HasValue && intervalTop >= topCementDepth.Value - CasingGroupingTolerance
+                });
+            }
+        }
+
+        return rows;
+    }
+
+    private void ApplySimplifiedRowsToDetailedSections()
+    {
+        var rows = EnsureSimplifiedCasingRows()
+            .Select(row => row with { })
+            .ToList();
+
+        if (rows.Count == 0)
+        {
+            rows.Add(CreateDefaultSimplifiedCasingRow());
+        }
+
+        var retainedOpenHole = EnsureCasingSectionsList()
+            .Select(section => section.OpenHoleSection)
+            .LastOrDefault(section => section != null) ?? CreateDefaultOpenHoleSection();
+
+        var detailedSections = new List<CasingSection>();
+        CasingSection? currentSection = null;
+        double? currentEnd = null;
+
+        foreach (var row in rows)
+        {
+            var rowStart = row.SuspensionDepth ?? 0.0;
+            var rowEnd = Math.Max(rowStart, row.FinalDepth ?? rowStart);
+            var rowLength = rowEnd - rowStart;
+
+            if (currentSection == null || currentEnd == null || Math.Abs(rowStart - currentEnd.Value) > CasingGroupingTolerance)
+            {
+                currentSection = CreateDefaultCasingSection();
+                currentSection.TopDepth = ConversionsFromOSDC.DoubleToGaussian(rowStart);
+                currentSection.Length = ConversionsFromOSDC.DoubleToGaussian(rowLength);
+                currentSection.CasingSectionElements = new List<CasingSectionElement>();
+                currentSection.CasingSectionSizeTable = new List<BoreHoleSize>();
+                detailedSections.Add(currentSection);
+            }
+            else
+            {
+                var sectionTop = GetGaussianValue(currentSection.TopDepth) ?? rowStart;
+                currentSection.Length = ConversionsFromOSDC.DoubleToGaussian(rowEnd - sectionTop);
+            }
+
+            AppendOrExtendCasingElement(currentSection!, row.OD, row.ID, rowLength);
+            AppendOrExtendBoreHoleSize(currentSection, row.BoreholeOD, rowLength);
+            currentEnd = rowEnd;
+        }
+
+        foreach (var section in detailedSections)
+        {
+            section.OpenHoleSection = null;
+        }
+
+        var groupedRows = BuildSimplifiedCasingGroups(rows);
+        for (var i = 0; i < detailedSections.Count; i++)
+        {
+            var group = i < groupedRows.Count ? groupedRows[i] : null;
+            var topCementDepth = group?.Rows
+                .Where(row => row.HasCement)
+                .Select(row => row.SuspensionDepth)
+                .Where(value => value.HasValue)
+                .Select(value => value!.Value)
+                .Cast<double?>()
+                .Min();
+
+            detailedSections[i].TopCementDepth = topCementDepth.HasValue
+                ? ConversionsFromOSDC.DoubleToGaussian(topCementDepth.Value)
+                : ConversionsFromOSDC.DoubleToGaussian(null);
+        }
+
+        detailedSections[^1].OpenHoleSection = retainedOpenHole;
+        WellBoreArchitecture!.CasingSections = detailedSections;
+    }
+
+    private static SimplifiedCasingRow CreateDefaultSimplifiedCasingRow()
+    {
+        return new SimplifiedCasingRow
+        {
+            SuspensionDepth = 0.0,
+            FinalDepth = 0.0
+        };
+    }
+
+    private static void AddIntervalBoundaries(HashSet<double> boundaries, double sectionTop, double sectionLength, IEnumerable<double?> lengths)
+    {
+        var cursor = sectionTop;
+        foreach (var length in lengths)
+        {
+            var safeLength = Math.Max(0.0, length ?? 0.0);
+            if (safeLength <= 0.0)
+            {
+                continue;
+            }
+
+            cursor = Math.Min(sectionTop + sectionLength, cursor + safeLength);
+            boundaries.Add(cursor);
+            if (cursor >= sectionTop + sectionLength - CasingGroupingTolerance)
+            {
+                break;
+            }
+        }
+    }
+
+    private static CasingSectionElement? GetSectionElementAtDepth(List<CasingSectionElement> elements, double sectionTop, double sectionLength, double depth)
+    {
+        if (elements.Count == 0)
+        {
+            return null;
+        }
+
+        var boundedDepth = Math.Min(sectionTop + sectionLength, Math.Max(sectionTop, depth));
+        var cursor = sectionTop;
+        var remaining = sectionLength;
+        for (var i = 0; i < elements.Count; i++)
+        {
+            var element = elements[i];
+            var segmentLength = GetSegmentLength(GetGaussianValue(element.SectionLength), remaining, elements.Count - i);
+            var nextCursor = cursor + segmentLength;
+            if (boundedDepth <= nextCursor + CasingGroupingTolerance || i == elements.Count - 1)
+            {
+                return element;
+            }
+
+            cursor = nextCursor;
+            remaining = Math.Max(0.0, sectionTop + sectionLength - cursor);
+        }
+
+        return elements[^1];
+    }
+
+    private static BoreHoleSize? GetBoreHoleSizeAtDepth(List<BoreHoleSize> rows, double sectionTop, double sectionLength, double depth)
+    {
+        if (rows.Count == 0)
+        {
+            return null;
+        }
+
+        var boundedDepth = Math.Min(sectionTop + sectionLength, Math.Max(sectionTop, depth));
+        var cursor = sectionTop;
+        var remaining = sectionLength;
+        for (var i = 0; i < rows.Count; i++)
+        {
+            var row = rows[i];
+            var segmentLength = GetSegmentLength(GetGaussianValue(row.Length), remaining, rows.Count - i);
+            var nextCursor = cursor + segmentLength;
+            if (boundedDepth <= nextCursor + CasingGroupingTolerance || i == rows.Count - 1)
+            {
+                return row;
+            }
+
+            cursor = nextCursor;
+            remaining = Math.Max(0.0, sectionTop + sectionLength - cursor);
+        }
+
+        return rows[^1];
+    }
+
+    private static double GetSegmentLength(double? requestedLength, double remaining, int segmentsRemaining)
+    {
+        if (requestedLength.HasValue && requestedLength.Value > 0.0)
+        {
+            return Math.Max(0.0, requestedLength.Value);
+        }
+
+        if (segmentsRemaining <= 1)
+        {
+            return Math.Max(0.0, remaining);
+        }
+
+        return Math.Max(0.0, remaining / Math.Max(1, segmentsRemaining));
+    }
+
+    private static void AppendOrExtendCasingElement(CasingSection section, double? od, double? id, double rowLength)
+    {
+        if (section.CasingSectionElements is not List<CasingSectionElement> elements)
+        {
+            elements = section.CasingSectionElements?.ToList() ?? new List<CasingSectionElement>();
+            section.CasingSectionElements = elements;
+        }
+
+        var last = elements.LastOrDefault();
+        if (last != null && AreClose(GetGaussianValue(last.BodyOD), od) && AreClose(GetGaussianValue(last.BodyID), id))
+        {
+            var existingLength = GetGaussianValue(last.SectionLength) ?? 0.0;
+            last.SectionLength = ConversionsFromOSDC.DoubleToGaussian(existingLength + rowLength);
+            return;
+        }
+
+        var element = CreateDefaultCasingSectionElement();
+        element.BodyOD = ConversionsFromOSDC.DoubleToGaussian(od);
+        element.BodyID = ConversionsFromOSDC.DoubleToGaussian(id);
+        element.SectionLength = ConversionsFromOSDC.DoubleToGaussian(rowLength);
+        elements.Add(element);
+    }
+
+    private static void AppendOrExtendBoreHoleSize(CasingSection section, double? boreholeOd, double rowLength)
+    {
+        if (!boreholeOd.HasValue || boreholeOd.Value <= 0.0)
+        {
+            return;
+        }
+
+        if (section.CasingSectionSizeTable is not List<BoreHoleSize> rows)
+        {
+            rows = section.CasingSectionSizeTable?.ToList() ?? new List<BoreHoleSize>();
+            section.CasingSectionSizeTable = rows;
+        }
+
+        var last = rows.LastOrDefault();
+        if (last != null && AreClose(GetGaussianValue(last.HoleSize), boreholeOd))
+        {
+            var existingLength = GetGaussianValue(last.Length) ?? 0.0;
+            last.Length = ConversionsFromOSDC.DoubleToGaussian(existingLength + rowLength);
+            return;
+        }
+
+        var row = CreateDefaultCasingSectionSizeRow();
+        row.HoleSize = ConversionsFromOSDC.DoubleToGaussian(boreholeOd);
+        row.Length = ConversionsFromOSDC.DoubleToGaussian(rowLength);
+        rows.Add(row);
+    }
+
+    private static bool AreClose(double? a, double? b)
+    {
+        if (!a.HasValue && !b.HasValue)
+        {
+            return true;
+        }
+
+        if (!a.HasValue || !b.HasValue)
+        {
+            return false;
+        }
+
+        return Math.Abs(a.Value - b.Value) <= 1e-6;
+    }
+
+    private static bool IsMeaningfulBoreHoleSizeRow(BoreHoleSize? row)
+    {
+        return row != null
+            && (GetGaussianValue(row.HoleSize).HasValue || GetGaussianValue(row.Length).HasValue);
+    }
+
+    private void AddCasingSection()
+    {
+        SimplifiedCasingRows.Add(CreateDefaultSimplifiedCasingRow());
+        StateHasChanged();
+    }
+
+    private void RemoveCasingSection(int index)
+    {
+        if (SimplifiedCasingRows.Count == 1)
+        {
+            return;
+        }
+
+        SimplifiedCasingRows.RemoveAt(index);
+        StateHasChanged();
+    }
+
+    private void MoveCasingSection(int index, int delta)
+    {
+        var list = SimplifiedCasingRows;
+        var newIndex = index + delta;
+        if (newIndex < 0 || newIndex >= list.Count)
+        {
+            return;
+        }
+
+        var item = list[index];
+        list.RemoveAt(index);
+        list.Insert(newIndex, item);
+        StateHasChanged();
+    }
+
+    private void UpdateCasingSuspensionDepth(int index, double? value)
+    {
+        SimplifiedCasingRows[index].SuspensionDepth = value;
+    }
+
+    private void UpdateCasingFinalDepth(int index, double? value)
+    {
+        SimplifiedCasingRows[index].FinalDepth = value;
+    }
+
+    private void UpdateCasingOd(int index, double? value)
+    {
+        SimplifiedCasingRows[index].OD = value;
+    }
+
+    private void UpdateCasingId(int index, double? value)
+    {
+        SimplifiedCasingRows[index].ID = value;
+    }
+
+    private void UpdateCasingBoreholeOd(int index, double? value)
+    {
+        SimplifiedCasingRows[index].BoreholeOD = value;
+    }
+
+    private void UpdateCasingCement(int index, bool value)
+    {
+        SimplifiedCasingRows[index].HasCement = value;
+    }
+
+    private void AddOpenHoleRow()
+    {
+        OpenHoleRows.Add(CreateDefaultOpenHoleRow());
+    }
+
+    private void RemoveOpenHoleRow(int index)
+    {
+        if (OpenHoleRows.Count == 1)
+        {
+            return;
+        }
+
+        OpenHoleRows.RemoveAt(index);
+    }
+
+    private void MoveOpenHoleRow(int index, int delta)
+    {
+        var newIndex = index + delta;
+        if (newIndex < 0 || newIndex >= OpenHoleRows.Count)
+        {
+            return;
+        }
+
+        var row = OpenHoleRows[index];
+        OpenHoleRows.RemoveAt(index);
+        OpenHoleRows.Insert(newIndex, row);
+    }
+
+    private void UpdateOpenHoleOd(int index, double? value)
+    {
+        OpenHoleRows[index].HoleSize = ConversionsFromOSDC.DoubleToGaussian(value);
+    }
+
+    private void UpdateOpenHoleLength(int index, double? value)
+    {
+        OpenHoleRows[index].Length = ConversionsFromOSDC.DoubleToGaussian(value);
+    }
+
+    private static double? GetGaussianValue(GaussianDrillingProperty? property) => ConversionsFromOSDC.GaussianToDouble(property);
+
+    private IEnumerable<string> GetFluidLabels()
+    {
+        if (WellBoreArchitecture?.FluidsAboveGroundLevel == null || WellBoreArchitecture.FluidsAboveGroundLevel.Count == 0)
+        {
+            return new[] { "Air" };
+        }
+
+        return WellBoreArchitecture.FluidsAboveGroundLevel
+            .Where(fluid => fluid != null)
+            .Select(fluid => fluid.Fluid.ToString())
+            .Distinct();
+    }
+
+    private List<SchematicTube> BuildSchematicTubes()
+    {
+        var segments = new List<SchematicTube>();
+        var maxDiameter = GetMaxDiameter();
+        if (maxDiameter <= 0.0)
+        {
+            maxDiameter = 1.0;
+        }
+
+        const double centerX = 160.0;
+        var topsideY = TopsideY;
+        var topsideHeight = TopsideHeight;
+
+        var sections = EnsureSurfaceSectionsList();
+        var surfaceTotalLength = sections.Sum(GetSurfaceSectionDisplayLength);
+        var cursor = topsideY;
+        foreach (var section in sections)
+        {
+            var segmentHeight = topsideHeight * (GetSurfaceSectionDisplayLength(section) / surfaceTotalLength);
+            if (section.Type == SurfaceSectionType.BOP)
+            {
+                cursor += segmentHeight;
+                continue;
+            }
+            var outerWidth = GetRiserDisplayWidth(maxDiameter);
+            segments.Add(new SchematicTube(GetSurfaceLabel(section.Type), centerX - outerWidth / 2.0, cursor, outerWidth, 0.0, Math.Max(segmentHeight, 20.0), "#b6b6b6", "#5f5f5f", false));
+            cursor += segmentHeight;
+        }
+
+        return segments;
+    }
+
+    private List<SchematicCasingString> BuildSchematicCasingStrings()
+    {
+        const double centerX = 160.0;
+        const double downholeY = WellHeadTopY;
+        const double downholeHeight = 430.0;
+        const double maxOuterWidth = 66.0;
+        const double nestingClearance = 8.0;
+        const double reserveInnerWidth = 16.0;
+
+        var groups = BuildSimplifiedCasingGroups();
+        var strings = new List<SchematicCasingString>();
+        if (groups.Count == 0)
+        {
+            return strings;
+        }
+
+        var maxDiameter = Math.Max(1.0, GetMaxDiameter());
+        var allRows = groups.SelectMany(group => group.Rows).ToList();
+        var minDepth = allRows.Min(row => row.SuspensionDepth ?? 0.0);
+        var maxDepth = allRows.Max(row => Math.Max(row.SuspensionDepth ?? 0.0, row.FinalDepth ?? row.SuspensionDepth ?? 0.0));
+        var depthRange = Math.Max(1.0, maxDepth - minDepth);
+        var availableOuterWidth = maxOuterWidth;
+
+        for (var groupIndex = 0; groupIndex < groups.Count; groupIndex++)
+        {
+            var group = groups[groupIndex];
+            var requestedMaxOuterWidth = Math.Max(12.0, group.Rows.Max(row => GetWidthFromDiameter(row.OD, maxDiameter) * 0.5));
+            var scale = requestedMaxOuterWidth > 0.0
+                ? Math.Min(1.0, availableOuterWidth / requestedMaxOuterWidth)
+                : 1.0;
+
+            var segments = new List<SchematicCasingSegment>();
+            var minInnerWidth = double.MaxValue;
+            for (var rowIndex = 0; rowIndex < group.Rows.Count; rowIndex++)
+            {
+                var row = group.Rows[rowIndex];
+                var startDepth = row.SuspensionDepth ?? 0.0;
+                var endDepth = Math.Max(startDepth, row.FinalDepth ?? startDepth);
+                var topY = downholeY + downholeHeight * ((startDepth - minDepth) / depthRange);
+                var bottomY = downholeY + downholeHeight * ((endDepth - minDepth) / depthRange);
+
+                var outerWidth = Math.Max(12.0, GetWidthFromDiameter(row.OD, maxDiameter) * 0.5 * scale);
+                var requestedInnerWidth = row.ID.HasValue && row.ID.Value > 0.0
+                    ? GetWidthFromDiameter(row.ID, maxDiameter) * 0.5 * scale
+                    : outerWidth * 0.72;
+                var innerWidth = Math.Min(outerWidth - 8.0, Math.Max(reserveInnerWidth, requestedInnerWidth));
+                minInnerWidth = Math.Min(minInnerWidth, innerWidth);
+
+                var nextRow = rowIndex + 1 < group.Rows.Count ? group.Rows[rowIndex + 1] : null;
+                var shouldAnnotate = nextRow == null
+                    || !AreClose(row.OD, nextRow.OD)
+                    || !AreClose(row.ID, nextRow.ID);
+                var depthAnnotation = shouldAnnotate ? $"Depth {FormatDepthForDisplay(endDepth)}" : string.Empty;
+                var diameterAnnotation = shouldAnnotate
+                    ? (row.ID.HasValue && row.ID.Value > 0.0
+                        ? $"OD {FormatDiameterForDisplay(row.OD ?? 0.0)} / ID {FormatDiameterForDisplay(row.ID.Value)}"
+                        : $"OD {FormatDiameterForDisplay(row.OD ?? 0.0)}")
+                    : string.Empty;
+                segments.Add(new SchematicCasingSegment(
+                    centerX - outerWidth / 2.0,
+                    topY,
+                    bottomY,
+                    outerWidth,
+                    innerWidth,
+                    depthAnnotation,
+                    diameterAnnotation));
+            }
+
+            strings.Add(new SchematicCasingString(segments));
+            availableOuterWidth = Math.Max(28.0, minInnerWidth - nestingClearance * 2.0);
+        }
+
+        return strings;
+    }
+
+    private List<SchematicBoreHoleSegment> BuildSchematicBoreHoleSegments()
+    {
+        var groups = BuildSimplifiedCasingGroups();
+        var casingStrings = SchematicCasingStrings;
+        var segments = new List<SchematicBoreHoleSegment>();
+        for (var groupIndex = 0; groupIndex < Math.Min(groups.Count, casingStrings.Count); groupIndex++)
+        {
+            var group = groups[groupIndex];
+            var casingString = casingStrings[groupIndex];
+            if (group.Rows.Count == 0 || casingString.Segments.Count == 0)
+            {
+                continue;
+            }
+
+            var maxBoreHoleOd = group.Rows
+                .Select(row => row.BoreholeOD)
+                .Where(value => value.HasValue && value.Value > 0.0)
+                .Select(value => value!.Value)
+                .DefaultIfEmpty()
+                .Max();
+
+            if (maxBoreHoleOd <= 0.0)
+            {
+                continue;
+            }
+
+            var stringOuterWidth = casingString.Segments.Max(segment => segment.OuterWidth);
+            var markerWidth = GetCasingMarkerWidth(stringOuterWidth);
+            var minWidth = stringOuterWidth + 4.0;
+            var maxWidth = stringOuterWidth + markerWidth * 2.0;
+            var tocDepth = group.Rows
+                .Where(row => row.HasCement)
+                .Select(row => row.SuspensionDepth)
+                .Where(value => value.HasValue)
+                .Select(value => value!.Value)
+                .Cast<double?>()
+                .Min();
+
+            var cursor = 0;
+            while (cursor < group.Rows.Count && cursor < casingString.Segments.Count)
+            {
+                var currentRow = group.Rows[cursor];
+                var currentBoreHoleOd = currentRow.BoreholeOD;
+                var endIndex = cursor;
+                while (endIndex + 1 < group.Rows.Count
+                    && endIndex + 1 < casingString.Segments.Count
+                    && AreClose(group.Rows[endIndex + 1].BoreholeOD, currentBoreHoleOd))
+                {
+                    endIndex++;
+                }
+
+                if (currentBoreHoleOd.HasValue && currentBoreHoleOd.Value > 0.0)
+                {
+                    var topSegment = casingString.Segments[cursor];
+                    var bottomSegment = casingString.Segments[endIndex];
+                    var ratio = Math.Clamp(currentBoreHoleOd.Value / maxBoreHoleOd, 0.0, 1.0);
+                    var width = minWidth + (maxWidth - minWidth) * ratio;
+                    var endDepth = group.Rows[endIndex].FinalDepth ?? group.Rows[endIndex].SuspensionDepth;
+                    double? cementTopY = null;
+                    string? tocDepthAnnotation = null;
+                    if (tocDepth.HasValue)
+                    {
+                        var segmentTopDepth = group.Rows[cursor].SuspensionDepth ?? 0.0;
+                        var segmentBottomDepth = group.Rows[endIndex].FinalDepth ?? segmentTopDepth;
+                        if (tocDepth.Value <= segmentBottomDepth + CasingGroupingTolerance)
+                        {
+                            if (tocDepth.Value <= segmentTopDepth + CasingGroupingTolerance)
+                            {
+                                cementTopY = topSegment.TopY;
+                            }
+                            else
+                            {
+                                var localRange = Math.Max(CasingGroupingTolerance, segmentBottomDepth - segmentTopDepth);
+                                var ratioToTop = (tocDepth.Value - segmentTopDepth) / localRange;
+                                cementTopY = topSegment.TopY + (bottomSegment.BottomY - topSegment.TopY) * ratioToTop;
+                            }
+
+                            tocDepthAnnotation = $"TOC Depth {FormatDepthForDisplay(tocDepth.Value)}";
+                        }
+                    }
+
+                    segments.Add(new SchematicBoreHoleSegment(
+                        topSegment.X + topSegment.OuterWidth / 2.0,
+                        topSegment.TopY,
+                        bottomSegment.BottomY,
+                        width,
+                        cementTopY,
+                        tocDepthAnnotation,
+                        $"Depth {FormatDepthForDisplay(endDepth)}",
+                        $"OD {FormatDiameterForDisplay(currentBoreHoleOd.Value)}"));
+                }
+
+                cursor = endIndex + 1;
+            }
+        }
+
+        return segments;
+    }
+
+    private List<SimplifiedCasingGroup> BuildSimplifiedCasingGroups()
+    {
+        return BuildSimplifiedCasingGroups(EnsureSimplifiedCasingRows());
+    }
+
+    private static List<SimplifiedCasingGroup> BuildSimplifiedCasingGroups(IEnumerable<SimplifiedCasingRow> sourceRows)
+    {
+        var groups = new List<SimplifiedCasingGroup>();
+        var currentRows = new List<SimplifiedCasingRow>();
+        double? currentEnd = null;
+
+        foreach (var row in sourceRows)
+        {
+            var rowStart = row.SuspensionDepth ?? 0.0;
+            var rowEnd = Math.Max(rowStart, row.FinalDepth ?? rowStart);
+            if (currentRows.Count == 0 || currentEnd == null || Math.Abs(rowStart - currentEnd.Value) <= CasingGroupingTolerance)
+            {
+                currentRows.Add(row);
+            }
+            else
+            {
+                groups.Add(new SimplifiedCasingGroup(currentRows.ToList()));
+                currentRows = new List<SimplifiedCasingRow> { row };
+            }
+
+            currentEnd = rowEnd;
+        }
+
+        if (currentRows.Count > 0)
+        {
+            groups.Add(new SimplifiedCasingGroup(currentRows));
+        }
+
+        return groups;
+    }
+
+    private List<SchematicOpenHoleSegment> BuildSchematicOpenHoleSegments()
+    {
+        var rows = EnsureOpenHoleRows();
+        var casingStrings = SchematicCasingStrings;
+        var innermostCasingString = casingStrings.LastOrDefault();
+        var innermostSegment = innermostCasingString?.Segments.LastOrDefault();
+        if (rows.Count == 0 || innermostSegment == null)
+        {
+            return new List<SchematicOpenHoleSegment>();
+        }
+
+        var groups = BuildSimplifiedCasingGroups();
+        var casingRows = groups.SelectMany(group => group.Rows).ToList();
+        var minDepth = casingRows.Count > 0 ? casingRows.Min(row => row.SuspensionDepth ?? 0.0) : 0.0;
+        var maxDepth = casingRows.Count > 0
+            ? casingRows.Max(row => Math.Max(row.SuspensionDepth ?? 0.0, row.FinalDepth ?? row.SuspensionDepth ?? 0.0))
+            : 1.0;
+        var depthRange = Math.Max(1.0, maxDepth - minDepth);
+        const double downholeHeight = 430.0;
+        var pixelsPerDepth = downholeHeight / depthRange;
+
+        var referenceDiameter = Math.Max(0.01, GetInnermostCasingInnerDiameter() ?? 0.01);
+        var referenceWidth = Math.Max(10.0, innermostSegment.InnerWidth);
+        var cursor = innermostSegment.BottomY;
+        var centerX = innermostSegment.X + innermostSegment.OuterWidth / 2.0;
+
+        var segments = new List<SchematicOpenHoleSegment>();
+        for (var i = 0; i < rows.Count; i++)
+        {
+            var row = rows[i];
+            var length = Math.Max(0.0, GetGaussianValue(row.Length) ?? 0.0);
+            var segmentHeight = Math.Max(12.0, length * pixelsPerDepth);
+            var holeDiameter = Math.Max(referenceDiameter, GetGaussianValue(row.HoleSize) ?? referenceDiameter);
+            var width = Math.Max(referenceWidth, referenceWidth * (holeDiameter / referenceDiameter));
+            var endDepth = GetOpenHoleSectionEndDepth(rows, i, maxDepth);
+            var depthAnnotation = $"Depth {FormatDepthForDisplay(endDepth)}";
+            var diameterAnnotation = $"OD {FormatDiameterForDisplay(GetGaussianValue(row.HoleSize) ?? holeDiameter)}";
+            segments.Add(new SchematicOpenHoleSegment(centerX, cursor, cursor + segmentHeight, width, depthAnnotation, diameterAnnotation));
+            cursor += segmentHeight;
+        }
+
+        return segments;
+    }
+
+    private List<SchematicPoint> BuildJaggedOpenHolePointList(double edgeX, double topY, double bottomY, bool isLeft)
+    {
+        const double amplitude = 3.0;
+        const double step = 10.0;
+        var points = new List<SchematicPoint> { new(edgeX, topY) };
+        var y = topY;
+        var direction = isLeft ? -1.0 : 1.0;
+        var toggle = false;
+        while (y < bottomY)
+        {
+            y = Math.Min(bottomY, y + step);
+            var x = edgeX + (toggle ? amplitude * direction : 0.0);
+            points.Add(new SchematicPoint(x, y));
+            toggle = !toggle;
+        }
+
+        return points;
+    }
+
+    private double GetOpenHoleSectionEndDepth(List<BoreHoleSize> rows, int index, double casingBottomDepth)
+    {
+        var depth = casingBottomDepth;
+        for (var i = 0; i <= index; i++)
+        {
+            depth += Math.Max(0.0, GetGaussianValue(rows[i].Length) ?? 0.0);
+        }
+
+        return depth;
+    }
+
+    private string FormatDiameterForDisplay(double value) => FormatDiameterQuantityWithUnit(value);
+
+    private string FormatDrillingQuantity(double value, OSDC.UnitConversion.Conversion.DrillingEngineering.DrillingPhysicalQuantity.QuantityEnum quantity)
+    {
+        return GetCurrentDrillingUnitSystem().FromSIString(quantity, value);
+    }
+
+    private string FormatDepthQuantityWithUnit(double value) =>
+        FormatQuantityWithUnit(value, OSDC.UnitConversion.Conversion.DrillingEngineering.DrillingPhysicalQuantity.QuantityEnum.DepthDrilling);
+
+    private string FormatDiameterQuantityWithUnit(double value) =>
+        FormatQuantityWithUnit(value, OSDC.UnitConversion.Conversion.DrillingEngineering.DrillingPhysicalQuantity.QuantityEnum.DiameterPipeDrilling);
+
+    private string FormatQuantityWithUnit(double value, OSDC.UnitConversion.Conversion.DrillingEngineering.DrillingPhysicalQuantity.QuantityEnum quantity)
+    {
+        var unitSystem = GetCurrentDrillingUnitSystem();
+        return $"{unitSystem.FromSIString(quantity, value)} {unitSystem.GetUnitLabel(quantity)}";
+    }
+
+    private OSDC.UnitConversion.Conversion.UnitSystem.DrillingEngineering.DrillingUnitSystem GetCurrentDrillingUnitSystem()
+    {
+        var unitSystem = DataUtils.UnitAndReferenceParameters.UnitSystemName ?? "Metric";
+        if (unitSystem.Contains("US", StringComparison.OrdinalIgnoreCase))
+        {
+            return OSDC.UnitConversion.Conversion.UnitSystem.DrillingEngineering.DrillingUnitSystem.USUnitSystem;
+        }
+
+        if (unitSystem.Contains("English", StringComparison.OrdinalIgnoreCase)
+            || unitSystem.Contains("Imperial", StringComparison.OrdinalIgnoreCase))
+        {
+            return OSDC.UnitConversion.Conversion.UnitSystem.DrillingEngineering.DrillingUnitSystem.ImperialUnitSystem;
+        }
+
+        if (unitSystem.Contains("SI", StringComparison.OrdinalIgnoreCase))
+        {
+            return OSDC.UnitConversion.Conversion.UnitSystem.DrillingEngineering.DrillingUnitSystem.SIUnitSystem;
+        }
+
+        return OSDC.UnitConversion.Conversion.UnitSystem.DrillingEngineering.DrillingUnitSystem.MetricUnitSystem;
+    }
+
+    private double GetOuterMostCasingHangerWidth()
+    {
+        var outerMostString = BuildSchematicCasingStrings().FirstOrDefault();
+        var firstSegment = outerMostString?.Segments.FirstOrDefault();
+        if (firstSegment == null)
+        {
+            return 20.0;
+        }
+
+        return GetCasingMarkerWidth(firstSegment.OuterWidth);
+    }
+
+    private static double GetCasingMarkerWidth(double segmentOuterWidth)
+    {
+        return Math.Max(10.0, Math.Min(18.67, segmentOuterWidth * 0.1467));
+    }
+
+    private static double GetCasingMarkerHeight(double wallThickness)
+    {
+        return Math.Max(6.67, wallThickness * 1.87);
+    }
+
+    private static double GetCasingShoeHeight(double wallThickness)
+    {
+        return Math.Max(12.0, wallThickness * 3.33);
+    }
+
+    private List<SchematicEquipmentBlock> BuildSchematicEquipment()
+    {
+        var blocks = new List<SchematicEquipmentBlock>();
+        const double centerX = 160.0;
+        var sections = EnsureSurfaceSectionsList();
+        var surfaceTotalLength = sections.Sum(GetSurfaceSectionDisplayLength);
+        var cursor = TopsideY;
+        var maxDiameter = Math.Max(1.0, GetMaxDiameter());
+
+        foreach (var section in sections)
+        {
+            var segmentHeight = TopsideHeight * (GetSurfaceSectionDisplayLength(section) / surfaceTotalLength);
+            if (section.Type == SurfaceSectionType.BOP)
+            {
+                var width = GetBopDisplayWidth(section, maxDiameter);
+                blocks.Add(new SchematicEquipmentBlock(GetSurfaceLabel(section.Type), centerX - width / 2.0, cursor, width, Math.Max(segmentHeight, 36.0), "#ef2f2f", "#981b1b", true));
+            }
+
+            cursor += segmentHeight;
+        }
+
+        return blocks;
+    }
+
+    private double GetSurfaceSectionDisplayLength(SurfaceSection section)
+    {
+        var length = GetGaussianValue(section.SectionLength);
+        if (length.HasValue && length.Value > 0.0)
+        {
+            return length.Value;
+        }
+
+        if (section.Type == SurfaceSectionType.BOP)
+        {
+            return CurrentSurfaceConfiguration == SurfaceConfiguration.OffshoreFloater ? 12.0 : 6.0;
+        }
+
+        return 10.0;
+    }
+
+    private double GetRiserDisplayWidth(double maxDiameter)
+    {
+        var bopSection = EnsureSurfaceSectionsList().FirstOrDefault(section => section.Type == SurfaceSectionType.BOP);
+        var bopWidth = bopSection != null ? GetBopDisplayWidth(bopSection, maxDiameter) : 18.0;
+        return Math.Max(8.0, bopWidth * 0.44);
+    }
+
+    private double GetBopDisplayWidth(SurfaceSection bopSection, double maxDiameter)
+    {
+        return Math.Max(18.0, (Math.Max(52.0, GetWidthFromDiameter(GetGaussianValue(bopSection.BodyOD), maxDiameter) + 22.0)) * 0.2);
+    }
+
+    private double GetMaxDiameter()
+    {
+        var diameters = new List<double?>
+        {
+            ConversionsFromOSDC.ScalarToDouble(WellBoreArchitecture?.WellHead?.MaxOD)
+        };
+
+        diameters.AddRange(EnsureSurfaceSectionsList().Select(section => GetGaussianValue(section.BodyOD)));
+        diameters.AddRange(SimplifiedCasingRows.Select(row => row.OD));
+        diameters.AddRange(EnsureOpenHoleRows().Select(row => GetGaussianValue(row.HoleSize)));
+
+        return diameters.Where(value => value != null && value > 0.0).DefaultIfEmpty(1.0).Max() ?? 1.0;
+    }
+
+    private double? GetInnermostCasingInnerDiameter()
+    {
+        return SimplifiedCasingRows
+            .Select(row => row.ID)
+            .Where(value => value.HasValue && value.Value > 0.0)
+            .LastOrDefault();
+    }
+
+    private static double GetWidthFromDiameter(double? diameter, double maxDiameter)
+    {
+        var normalized = diameter.HasValue && diameter.Value > 0.0 ? diameter.Value / maxDiameter : 0.35;
+        return 48.0 + (160.0 * normalized);
+    }
+
+    private static string GetSurfaceLabel(SurfaceSectionType type) => type switch
+    {
+        SurfaceSectionType.BOP => "BOP",
+        SurfaceSectionType.HighPressureRiser => "HP riser",
+        SurfaceSectionType.LowPressureRiser => "LP riser",
+        SurfaceSectionType.MarineRiser => "Marine riser",
+        _ => "Surface"
+    };
+
+    private async Task SaveWellBoreArchitecture()
+    {
+        if (WellBoreArchitecture == null)
+        {
+            return;
+        }
+
+        await CommitActiveEditorAsync();
+
+        var isEditMode = IsEditMode;
+        ApplySimplifiedRowsToDetailedSections();
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(WellBoreArchitecture.Name))
+            {
+                WellBoreArchitecture.Name = "Wellbore Architecture";
+            }
+
+            WellBoreArchitecture.WellBoreID = _selectedWellBore?.MetaInfo?.ID is Guid wellBoreId && wellBoreId != Guid.Empty
+                ? wellBoreId
+                : null;
+
+            if (isEditMode)
+            {
+                WellBoreArchitecture.LastModificationDate = DateTimeOffset.UtcNow;
+                await APIUtils.ClientWellBoreArchitecture.PutWellBoreArchitectureByIdAsync(WellBoreArchitecture.MetaInfo.ID, WellBoreArchitecture);
+                logger.LogInformation("Wellbore Architecture updated successfully");
+                Snackbar.Add("Wellbore Architecture updated successfully", Severity.Success);
+            }
+            else
+            {
+                var creationDate = DateTimeOffset.UtcNow;
+                WellBoreArchitecture.MetaInfo = new MetaInfo
+                {
+                    ID = Guid.NewGuid(),
+                    HttpHostName = APIUtils.HostNameWellBoreArchitecture,
+                    HttpHostBasePath = APIUtils.HostBasePathWellBoreArchitecture,
+                    HttpEndPoint = "WellBoreArchitecture/"
+                };
+                WellBoreArchitecture.CreationDate = creationDate;
+                WellBoreArchitecture.LastModificationDate = creationDate;
+                await APIUtils.ClientWellBoreArchitecture.PostWellBoreArchitectureAsync(WellBoreArchitecture);
+                logger.LogInformation("WellBoreArchitecture posted successfully");
+                Snackbar.Add("WellBoreArchitecture posted successfully", Severity.Success);
+            }
+        }
+        catch (Exception ex)
+        {
+            if (isEditMode)
+            {
+                logger.LogError(ex, "Impossible to update Wellbore Architecture");
+                Snackbar.Add("Impossible to update Wellbore Architecture", Severity.Warning);
+            }
+            else
+            {
+                logger.LogError(ex, "Impossible to add a new WellBoreArchitecture");
+                Snackbar.Add("Impossible to add a new WellBoreArchitecture", Severity.Warning);
+            }
+        }
+
+        OnUpdate?.Invoke();
+    }
+
+    private async Task CommitActiveEditorAsync()
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("wellBoreArchitecture.blurActiveElement");
+            await Task.Yield();
+        }
+        catch (JSException ex)
+        {
+            logger.LogWarning(ex, "Unable to blur the active editor before saving");
+        }
+    }
+
+    private void CloseWellBoreArchitecture()
+    {
+        OnUpdate?.Invoke();
+    }
+
+    private enum ArchitectureEditorMode
+    {
+        Simplified,
+        Detailed
+    }
+
+    private enum SurfaceConfiguration
+    {
+        Onshore,
+        OffshoreFixed,
+        OffshoreFloater
+    }
+
+    private sealed record SimplifiedCasingRow
+    {
+        public double? SuspensionDepth { get; set; }
+        public double? FinalDepth { get; set; }
+        public double? OD { get; set; }
+        public double? ID { get; set; }
+        public double? BoreholeOD { get; set; }
+        public bool HasCement { get; set; }
+    }
+
+    private sealed record SimplifiedCasingGroup(List<SimplifiedCasingRow> Rows);
+    private sealed record SurfaceSectionDescriptor(string Label, SurfaceSectionType Type);
+    private sealed record SchematicCasingString(List<SchematicCasingSegment> Segments);
+    private sealed record SchematicBoreHoleSegment(double CenterX, double TopY, double BottomY, double Width, double? CementTopY, string? TocDepthAnnotation, string DepthAnnotation, string DiameterAnnotation);
+    private sealed record SchematicCasingSegment(double X, double TopY, double BottomY, double OuterWidth, double InnerWidth, string DepthAnnotation, string DiameterAnnotation);
+    private sealed record SchematicPoint(double X, double Y);
+    private sealed record SchematicOpenHoleSegment(double CenterX, double TopY, double BottomY, double Width, string DepthAnnotation, string DiameterAnnotation);
+    private sealed record SchematicTube(string Label, double X, double Y, double OuterWidth, double InnerWidth, double Height, string Fill, string Stroke, bool ShowShoulder);
+    private sealed record SchematicEquipmentBlock(string Label, double X, double Y, double Width, double Height, string Fill, string Stroke, bool IsBop = false);
+
+    private sealed class MetaInfoIdComparer<T>(Func<T?, Guid?> idSelector) : IEqualityComparer<T>
+    {
+        public bool Equals(T? x, T? y)
+        {
+            if (ReferenceEquals(x, y))
+            {
+                return true;
+            }
+
+            var xId = idSelector(x);
+            var yId = idSelector(y);
+            return xId != null && yId != null && xId == yId;
+        }
+
+        public int GetHashCode(T obj)
+        {
+            var id = idSelector(obj);
+            return id?.GetHashCode() ?? 0;
+        }
+    }
+}
+

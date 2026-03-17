@@ -8,20 +8,20 @@
     <MudCollapse Expanded="openPanel">
         <MudDivider Class="mb-2"/>
         <MudGrid Class="my-2">
-            <InputHeader xs="1" Text="Max OD"/>
-            <InputHeader xs="1" Text="Min OD"/>
+            <InputHeader xs="2" Text="Max OD"/>
+            <InputHeader xs="2" Text="Min OD"/>
             <InputHeader xs="2" Text="Depth"/>
-            <InputHeader xs="2" Text="Casing Hanger Depth"/>
-            <InputHeader xs="2" Text="Tubing Hanger Depth"/>        
+            <InputHeader xs="3" Text="Casing Hanger Depth"/>
+            <InputHeader xs="3" Text="Tubing Hanger Depth"/>        
         </MudGrid>
         <MudGrid Class="my-2">
-            <MudItem xs="1">
+            <MudItem xs="2">
                 <MudInputWithUnitAdornment VariantType="Variant.Text"
                     QuantityName="DiameterPipeDrilling"
                     SIValueNullable="maxOD"
                     SIValueNullableChanged="UpdateMaxOD" />
             </MudItem>
-            <MudItem xs="1">
+            <MudItem xs="2">
                 <MudInputWithUnitAdornment VariantType="Variant.Text"
                     QuantityName="DiameterPipeDrilling"
                     SIValueNullable="minOD"
@@ -35,13 +35,13 @@
                     SIValueNullableChanged="val => { UpdateDepth(val); }" />
             </MudItem>
 
-            <MudItem xs="2">
+            <MudItem xs="3">
                 <MudInputWithUnitAdornment VariantType="Variant.Text"
                     QuantityName="DepthDrilling"
                     SIValueNullable="casingHangerDepth"
                     SIValueNullableChanged="val => { UpdateCasingHangerDepth(val); }" />
             </MudItem>                
-            <MudItem xs="2">
+            <MudItem xs="3">
                 <MudInputWithUnitAdornment VariantType="Variant.Text"
                     QuantityName="DepthDrilling"
                     SIValueNullable="tubingHangerDepth"

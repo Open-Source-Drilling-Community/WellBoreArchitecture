@@ -1,7 +1,7 @@
 
 <MudPaper Class="@Class">
     <MudToolBar Class="ml-n6 my-n4">    
-        <MudText Typo="Typo.body1"><b>Casing size properties table</b></MudText>
+        <MudText Typo="Typo.body1"><b>Borehole Size Description</b></MudText>
         <MudSpacer/>
         <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Add" Color="Color.Secondary" OnClick="AddCasingSectionTableLine" Size="Size.Small"> Add line </MudButton>        
         <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Remove"  Color="Color.Tertiary" OnClick="RemoveCasingSectionTableLine " Size="Size.Small"> Remove line</MudButton>              
@@ -24,7 +24,7 @@
                     </MudItem>
                     <MudItem xs="2">
                         <MudInputWithUnitAdornment VariantType="Variant.Text"
-                            QuantityName="Length"
+                            QuantityName="DepthDrilling"
                             SIValueNullable="length[index]"
                             SIValueNullableChanged="val => { UpdateLength(val, index); }" />
                     </MudItem>
@@ -67,11 +67,28 @@
     private string expandIcon = Icons.Material.Filled.ExpandLess;
     protected override void OnInitialized()
     {
+        var hasMeaningfulData = HasMeaningfulBoreHoleSizeData(CasingSectionInstance?.CasingSectionSizeTable);
+        openPanel = hasMeaningfulData;
+        expandIcon = openPanel ? Icons.Material.Filled.ExpandLess : Icons.Material.Filled.ExpandMore;
+        ShowHideText = openPanel ? "Hide" : "Show";
+
         //check if there are any initial information. If so, load it.
         if(CasingSectionInstance!=null)
         {
             if(CasingSectionInstance.CasingSectionSizeTable != null)
             {
+                if (CasingSectionInstance.CasingSectionSizeTable.Count == 0)
+                {
+                    CasingSectionInstance.CasingSectionSizeTable = new List<BoreHoleSize>
+                    {
+                        new BoreHoleSize
+                        {
+                            HoleSize = ConversionsFromOSDC.DoubleToGaussian(null),
+                            Length = ConversionsFromOSDC.DoubleToGaussian(null)
+                        }
+                    };
+                }
+
                 if (boreHoleSizes is List<BoreHoleSize> list)
                 {
 
@@ -160,6 +177,18 @@
             ShowHideText = "Hide";
         }
         openPanel = !openPanel;
+    }
+
+    private static bool HasMeaningfulBoreHoleSizeData(ICollection<BoreHoleSize>? rows)
+    {
+        if (rows == null || rows.Count == 0)
+        {
+            return false;
+        }
+
+        return rows.Any(row =>
+            ConversionsFromOSDC.GaussianToDouble(row?.Length) != null ||
+            ConversionsFromOSDC.GaussianToDouble(row?.HoleSize) != null);
     }
 
 }

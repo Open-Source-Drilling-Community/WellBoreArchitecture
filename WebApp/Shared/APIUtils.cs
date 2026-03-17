@@ -23,6 +23,11 @@ public static class APIUtils
     public static readonly string HostBasePathWell = "Well/api/";
     public static readonly HttpClient HttpClientWell = APIUtils.SetHttpClient(HostNameWell, HostBasePathWell);
     public static readonly NORCE.Drilling.WellBoreArchitecture.ModelShared.Client ClientWell = new NORCE.Drilling.WellBoreArchitecture.ModelShared.Client(APIUtils.HttpClientWell.BaseAddress!.ToString(), APIUtils.HttpClientWell);
+    // Rig api
+    public static readonly string HostNameRig = NORCE.Drilling.WellBoreArchitecture.WebApp.Configuration.RigHostURL!;
+    public static readonly string HostBasePathRig = "Rig/api/";
+    public static readonly HttpClient HttpClientRig = APIUtils.SetHttpClient(HostNameRig, HostBasePathRig);
+    public static readonly NORCE.Drilling.WellBoreArchitecture.ModelShared.Client ClientRig = new NORCE.Drilling.WellBoreArchitecture.ModelShared.Client(APIUtils.HttpClientRig.BaseAddress!.ToString(), APIUtils.HttpClientRig);
     // WellBore api
     public static readonly string HostNameWellBore = NORCE.Drilling.WellBoreArchitecture.WebApp.Configuration.WellBoreHostURL!;
     public static readonly string HostBasePathWellBore = "WellBore/api/";

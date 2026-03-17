@@ -14,6 +14,7 @@
             int index = i;
             <MudPaper Class="@Class" Style="@($"background:{createRowColor(i)};")" Elevation="0">
                 <CasingSectionElementEditor  
+                    @key="CasingSectionElements.ElementAt<CasingSectionElement>(index)"
                     CasingSectionElementInstance="CasingElementUpdate(index)" 
                     index="index" 
                     CasingSectionInstance="CasingSectionInstance"/>

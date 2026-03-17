@@ -33,6 +33,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Pages\WellBoreArchitetureAddPanel.razor" />
+    <Compile Remove="Pages\WellBoreArchitetureEditPanel.razor" />
+    <Content Remove="Pages\WellBoreArchitetureAddPanel.razor" />
+    <Content Remove="Pages\WellBoreArchitetureEditPanel.razor" />
+    <EmbeddedResource Remove="Pages\WellBoreArchitetureAddPanel.razor" />
+    <EmbeddedResource Remove="Pages\WellBoreArchitetureEditPanel.razor" />
+    <None Remove="Pages\WellBoreArchitetureAddPanel.razor" />
+    <None Remove="Pages\WellBoreArchitetureEditPanel.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Update="wwwroot\css\site.css">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

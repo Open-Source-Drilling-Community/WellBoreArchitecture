@@ -32,7 +32,7 @@
     </MudItem>
     <MudItem xs="2">
         <MudInputWithUnitAdornment VariantType="Variant.Text"
-            QuantityName="Length"
+            QuantityName="DepthDrilling"
             SIValueNullable="sectionLength"
             SIValueNullableChanged="val => { UpdateSectionLength(val); }"/>
     </MudItem>
@@ -53,9 +53,8 @@
     private double? jointLength = 0.0;
     private double? sectionLength = 0.0;
     
-    protected override void OnInitialized()
+    protected override void OnParametersSet()
     {
-        //Load casing element instances
         if (CasingSectionElementInstance != null)
         {
             bodyOD = ConversionsFromOSDC.GaussianToDouble(CasingSectionElementInstance.BodyOD);

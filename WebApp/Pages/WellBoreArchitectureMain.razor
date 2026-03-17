@@ -6,7 +6,13 @@
                               HttpBasePath=@APIUtils.HostBasePathUnitConversion
                               HttpController="UnitSystem/"
                               UnitSystemName="@DataUtils.UnitAndReferenceParameters.UnitSystemName"
-                              UnitSystemNameChanged="@DataUtils.UpdateUnitSystemName">
+                              UnitSystemNameChanged="@DataUtils.UpdateUnitSystemName"
+                              DepthReferenceName="@DataUtils.UnitAndReferenceParameters.DepthReferenceName"
+                              DepthReferenceNameChanged="@DataUtils.UpdateDepthReferenceName"
+                              GroundMudLineDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.GroundMudLineDepthReferenceSource"
+                              RotaryTableDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.RotaryTableDepthReferenceSource"
+                              SeaWaterLevelDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource"
+                              WellHeadDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.WellHeadDepthReferenceSource">
 
 
     @if (wellBoreArchitectureList == null)
@@ -49,23 +55,15 @@
                 </PagerContent>
             </MudDataGrid>
         }
-        @if (displayAddPanel)
+        @if (displayEditorPanel)
         {
-            <WellBoreArchitetureAddPanel WellBoreArchitecture="@currentWellBoreArchitecture"
-                                         Fields="@fieldDicts"
-                                         Clusters="@clusterDicts"
-                                         Wells="@wellDicts"
-                                         WellBores="@wellBoreDicts"
-                                         OnUpdate="@ShowMainPanel" />
-        }
-        @if (displayEditPanel)
-        {
-            <WellBoreArchitetureEditPanel WellBoreArchitecture="@currentWellBoreArchitecture"
-                                          Fields="@fieldDicts"
-                                          Clusters="@clusterDicts"
-                                          Wells="@wellDicts"
-                                          WellBores="@wellBoreDicts"
-                                          OnUpdate="@ShowMainPanel" />
+            <WellBoreArchiteturePanel WellBoreArchitecture="@currentWellBoreArchitecture"
+                                      Fields="@fieldDicts"
+                                      Clusters="@clusterDicts"
+                                      Wells="@wellDicts"
+                                      Rigs="@rigDicts"
+                                      WellBores="@wellBoreDicts"
+                                      OnUpdate="@ShowMainPanel" />
         }
     }
 
@@ -83,20 +81,19 @@
     private Dictionary<Guid, Field> fieldDicts = new();
     private Dictionary<Guid, Cluster> clusterDicts = new();
     private Dictionary<Guid, Well> wellDicts = new();
+    private Dictionary<Guid, RigLight> rigDicts = new();
     private Dictionary<Guid, WellBore> wellBoreDicts = new();
 
     //UI related variables
     public bool displayMainPanel = true;
-    public bool displayEditPanel = false;
-    private bool displayAddPanel = false;
+    private bool displayEditorPanel = false;
     private string? _searchString;
 
     protected override async Task OnInitializedAsync()
     {
         //Show main panel
         displayMainPanel = true;
-        displayAddPanel = false;
-        displayEditPanel = false;
+        displayEditorPanel = false;
         await InitializeAsync();
         await InvokeAsync(() => { StateHasChanged(); });
     }
@@ -171,6 +168,14 @@
                     wellDicts.Add(well.MetaInfo.ID, well);
                 }
             }
+            ICollection<RigLight> rigs = await APIUtils.ClientRig.GetAllRigLightAsync();
+            foreach (RigLight rig in rigs)
+            {
+                if (!rigDicts.ContainsKey(rig.MetaInfo.ID))
+                {
+                    rigDicts.Add(rig.MetaInfo.ID, rig);
+                }
+            }
             ICollection<WellBore> wellBores = await APIUtils.ClientWellBore.GetAllWellBoreAsync();
             foreach (WellBore wellBore in wellBores)
             {
@@ -206,15 +211,13 @@
             currentWellBoreArchitecture.CasingSections = APIUtils.DefaultCasingSections();
         }
         displayMainPanel = false;
-        displayAddPanel = true;
-        displayEditPanel = false;
+        displayEditorPanel = true;
     }
     private async void ShowMainPanel()
     {
         currentWellBoreArchitecture = null;
         displayMainPanel = true;
-        displayAddPanel = false;
-        displayEditPanel = false;
+        displayEditorPanel = false;
         await InitializeAsync();
         await InvokeAsync(() => { StateHasChanged(); });
     }
@@ -252,8 +255,7 @@
             if (currentWellBoreArchitecture != null)
             {
                 displayMainPanel = false;
-                displayAddPanel = false;
-                displayEditPanel = true;
+                displayEditorPanel = true;
                 await InvokeAsync(() => { StateHasChanged(); });
             }
             else
