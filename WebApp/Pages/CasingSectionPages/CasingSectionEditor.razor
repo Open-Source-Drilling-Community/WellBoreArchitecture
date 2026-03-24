@@ -1,45 +1,47 @@
-<MudPaper Class="@Class"  Style="@($"background:{Colors.Gray.Lighten4};")">
+<MudPaper Class="@Class" Style="@($"background:{Colors.Gray.Lighten4};")">
     <MudGrid Class="my-2 mx-2">
-        <InputHeader xs="2" Text="Top depth"/>        
-        <InputHeader xs="2" Text="Length"/>
-        <InputHeader xs="3" Text="Cement depth"/>                
+        <InputHeader xs="2" Text="Top depth" />
+        <InputHeader xs="2" Text="Length" />
+        <InputHeader xs="3" Text="Cement depth" />
     </MudGrid>
     <MudGrid Class="my-2 mx-2">
         <MudItem xs="2">
             <MudInputWithUnitAdornment VariantType="Variant.Text"
-                QuantityName="DepthDrilling"
-                SIValueNullable="topDepth"
-                SIValueNullableChanged="val => { UpdateDepth(val); }" />
+                                       QuantityName="DepthDrilling"
+                                       DrillingSignalReference="@DrillingSignalReferenceType.Depth"
+                                       SIValueNullable="topDepth"
+                                       SIValueNullableChanged="val => { UpdateDepth(val); }" />
         </MudItem>
         <MudItem xs="2">
             <MudInputWithUnitAdornment VariantType="Variant.Text"
-                QuantityName="DepthDrilling"
-                SIValueNullable="ComputedLength"
-                ReadOnly="true" />
+                                       QuantityName="DepthDrilling"
+                                       SIValueNullable="ComputedLength"
+                                       ReadOnly="true" />
         </MudItem>
         <MudItem xs="3">
             <MudInputWithUnitAdornment VariantType="Variant.Text"
-                QuantityName="DepthDrilling"
-                SIValueNullable="topCementDepth"
-                SIValueNullableChanged="val => { UpdateTopCementDepth(val); }" />
+                                       QuantityName="DepthDrilling"
+                                       DrillingSignalReference="@DrillingSignalReferenceType.Depth"
+                                       SIValueNullable="topCementDepth"
+                                       SIValueNullableChanged="val => { UpdateTopCementDepth(val); }" />
         </MudItem>
     </MudGrid>
-     <!-- Add editor for CasingSectionElements-->
-    <CasingSectionElementMain Class="py-2 px-4 my-4 mx-4" CasingSectionElements="@CasingSectionElements"/>
-    <CasingSectionSizeMain Class="py-2 px-4 my-4 mx-4" CasingSectionInstance="@CasingSectionsInstance"/>
+    <!-- Add editor for CasingSectionElements-->
+    <CasingSectionElementMain Class="py-2 px-4 my-4 mx-4" CasingSectionElements="@CasingSectionElements" />
+    <CasingSectionSizeMain Class="py-2 px-4 my-4 mx-4" CasingSectionInstance="@CasingSectionsInstance" />
 </MudPaper>
-@if( CasingSectionElements.Count > 0)
+@if (CasingSectionElements.Count > 0)
 {
     CasingSectionsInstance.CasingSectionElements = CasingSectionElements;
 }
 
-@code{
+@code {
     [Parameter]
-    public CasingSection CasingSectionsInstance {get; set;} = new CasingSection();
+    public CasingSection CasingSectionsInstance { get; set; } = new CasingSection();
     [Parameter]
-    public string Class {get; set;} = "mb-4";
+    public string Class { get; set; } = "mb-4";
     [Parameter]
-    public ICollection<CasingSectionElement> CasingSectionElements {get; set;} = new List<CasingSectionElement>(){new CasingSectionElement()};
+    public ICollection<CasingSectionElement> CasingSectionElements { get; set; } = new List<CasingSectionElement>() { new CasingSectionElement() };
     private double? topDepth = 0.0;
     private double? topCementDepth = 0.0;
     private double? ComputedLength
@@ -60,26 +62,26 @@
         if (CasingSectionsInstance != null)
         {
             topDepth = ConversionsFromOSDC.GaussianToDouble(CasingSectionsInstance.TopDepth);
-            topCementDepth = ConversionsFromOSDC.GaussianToDouble(CasingSectionsInstance.TopCementDepth);        
-        }             
+            topCementDepth = ConversionsFromOSDC.GaussianToDouble(CasingSectionsInstance.TopCementDepth);
+        }
         if (CasingSectionElements == null)
-        {            
-            CasingSectionElements = new List<CasingSectionElement>{new CasingSectionElement()};
-        }   
+        {
+            CasingSectionElements = new List<CasingSectionElement> { new CasingSectionElement() };
+        }
     }
 
-    void ManageUnits(){}
+    void ManageUnits() { }
     Conversions Conversions = new();
     void UpdateDepth(double? val)
     {
-        if(val != null){topDepth = (double) val;}
-        CasingSectionsInstance.TopDepth = ConversionsFromOSDC.DoubleToGaussian(val);        
-    }    
+        if (val != null) { topDepth = (double)val; }
+        CasingSectionsInstance.TopDepth = ConversionsFromOSDC.DoubleToGaussian(val);
+    }
 
     void UpdateTopCementDepth(double? val)
     {
-        if(val != null){topCementDepth = (double) val;}
-        CasingSectionsInstance.TopCementDepth = ConversionsFromOSDC.DoubleToGaussian(val);        
-    }    
+        if (val != null) { topCementDepth = (double)val; }
+        CasingSectionsInstance.TopCementDepth = ConversionsFromOSDC.DoubleToGaussian(val);
+    }
 
-}   
+}

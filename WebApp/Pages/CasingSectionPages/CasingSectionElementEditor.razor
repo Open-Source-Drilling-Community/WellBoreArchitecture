@@ -1,58 +1,58 @@
 <MudGrid Class="my-2">
-    <InputHeader xs="1" Text="OD"/>        
-    <InputHeader xs="1" Text="ID"/>
-    <InputHeader xs="2" Text="Collar OD"/>
-    <InputHeader xs="2" Text="Joint Length"/>
-    <InputHeader xs="2" Text="Section Length"/>                                    
+    <InputHeader xs="1" Text="OD" />
+    <InputHeader xs="1" Text="ID" />
+    <InputHeader xs="2" Text="Collar OD" />
+    <InputHeader xs="2" Text="Joint Length" />
+    <InputHeader xs="2" Text="Section Length" />
 </MudGrid>
 <MudGrid Class="my-2">
     <MudItem xs="1">
         <MudInputWithUnitAdornment VariantType="Variant.Text"
-            QuantityName="DiameterPipeDrilling"
-            SIValueNullable="bodyOD"
-            SIValueNullableChanged="val => { UpdateBodyOD(val); }"/>
+                                   QuantityName="DiameterPipeDrilling"
+                                   SIValueNullable="bodyOD"
+                                   SIValueNullableChanged="val => { UpdateBodyOD(val); }" />
     </MudItem>
     <MudItem xs="1">
         <MudInputWithUnitAdornment VariantType="Variant.Text"
-            QuantityName="DiameterPipeDrilling"
-            SIValueNullable="bodyID"
-            SIValueNullableChanged="val => { UpdateBodyID(val); }"/>
+                                   QuantityName="DiameterPipeDrilling"
+                                   SIValueNullable="bodyID"
+                                   SIValueNullableChanged="val => { UpdateBodyID(val); }" />
     </MudItem>
     <MudItem xs="2">
         <MudInputWithUnitAdornment VariantType="Variant.Text"
-            QuantityName="DiameterPipeDrilling"
-            SIValueNullable="collarOD"
-            SIValueNullableChanged="val => { UpdateCollarOD(val); }"/>
+                                   QuantityName="DiameterPipeDrilling"
+                                   SIValueNullable="collarOD"
+                                   SIValueNullableChanged="val => { UpdateCollarOD(val); }" />
     </MudItem>
     <MudItem xs="2">
         <MudInputWithUnitAdornment VariantType="Variant.Text"
-            QuantityName="Length"
-            SIValueNullable="jointLength"
-            SIValueNullableChanged="val => { UpdateJointLength(val); }"/>
+                                   QuantityName="Length"
+                                   SIValueNullable="jointLength"
+                                   SIValueNullableChanged="val => { UpdateJointLength(val); }" />
     </MudItem>
     <MudItem xs="2">
         <MudInputWithUnitAdornment VariantType="Variant.Text"
-            QuantityName="DepthDrilling"
-            SIValueNullable="sectionLength"
-            SIValueNullableChanged="val => { UpdateSectionLength(val); }"/>
+                                   QuantityName="DepthDrilling"
+                                   SIValueNullable="sectionLength"
+                                   SIValueNullableChanged="val => { UpdateSectionLength(val); }" />
     </MudItem>
 </MudGrid>
 
 
 
-@code{
+@code {
     [Parameter]
-    public CasingSectionElement CasingSectionElementInstance {get; set;} = new CasingSectionElement();
+    public CasingSectionElement CasingSectionElementInstance { get; set; } = new CasingSectionElement();
     [Parameter]
-    public int index {get; set;} = 1;
+    public int index { get; set; } = 1;
     [Parameter]
-    public CasingSection CasingSectionInstance {get; set;} = new CasingSection();
+    public CasingSection CasingSectionInstance { get; set; } = new CasingSection();
     private double? bodyOD = 0.0;
     private double? bodyID = 0.0;
     private double? collarOD = 0.0;
     private double? jointLength = 0.0;
     private double? sectionLength = 0.0;
-    
+
     protected override void OnParametersSet()
     {
         if (CasingSectionElementInstance != null)
@@ -61,35 +61,35 @@
             bodyID = ConversionsFromOSDC.GaussianToDouble(CasingSectionElementInstance.BodyID);
             collarOD = ConversionsFromOSDC.GaussianToDouble(CasingSectionElementInstance.CollarOD);
             sectionLength = ConversionsFromOSDC.GaussianToDouble(CasingSectionElementInstance.SectionLength);
-            jointLength = ConversionsFromOSDC.GaussianToDouble(CasingSectionElementInstance.JointLength);        
+            jointLength = ConversionsFromOSDC.GaussianToDouble(CasingSectionElementInstance.JointLength);
         }
     }
 
-    void ManageUnits(){}
+    void ManageUnits() { }
     private void UpdateBodyOD(double? val)
     {
-        if(val != null){bodyOD= (double) val;}
+        if (val != null) { bodyOD = (double)val; }
         CasingSectionElementInstance.BodyOD = ConversionsFromOSDC.DoubleToGaussian(val);
-    }        
-    private void  UpdateBodyID(double? val)
+    }
+    private void UpdateBodyID(double? val)
     {
-        if(val != null){bodyID= (double) val;}
+        if (val != null) { bodyID = (double)val; }
         CasingSectionElementInstance.BodyID = ConversionsFromOSDC.DoubleToGaussian(val);
-    }        
-    private void  UpdateCollarOD(double? val)
+    }
+    private void UpdateCollarOD(double? val)
     {
-        if(val != null){collarOD= (double) val;}
-        CasingSectionElementInstance.CollarOD = ConversionsFromOSDC.DoubleToGaussian(val);    
-    }        
-    private void  UpdateSectionLength(double? val)
+        if (val != null) { collarOD = (double)val; }
+        CasingSectionElementInstance.CollarOD = ConversionsFromOSDC.DoubleToGaussian(val);
+    }
+    private void UpdateSectionLength(double? val)
     {
-        if(val != null){sectionLength = (double) val;}
-        CasingSectionElementInstance.SectionLength = ConversionsFromOSDC.DoubleToGaussian(val);  
-    }        
-    private void  UpdateJointLength(double? val)
+        if (val != null) { sectionLength = (double)val; }
+        CasingSectionElementInstance.SectionLength = ConversionsFromOSDC.DoubleToGaussian(val);
+    }
+    private void UpdateJointLength(double? val)
     {
-        if(val != null){jointLength = (double) val;}
-        CasingSectionElementInstance.JointLength = ConversionsFromOSDC.DoubleToGaussian(val);    
-    }        
+        if (val != null) { jointLength = (double)val; }
+        CasingSectionElementInstance.JointLength = ConversionsFromOSDC.DoubleToGaussian(val);
+    }
 
-}   
+}

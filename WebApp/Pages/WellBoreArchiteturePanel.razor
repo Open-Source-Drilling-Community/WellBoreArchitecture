@@ -94,6 +94,7 @@
                             <MudItem xs="4">
                                 <MudInputWithUnitAdornment VariantType="Variant.Text"
                                                            QuantityName="DepthDrilling"
+                                                           DrillingSignalReference="@DrillingSignalReferenceType.Depth"
                                                            SIValueNullable="@GetGroundOrMudLineDepth()"
                                                            SIValueNullableChanged="@OnGroundOrMudLineDepthChanged" />
                             </MudItem>
@@ -125,6 +126,7 @@
                             <MudItem xs="4">
                                 <MudInputWithUnitAdornment VariantType="Variant.Text"
                                                            QuantityName="DepthDrilling"
+                                                           DrillingSignalReference="@DrillingSignalReferenceType.Depth"
                                                            SIValueNullable="@GetGroundOrMudLineDepth()"
                                                            SIValueNullableChanged="@OnGroundOrMudLineDepthChanged" />
                             </MudItem>
@@ -133,6 +135,7 @@
                                 <MudItem xs="4">
                                     <MudInputWithUnitAdornment VariantType="Variant.Text"
                                                                QuantityName="DepthDrilling"
+                                                               DrillingSignalReference="@DrillingSignalReferenceType.Depth"
                                                                SIValueNullable="@GetTopWaterDepth()"
                                                                SIValueNullableChanged="@OnTopWaterDepthChanged" />
                                 </MudItem>
@@ -247,12 +250,14 @@
                                     <MudItem xs="4">
                                         <MudInputWithUnitAdornment VariantType="Variant.Text"
                                                                    QuantityName="DepthDrilling"
+                                                                   DrillingSignalReference="@DrillingSignalReferenceType.Depth"
                                                                    SIValueNullable="@GetChokeLineDepth()"
                                                                    SIValueNullableChanged="@OnChokeLineDepthChanged" />
                                     </MudItem>
                                     <MudItem xs="4">
                                         <MudInputWithUnitAdornment VariantType="Variant.Text"
                                                                    QuantityName="DepthDrilling"
+                                                                   DrillingSignalReference="@DrillingSignalReferenceType.Depth"
                                                                    SIValueNullable="@GetKillLineDepth()"
                                                                    SIValueNullableChanged="@OnKillLineDepthChanged" />
                                     </MudItem>
@@ -267,6 +272,7 @@
                                     <MudItem xs="4">
                                         <MudInputWithUnitAdornment VariantType="Variant.Text"
                                                                    QuantityName="DepthDrilling"
+                                                                   DrillingSignalReference="@DrillingSignalReferenceType.Depth"
                                                                    SIValueNullable="@GetBoosterLineDepth()"
                                                                    SIValueNullableChanged="@OnBoosterLineDepthChanged" />
                                     </MudItem>
@@ -292,6 +298,7 @@
                                         <MudItem xs="4">
                                             <MudInputWithUnitAdornment VariantType="Variant.Text"
                                                                        QuantityName="DepthDrilling"
+                                                                       DrillingSignalReference="@DrillingSignalReferenceType.Depth"
                                                                        SIValueNullable="@GetLiftPumpDepth()"
                                                                        SIValueNullableChanged="@OnLiftPumpDepthChanged" />
                                         </MudItem>
@@ -326,12 +333,14 @@
                             <div>
                                 <MudInputWithUnitAdornment VariantType="Variant.Text"
                                                            QuantityName="DepthDrilling"
+                                                           DrillingSignalReference="@DrillingSignalReferenceType.Depth"
                                                            SIValueNullable="@row.SuspensionDepth"
                                                            SIValueNullableChanged="value => UpdateCasingSuspensionDepth(index, value)" />
                             </div>
                             <div>
                                 <MudInputWithUnitAdornment VariantType="Variant.Text"
                                                            QuantityName="DepthDrilling"
+                                                           DrillingSignalReference="@DrillingSignalReferenceType.Depth"
                                                            SIValueNullable="@row.FinalDepth"
                                                            SIValueNullableChanged="value => UpdateCasingFinalDepth(index, value)" />
                             </div>
@@ -759,6 +768,8 @@
     private Well? _selectedWell;
     private WellBore? _selectedWellBore;
     private Guid? _initializedArchitectureId;
+    private (double? GroundMudLine, double? SeaWaterLevel, double? WellHead, double? RotaryTable) _lastDepthReferenceSnapshot;
+    private bool _hasDepthReferenceSnapshot;
     private List<SimplifiedCasingRow> _simplifiedCasingRows = new();
     private bool _includeBop = true;
     private bool _includeMarineRiser = true;
@@ -823,12 +834,7 @@
     protected override async Task OnParametersSetAsync()
     {
         await InitializeArchitectureAsync();
-        SyncDepthReferenceSources();
-    }
-
-    protected override void OnAfterRender(bool firstRender)
-    {
-        SyncDepthReferenceSources();
+        await SyncDepthReferenceSourcesAsync();
     }
 
     private void SetEditorMode(ArchitectureEditorMode mode)
@@ -1166,12 +1172,33 @@
         }
     }
 
-    private void SyncDepthReferenceSources()
+    private async Task SyncDepthReferenceSourcesAsync(bool forceRefresh = false)
     {
-        DataUtils.UnitAndReferenceParameters.GroundMudLineDepthReferenceSource.GroundMudLineDepthReference = GetGroundOrMudLineDepth();
-        DataUtils.UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource.SeaWaterLevelDepthReference = GetSeaWaterLevelReferenceDepth();
-        DataUtils.UnitAndReferenceParameters.WellHeadDepthReferenceSource.WellHeadDepthReference = GetWellHeadReferenceDepth();
-        DataUtils.UnitAndReferenceParameters.RotaryTableDepthReferenceSource.RotaryTableDepthReference = GetRotaryTableReferenceDepth();
+        var snapshot = (
+            GroundMudLine: GetGroundOrMudLineDepth(),
+            SeaWaterLevel: GetSeaWaterLevelReferenceDepth(),
+            WellHead: GetWellHeadReferenceDepth(),
+            RotaryTable: GetRotaryTableReferenceDepth());
+
+        DataUtils.UnitAndReferenceParameters.GroundMudLineDepthReferenceSource.GroundMudLineDepthReference = -snapshot.GroundMudLine;
+        DataUtils.UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource.SeaWaterLevelDepthReference = -snapshot.SeaWaterLevel;
+        DataUtils.UnitAndReferenceParameters.WellHeadDepthReferenceSource.WellHeadDepthReference = -snapshot.WellHead;
+        DataUtils.UnitAndReferenceParameters.RotaryTableDepthReferenceSource.RotaryTableDepthReference = -snapshot.RotaryTable;
+
+        var hasChanged = forceRefresh
+            || !_hasDepthReferenceSnapshot
+            || !Nullable.Equals(_lastDepthReferenceSnapshot.GroundMudLine, snapshot.GroundMudLine)
+            || !Nullable.Equals(_lastDepthReferenceSnapshot.SeaWaterLevel, snapshot.SeaWaterLevel)
+            || !Nullable.Equals(_lastDepthReferenceSnapshot.WellHead, snapshot.WellHead)
+            || !Nullable.Equals(_lastDepthReferenceSnapshot.RotaryTable, snapshot.RotaryTable);
+
+        _lastDepthReferenceSnapshot = snapshot;
+        _hasDepthReferenceSnapshot = true;
+
+        if (hasChanged && Parent != null)
+        {
+            await Parent.RefreshDepthReferenceAsync();
+        }
     }
 
     private double? GetSeaWaterLevelReferenceDepth() => ShouldShowWaterAboveMudLine ? GetTopWaterDepth() : null;
@@ -1197,7 +1224,7 @@
         return null;
     }
 
-    private Task OnSelectedFieldChanged(Field? field)
+    private async Task OnSelectedFieldChanged(Field? field)
     {
         _selectedField = field;
         _selectedCluster = null;
@@ -1207,7 +1234,7 @@
         _selectedWellBore = null;
         EnsureSurfaceSectionsForCurrentConfiguration();
         EnsureFluidsForCurrentConfiguration();
-        return Task.CompletedTask;
+        await SyncDepthReferenceSourcesAsync();
     }
 
     private Task OnSelectedFieldIdChanged(Guid? fieldId)
@@ -1237,6 +1264,7 @@
             await ResolveRigAsync();
         }
 
+        await SyncDepthReferenceSourcesAsync();
         return;
     }
 
@@ -1277,6 +1305,7 @@
         EnsureSurfaceSectionsForCurrentConfiguration();
         EnsureFluidsForCurrentConfiguration();
         await ResolveRigAsync();
+        await SyncDepthReferenceSourcesAsync();
         return;
     }
 
@@ -1296,6 +1325,7 @@
         _selectedWellBore = wellBore;
         EnsureFluidsForCurrentConfiguration();
         await ResolveRigAsync();
+        await SyncDepthReferenceSourcesAsync();
         return;
     }
 
@@ -1448,6 +1478,15 @@
         if (depth == null)
         {
             return "-";
+        }
+
+        if (Parent != null)
+        {
+            var convertedDepth = Parent.FromWGS84DepthSI(depth, "DepthDrilling", true);
+            if (!string.IsNullOrWhiteSpace(convertedDepth))
+            {
+                return convertedDepth;
+            }
         }
 
         var depthReference = DataUtils.UnitAndReferenceParameters.DepthReferenceName ?? "reference";
