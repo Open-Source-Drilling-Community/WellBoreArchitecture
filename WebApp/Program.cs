@@ -1,9 +1,21 @@
 using MudBlazor;
 using MudBlazor.Services;
+using NORCE.Drilling.WellBoreArchitecture.WebApp;
+using NORCE.Drilling.WellBoreArchitecture.WebPages;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+WebPagesHostConfiguration webPagesConfiguration = new()
+{
+    FieldHostURL = builder.Configuration["FieldHostURL"] ?? string.Empty,
+    ClusterHostURL = builder.Configuration["ClusterHostURL"] ?? string.Empty,
+    WellHostURL = builder.Configuration["WellHostURL"] ?? string.Empty,
+    RigHostURL = builder.Configuration["RigHostURL"] ?? string.Empty,
+    WellBoreHostURL = builder.Configuration["WellBoreHostURL"] ?? string.Empty,
+    WellBoreArchitectureHostURL = builder.Configuration["WellBoreArchitectureHostURL"] ?? string.Empty,
+    UnitConversionHostURL = builder.Configuration["UnitConversionHostURL"] ?? string.Empty,
+};
+
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices(config =>
@@ -17,40 +29,22 @@ builder.Services.AddMudServices(config =>
     config.SnackbarConfiguration.ShowTransitionDuration = 500;
     config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
 });
+builder.Services.AddSingleton<IWellBoreArchitectureWebPagesConfiguration>(webPagesConfiguration);
+builder.Services.AddSingleton<IWellBoreArchitectureAPIUtils, WellBoreArchitectureAPIUtils>();
 
 var app = builder.Build();
 
 app.UseForwardedHeaders();
-// This needs to match with what is defined in "charts/<helm-chart-name>/templates/values.yaml ingress.Path
 app.UsePathBase("/WellBoreArchitecture/webapp");
 
-if (!String.IsNullOrEmpty(builder.Configuration["FieldHostURL"]))
-    NORCE.Drilling.WellBoreArchitecture.WebApp.Configuration.FieldHostURL = builder.Configuration["FieldHostURL"];
-if (!String.IsNullOrEmpty(builder.Configuration["ClusterHostURL"]))
-    NORCE.Drilling.WellBoreArchitecture.WebApp.Configuration.ClusterHostURL = builder.Configuration["ClusterHostURL"];
-if (!String.IsNullOrEmpty(builder.Configuration["WellHostURL"]))
-    NORCE.Drilling.WellBoreArchitecture.WebApp.Configuration.WellHostURL = builder.Configuration["WellHostURL"];
-if (!String.IsNullOrEmpty(builder.Configuration["RigHostURL"]))
-    NORCE.Drilling.WellBoreArchitecture.WebApp.Configuration.RigHostURL = builder.Configuration["RigHostURL"];
-if (!String.IsNullOrEmpty(builder.Configuration["WellBoreHostURL"]))
-    NORCE.Drilling.WellBoreArchitecture.WebApp.Configuration.WellBoreHostURL = builder.Configuration["WellBoreHostURL"];
-if (!String.IsNullOrEmpty(builder.Configuration["WellBoreArchitectureHostURL"]))
-    NORCE.Drilling.WellBoreArchitecture.WebApp.Configuration.WellBoreArchitectureHostURL = builder.Configuration["WellBoreArchitectureHostURL"];
-if (!String.IsNullOrEmpty(builder.Configuration["UnitConversionHostURL"]))
-    NORCE.Drilling.WellBoreArchitecture.WebApp.Configuration.UnitConversionHostURL = builder.Configuration["UnitConversionHostURL"];
-
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
-
 app.UseRouting();
 
 app.MapBlazorHub();

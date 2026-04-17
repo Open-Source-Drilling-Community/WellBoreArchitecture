@@ -1,6 +1,7 @@
 @inject ILogger<WellBoreArchitectureMain> logger
 @inject ISnackbar Snackbar
 @inject IJSRuntime JSRuntime
+@inject IWellBoreArchitectureAPIUtils Api
 
 @if (WellBoreArchitecture != null)
 {
@@ -1043,7 +1044,7 @@
 
         try
         {
-            return await APIUtils.ClientWellBore.GetWellBoreByIdAsync(wellBoreId.Value);
+            return await Api.ClientWellBore.GetWellBoreByIdAsync(wellBoreId.Value);
         }
         catch (Exception ex)
         {
@@ -1066,7 +1067,7 @@
 
         try
         {
-            return await APIUtils.ClientWell.GetWellByIdAsync(wellId.Value);
+            return await Api.ClientWell.GetWellByIdAsync(wellId.Value);
         }
         catch (Exception ex)
         {
@@ -1089,7 +1090,7 @@
 
         try
         {
-            return await APIUtils.ClientCluster.GetClusterByIdAsync(clusterId.Value);
+            return await Api.ClientCluster.GetClusterByIdAsync(clusterId.Value);
         }
         catch (Exception ex)
         {
@@ -1112,7 +1113,7 @@
 
         try
         {
-            return await APIUtils.ClientField.GetFieldByIdAsync(fieldId.Value);
+            return await Api.ClientField.GetFieldByIdAsync(fieldId.Value);
         }
         catch (Exception ex)
         {
@@ -1144,10 +1145,10 @@
             return;
         }
 
-        WellBoreArchitecture.WellHead ??= APIUtils.DefaultWellHead();
-        WellBoreArchitecture.FluidsAboveGroundLevel ??= APIUtils.DefaultFluidsAboveGroundLevel();
-        WellBoreArchitecture.SurfaceSections ??= APIUtils.DefaultSurfaceSections();
-        WellBoreArchitecture.CasingSections ??= APIUtils.DefaultCasingSections();
+        WellBoreArchitecture.WellHead ??= Api.DefaultWellHead();
+        WellBoreArchitecture.FluidsAboveGroundLevel ??= Api.DefaultFluidsAboveGroundLevel();
+        WellBoreArchitecture.SurfaceSections ??= Api.DefaultSurfaceSections();
+        WellBoreArchitecture.CasingSections ??= Api.DefaultCasingSections();
         EnsureCasingSectionsList();
         EnsureSimplifiedCasingRows();
         EnsureOpenHoleRows();
@@ -1554,7 +1555,7 @@
 
         try
         {
-            _resolvedRig = await APIUtils.ClientRig.GetRigByIdAsync(rigId.Value);
+            _resolvedRig = await Api.ClientRig.GetRigByIdAsync(rigId.Value);
         }
         catch (Exception ex)
         {
@@ -3068,7 +3069,7 @@
             if (isEditMode)
             {
                 WellBoreArchitecture.LastModificationDate = DateTimeOffset.UtcNow;
-                await APIUtils.ClientWellBoreArchitecture.PutWellBoreArchitectureByIdAsync(WellBoreArchitecture.MetaInfo.ID, WellBoreArchitecture);
+                await Api.ClientWellBoreArchitecture.PutWellBoreArchitectureByIdAsync(WellBoreArchitecture.MetaInfo.ID, WellBoreArchitecture);
                 logger.LogInformation("Wellbore Architecture updated successfully");
                 Snackbar.Add("Wellbore Architecture updated successfully", Severity.Success);
             }
@@ -3078,13 +3079,13 @@
                 WellBoreArchitecture.MetaInfo = new MetaInfo
                 {
                     ID = Guid.NewGuid(),
-                    HttpHostName = APIUtils.HostNameWellBoreArchitecture,
-                    HttpHostBasePath = APIUtils.HostBasePathWellBoreArchitecture,
+                    HttpHostName = Api.HostNameWellBoreArchitecture,
+                    HttpHostBasePath = Api.HostBasePathWellBoreArchitecture,
                     HttpEndPoint = "WellBoreArchitecture/"
                 };
                 WellBoreArchitecture.CreationDate = creationDate;
                 WellBoreArchitecture.LastModificationDate = creationDate;
-                await APIUtils.ClientWellBoreArchitecture.PostWellBoreArchitectureAsync(WellBoreArchitecture);
+                await Api.ClientWellBoreArchitecture.PostWellBoreArchitectureAsync(WellBoreArchitecture);
                 logger.LogInformation("WellBoreArchitecture posted successfully");
                 Snackbar.Add("WellBoreArchitecture posted successfully", Severity.Success);
             }
@@ -3178,4 +3179,5 @@
         }
     }
 }
+
 

@@ -1,9 +1,10 @@
-﻿@page "/WellBoreArchitecture"
+@page "/WellBoreArchitecture"
 @inject NavigationManager Navigation
 @inject ILogger<WellBoreArchitectureMain> logger
 @inject ISnackbar Snackbar
-<MudUnitAndReferenceChoiceTag HttpHost=@APIUtils.HostNameUnitConversion
-                              HttpBasePath=@APIUtils.HostBasePathUnitConversion
+@inject IWellBoreArchitectureAPIUtils Api
+<MudUnitAndReferenceChoiceTag HttpHost=@Api.HostNameUnitConversion
+                              HttpBasePath=@Api.HostBasePathUnitConversion
                               HttpController="UnitSystem/"
                               UnitSystemName="@DataUtils.UnitAndReferenceParameters.UnitSystemName"
                               UnitSystemNameChanged="@DataUtils.UpdateUnitSystemName"
@@ -103,8 +104,8 @@
         try
         {
             // Starting all loading tasks asynchronously
-            logger.LogInformation("Trying to load list of WellBoreArchitecture from client: " + APIUtils.HttpClientWellBoreArchitecture);
-            var wellBoreArchitectureTask = APIUtils.ClientWellBoreArchitecture.GetAllWellBoreArchitectureAsync();
+            logger.LogInformation("Trying to load list of WellBoreArchitecture from client: " + Api.HttpClientWellBoreArchitecture);
+            var wellBoreArchitectureTask = Api.ClientWellBoreArchitecture.GetAllWellBoreArchitectureAsync();
 
             List<Task> loadingTaskList = new List<Task>() { wellBoreArchitectureTask };
             // Awaiting tasks and retrieve results as they become available
@@ -140,11 +141,11 @@
         {
             logger.LogError(ex, "Impossible to load list of WellBoreArchitecture on initialization");
         }
-        logger.LogInformation("Trying to load microservices through client: " + APIUtils.HttpClientField);
+        logger.LogInformation("Trying to load microservices through client: " + Api.HttpClientField);
         try
         {
             // get guid and name from external microservices
-            ICollection<Field> fields = await APIUtils.ClientField.GetAllFieldAsync();
+            ICollection<Field> fields = await Api.ClientField.GetAllFieldAsync();
             foreach (Field field in fields)
             {
                 if (!fieldDicts.ContainsKey(field.MetaInfo.ID))
@@ -152,7 +153,7 @@
                     fieldDicts.Add(field.MetaInfo.ID, field);
                 }
             }
-            ICollection<Cluster> clusters = await APIUtils.ClientCluster.GetAllClusterAsync();
+            ICollection<Cluster> clusters = await Api.ClientCluster.GetAllClusterAsync();
             foreach (Cluster cluster in clusters)
             {
                 if (!clusterDicts.ContainsKey(cluster.MetaInfo.ID))
@@ -160,7 +161,7 @@
                     clusterDicts.Add(cluster.MetaInfo.ID, cluster);
                 }
             }
-            ICollection<Well> wells = await APIUtils.ClientWell.GetAllWellAsync();
+            ICollection<Well> wells = await Api.ClientWell.GetAllWellAsync();
             foreach (Well well in wells)
             {
                 if (!wellDicts.ContainsKey(well.MetaInfo.ID))
@@ -168,7 +169,7 @@
                     wellDicts.Add(well.MetaInfo.ID, well);
                 }
             }
-            ICollection<RigLight> rigs = await APIUtils.ClientRig.GetAllRigLightAsync();
+            ICollection<RigLight> rigs = await Api.ClientRig.GetAllRigLightAsync();
             foreach (RigLight rig in rigs)
             {
                 if (!rigDicts.ContainsKey(rig.MetaInfo.ID))
@@ -176,7 +177,7 @@
                     rigDicts.Add(rig.MetaInfo.ID, rig);
                 }
             }
-            ICollection<WellBore> wellBores = await APIUtils.ClientWellBore.GetAllWellBoreAsync();
+            ICollection<WellBore> wellBores = await Api.ClientWellBore.GetAllWellBoreAsync();
             foreach (WellBore wellBore in wellBores)
             {
                 if (!wellBoreDicts.ContainsKey(wellBore.MetaInfo.ID))
@@ -196,19 +197,19 @@
         currentWellBoreArchitecture = new WellBoreArchitecture();
         if (currentWellBoreArchitecture.WellHead == null)
         {
-            currentWellBoreArchitecture.WellHead = APIUtils.DefaultWellHead();
+            currentWellBoreArchitecture.WellHead = Api.DefaultWellHead();
         }
         if (currentWellBoreArchitecture.FluidsAboveGroundLevel == null)
         {
-            currentWellBoreArchitecture.FluidsAboveGroundLevel = APIUtils.DefaultFluidsAboveGroundLevel();
+            currentWellBoreArchitecture.FluidsAboveGroundLevel = Api.DefaultFluidsAboveGroundLevel();
         }
         if (currentWellBoreArchitecture.SurfaceSections == null)
         {
-            currentWellBoreArchitecture.SurfaceSections = APIUtils.DefaultSurfaceSections();
+            currentWellBoreArchitecture.SurfaceSections = Api.DefaultSurfaceSections();
         }
         if (currentWellBoreArchitecture.CasingSections == null)
         {
-            currentWellBoreArchitecture.CasingSections = APIUtils.DefaultCasingSections();
+            currentWellBoreArchitecture.CasingSections = Api.DefaultCasingSections();
         }
         displayMainPanel = false;
         displayEditorPanel = true;
@@ -251,7 +252,7 @@
     {
         try
         {
-            currentWellBoreArchitecture = await APIUtils.ClientWellBoreArchitecture.GetWellBoreArchitectureByIdAsync(id);
+            currentWellBoreArchitecture = await Api.ClientWellBoreArchitecture.GetWellBoreArchitectureByIdAsync(id);
             if (currentWellBoreArchitecture != null)
             {
                 displayMainPanel = false;
@@ -278,7 +279,7 @@
             bool confirmation = await ConfirmDeletion();
             if (confirmation)
             {
-                await APIUtils.ClientWellBoreArchitecture.DeleteWellBoreArchitectureByIdAsync(id);
+                await Api.ClientWellBoreArchitecture.DeleteWellBoreArchitectureByIdAsync(id);
             }
         }
         catch (Exception ex)
@@ -295,7 +296,7 @@
         {
             foreach (WellBoreArchitecture wellBoreArchitecture in selectedWellBoreArchitectureList)
             {
-                await APIUtils.ClientWellBoreArchitecture.DeleteWellBoreArchitectureByIdAsync(wellBoreArchitecture.MetaInfo.ID);
+                await Api.ClientWellBoreArchitecture.DeleteWellBoreArchitectureByIdAsync(wellBoreArchitecture.MetaInfo.ID);
             }
             selectedWellBoreArchitectureList.Clear();
             await OnInitializedAsync();
@@ -338,3 +339,4 @@
     }
 
 }
+

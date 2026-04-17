@@ -1,5 +1,6 @@
 @inject ILogger<WellBoreArchitectureMain> logger
 @inject ISnackbar Snackbar
+@inject IWellBoreArchitectureAPIUtils Api
 
 @if (WellBoreArchitecture != null)
 {
@@ -168,32 +169,32 @@
             //Grab old values for well bore architecture
             if (WellBoreArchitecture.WellHead == null)
             {
-                WellBoreArchitecture.WellHead = APIUtils.DefaultWellHead();
+                WellBoreArchitecture.WellHead = Api.DefaultWellHead();
             }
             if (WellBoreArchitecture.FluidsAboveGroundLevel == null)
             {
-                WellBoreArchitecture.FluidsAboveGroundLevel = APIUtils.DefaultFluidsAboveGroundLevel();
+                WellBoreArchitecture.FluidsAboveGroundLevel = Api.DefaultFluidsAboveGroundLevel();
             }
             if (WellBoreArchitecture.SurfaceSections == null)
             {
-                WellBoreArchitecture.SurfaceSections = APIUtils.DefaultSurfaceSections();
+                WellBoreArchitecture.SurfaceSections = Api.DefaultSurfaceSections();
             }
             if (WellBoreArchitecture.CasingSections == null)
             {
-                WellBoreArchitecture.CasingSections = APIUtils.DefaultCasingSections();
+                WellBoreArchitecture.CasingSections = Api.DefaultCasingSections();
             }
             Guid? wbaWellBoreID = WellBoreArchitecture.WellBoreID;
             if (wbaWellBoreID != null && wbaWellBoreID != Guid.Empty)
             {
-                WellBore wellBore = await APIUtils.ClientWellBore.GetWellBoreByIdAsync(wbaWellBoreID.Value);
+                WellBore wellBore = await Api.ClientWellBore.GetWellBoreByIdAsync(wbaWellBoreID.Value);
                 if (wellBore != null && wellBore.WellID != null && wellBore.WellID != Guid.Empty)
                 {
                     _selectedWellBore = wellBore;
-                    Well well = await APIUtils.ClientWell.GetWellByIdAsync(wellBore.WellID.Value);
+                    Well well = await Api.ClientWell.GetWellByIdAsync(wellBore.WellID.Value);
                     if (well != null && well.ClusterID != null && well.ClusterID != Guid.Empty)
                     {
                         _selectedWell = well;
-                        Cluster cluster = await APIUtils.ClientCluster.GetClusterByIdAsync(well.ClusterID.Value);
+                        Cluster cluster = await Api.ClientCluster.GetClusterByIdAsync(well.ClusterID.Value);
                         if (cluster != null && cluster.FieldID != null && cluster.FieldID != Guid.Empty)
                         {
                             if (cluster.ReferenceDepth != null && cluster.ReferenceDepth.GaussianValue != null && cluster.ReferenceDepth.GaussianValue.Mean != null)
@@ -216,7 +217,7 @@
                             {
                                 _selectedCluster = cluster;
                             }
-                            Field field = await APIUtils.ClientField.GetFieldByIdAsync(cluster.FieldID.Value);
+                            Field field = await Api.ClientField.GetFieldByIdAsync(cluster.FieldID.Value);
                             if (field != null)
                             {
                                 _selectedField = field;
@@ -237,7 +238,7 @@
                 DateTimeOffset modificationDate = DateTimeOffset.UtcNow;
                 WellBoreArchitecture.WellBoreID = (_selectedWellBore != null && _selectedWellBore.MetaInfo != null && _selectedWellBore.MetaInfo.ID != Guid.Empty) ? _selectedWellBore.MetaInfo.ID : null;
                 WellBoreArchitecture.LastModificationDate = modificationDate;
-                await APIUtils.ClientWellBoreArchitecture.PutWellBoreArchitectureByIdAsync(WellBoreArchitecture.MetaInfo.ID, WellBoreArchitecture);
+                await Api.ClientWellBoreArchitecture.PutWellBoreArchitectureByIdAsync(WellBoreArchitecture.MetaInfo.ID, WellBoreArchitecture);
                 logger.LogInformation("Wellbore Architecture updated successfully");
                 Snackbar.Add("Wellbore Architecture updated successfully", Severity.Success);
             }

@@ -1,5 +1,6 @@
 @inject ILogger<WellBoreArchitectureMain> logger
 @inject ISnackbar Snackbar
+@inject IWellBoreArchitectureAPIUtils Api
 
 @if (WellBoreArchitecture != null)
 {
@@ -143,13 +144,13 @@
                     WellBoreArchitecture.Name = $"Wellbore Architecture";
                 }
 
-                MetaInfo metaInfo = new() { ID = Guid.NewGuid(), HttpHostName = APIUtils.HostNameWellBoreArchitecture, HttpHostBasePath = APIUtils.HostBasePathWellBoreArchitecture, HttpEndPoint = "WellBoreArchitecture/" };
+                MetaInfo metaInfo = new() { ID = Guid.NewGuid(), HttpHostName = Api.HostNameWellBoreArchitecture, HttpHostBasePath = Api.HostBasePathWellBoreArchitecture, HttpEndPoint = "WellBoreArchitecture/" };
                 DateTimeOffset creationDate = DateTimeOffset.UtcNow;
                 WellBoreArchitecture.MetaInfo = metaInfo;
                 WellBoreArchitecture.CreationDate = creationDate;
                 WellBoreArchitecture.LastModificationDate = creationDate;
                 WellBoreArchitecture.WellBoreID = (_selectedWellBore != null && _selectedWellBore.MetaInfo != null && _selectedWellBore.MetaInfo.ID != Guid.Empty) ? _selectedWellBore.MetaInfo.ID : null;
-                await APIUtils.ClientWellBoreArchitecture.PostWellBoreArchitectureAsync(WellBoreArchitecture);
+                await Api.ClientWellBoreArchitecture.PostWellBoreArchitectureAsync(WellBoreArchitecture);
                 logger.LogInformation("WellBoreArchitecture posted successfully");
                 Snackbar.Add("WellBoreArchitecture posted successfully", Severity.Success);
             }
