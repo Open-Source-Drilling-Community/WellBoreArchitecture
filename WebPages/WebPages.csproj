@@ -6,7 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <RootNamespace>NORCE.Drilling.WellBoreArchitecture.WebPages</RootNamespace>
-    <PackageId>NORCE.Drilling.WellBoreArchitecture.WebPages</PackageId>
+	<AssemblyName>NORCE.Drilling.WellBoreArchitecture.WebPages</AssemblyName>
+	<PackageId>NORCE.Drilling.WellBoreArchitecture.WebPages</PackageId>
     <Title>NORCE.Drilling.WellBoreArchitecture.WebPages</Title>
     <Authors>Eric Cayeux</Authors>
     <Company>NORCE</Company>

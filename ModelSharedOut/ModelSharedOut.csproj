@@ -7,6 +7,8 @@
 		<Nullable>enable</Nullable>
 		<Authors>Energy Modelling and Automation group</Authors>
 		<Company>NORCE</Company>
+		<RootNamespace>NORCE.Drilling.WellBoreArchitecture.ModelSharedOut</RootNamespace>
+		<AssemblyName>NORCE.Drilling.WellBoreArchitecture.ModelSharedOut</AssemblyName>
 		<Title>Auto-generation of the API of the WellBoreArchitecture microservice (distributed shared model approach)</Title>
 	</PropertyGroup>
 
