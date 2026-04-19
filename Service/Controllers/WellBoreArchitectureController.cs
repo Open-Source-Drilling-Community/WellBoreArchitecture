@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using NORCE.Drilling.WellBoreArchitecture.Model;
 using OSDC.DotnetLibraries.General.DataManagement;
 using NORCE.Drilling.WellBoreArchitecture.Service.Managers;
 
@@ -29,6 +30,7 @@ namespace NORCE.Drilling.WellBoreArchitecture.Service.Controllers
         [HttpGet(Name = "GetAllWellBoreArchitectureId")]
         public ActionResult<IEnumerable<Guid>> GetAllWellBoreArchitectureId()
         {
+            UsageStatisticsWellBoreArchitecture.Instance.IncrementGetAllWellBoreArchitectureIdPerDay();
             var ids = _wellBoreArchitectureManager.GetAllWellBoreArchitectureId();
             if (ids != null)
             {
@@ -47,6 +49,7 @@ namespace NORCE.Drilling.WellBoreArchitecture.Service.Controllers
         [HttpGet("MetaInfo", Name = "GetAllWellBoreArchitectureMetaInfo")]
         public ActionResult<IEnumerable<MetaInfo>> GetAllWellBoreArchitectureMetaInfo()
         {
+            UsageStatisticsWellBoreArchitecture.Instance.IncrementGetAllWellBoreArchitectureMetaInfoPerDay();
             var vals = _wellBoreArchitectureManager.GetAllWellBoreArchitectureMetaInfo();
             if (vals != null)
             {
@@ -66,6 +69,7 @@ namespace NORCE.Drilling.WellBoreArchitecture.Service.Controllers
         [HttpGet("{id}", Name = "GetWellBoreArchitectureById")]
         public ActionResult<Model.WellBoreArchitecture?> GetWellBoreArchitectureById(Guid id)
         {
+            UsageStatisticsWellBoreArchitecture.Instance.IncrementGetWellBoreArchitectureByIdPerDay();
             if (!id.Equals(Guid.Empty))
             {
                 var val = _wellBoreArchitectureManager.GetWellBoreArchitectureById(id);
@@ -91,6 +95,7 @@ namespace NORCE.Drilling.WellBoreArchitecture.Service.Controllers
         [HttpGet("LightData", Name = "GetAllWellBoreArchitectureLight")]
         public ActionResult<IEnumerable<Model.WellBoreArchitectureLight>> GetAllWellBoreArchitectureLight()
         {
+            UsageStatisticsWellBoreArchitecture.Instance.IncrementGetAllWellBoreArchitectureLightPerDay();
             var vals = _wellBoreArchitectureManager.GetAllWellBoreArchitectureLight();
             if (vals != null)
             {
@@ -109,6 +114,7 @@ namespace NORCE.Drilling.WellBoreArchitecture.Service.Controllers
         [HttpGet("HeavyData", Name = "GetAllWellBoreArchitecture")]
         public ActionResult<IEnumerable<Model.WellBoreArchitecture?>> GetAllWellBoreArchitecture()
         {
+            UsageStatisticsWellBoreArchitecture.Instance.IncrementGetAllWellBoreArchitecturePerDay();
             var vals = _wellBoreArchitectureManager.GetAllWellBoreArchitecture();
             if (vals != null)
             {
@@ -128,6 +134,7 @@ namespace NORCE.Drilling.WellBoreArchitecture.Service.Controllers
         [HttpPost(Name = "PostWellBoreArchitecture")]
         public ActionResult PostWellBoreArchitecture([FromBody] Model.WellBoreArchitecture? data)
         {
+            UsageStatisticsWellBoreArchitecture.Instance.IncrementPostWellBoreArchitecturePerDay();
             // Check if wellBoreArchitecture exists in the database through ID
             if (data != null && data.MetaInfo != null && data.MetaInfo.ID != Guid.Empty)
             {
@@ -166,6 +173,7 @@ namespace NORCE.Drilling.WellBoreArchitecture.Service.Controllers
         [HttpPut("{id}", Name = "PutWellBoreArchitectureById")]
         public ActionResult PutWellBoreArchitectureById(Guid id, [FromBody] Model.WellBoreArchitecture? data)
         {
+            UsageStatisticsWellBoreArchitecture.Instance.IncrementPutWellBoreArchitectureByIdPerDay();
             // Check if WellBoreArchitecture is in the data base
             if (data != null && data.MetaInfo != null && data.MetaInfo.ID.Equals(id))
             {
@@ -202,6 +210,7 @@ namespace NORCE.Drilling.WellBoreArchitecture.Service.Controllers
         [HttpDelete("{id}", Name = "DeleteWellBoreArchitectureById")]
         public ActionResult DeleteWellBoreArchitectureById(Guid id)
         {
+            UsageStatisticsWellBoreArchitecture.Instance.IncrementDeleteWellBoreArchitectureByIdPerDay();
             if (_wellBoreArchitectureManager.GetWellBoreArchitectureById(id) != null)
             {
                 if (_wellBoreArchitectureManager.DeleteWellBoreArchitectureById(id))

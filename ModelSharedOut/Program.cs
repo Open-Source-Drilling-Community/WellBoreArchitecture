@@ -57,8 +57,15 @@ class Program
     static async Task Main()
     {
         bool finished = false;
-        Console.Clear();
-        Console.BackgroundColor = ConsoleColor.Black;
+        try
+        {
+            Console.Clear();
+            Console.BackgroundColor = ConsoleColor.Black;
+        }
+        catch (IOException)
+        {
+        }
+
         do
         {
             Thread.Sleep(100);
@@ -94,14 +101,21 @@ class Program
             if (File.Exists(jsonOutputDirectory + Path.DirectorySeparatorChar + JSON_BUNDLE) ||
                 File.Exists(modelSharedDir + Path.DirectorySeparatorChar + CSHARP_MODEL))
             {
-                PrettyPrint(PRETTY_STRING, $"Shared model files already exist!\n" +
-                            "\tAre you sure you want to overwrite the following existing files?\n" +
-                            $"\t\t- C# model (.{Path.DirectorySeparatorChar}{MODELSHARED_FOLDER}{Path.DirectorySeparatorChar}{CSHARP_MODEL})\n" +
-                            $"\t\t- OpenApi bundle (.{Path.DirectorySeparatorChar}{MODELSHARED_FOLDER}{Path.DirectorySeparatorChar}{JSON_BUNDLE})\n" +
-                            //// option 2: activate the following line in case of online dependency discovery
-                            //$"\t\t- backups of the individual OpenApi documents (.\\json-schemas\\microserviceDependency.json)\n" +
-                            "\tType Y for YES, or any other key for NO");
-                res = Console.ReadLine();
+                if (Console.IsInputRedirected || Console.IsOutputRedirected)
+                {
+                    res = "Y";
+                }
+                else
+                {
+                    PrettyPrint(PRETTY_STRING, $"Shared model files already exist!\n" +
+                                "\tAre you sure you want to overwrite the following existing files?\n" +
+                                $"\t\t- C# model (.{Path.DirectorySeparatorChar}{MODELSHARED_FOLDER}{Path.DirectorySeparatorChar}{CSHARP_MODEL})\n" +
+                                $"\t\t- OpenApi bundle (.{Path.DirectorySeparatorChar}{MODELSHARED_FOLDER}{Path.DirectorySeparatorChar}{JSON_BUNDLE})\n" +
+                                //// option 2: activate the following line in case of online dependency discovery
+                                //$"\t\t- backups of the individual OpenApi documents (.\\json-schemas\\microserviceDependency.json)\n" +
+                                "\tType Y for YES, or any other key for NO");
+                    res = Console.ReadLine();
+                }
             }
             if (res == "Y")
             {

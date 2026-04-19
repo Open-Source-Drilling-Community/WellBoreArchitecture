@@ -221,6 +221,26 @@
           }
         }
       }
+    },
+    "/WellBoreArchitectureUsageStatistics": {
+      "get": {
+        "tags": [
+          "WellBoreArchitectureUsageStatistics"
+        ],
+        "operationId": "GetWellBoreArchitectureUsageStatistics",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NORCE.Drilling.WellBoreArchitecture.Model.UsageStatisticsWellBoreArchitecture"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -328,6 +348,20 @@
         },
         "additionalProperties": false
       },
+      "NORCE.Drilling.WellBoreArchitecture.Model.CountPerDay": {
+        "type": "object",
+        "properties": {
+          "Date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Count": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
       "NORCE.Drilling.WellBoreArchitecture.Model.ElementConnectivity": {
         "type": "object",
         "properties": {
@@ -346,6 +380,19 @@
           "Water"
         ],
         "type": "string"
+      },
+      "NORCE.Drilling.WellBoreArchitecture.Model.History": {
+        "type": "object",
+        "properties": {
+          "Data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NORCE.Drilling.WellBoreArchitecture.Model.CountPerDay"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "NORCE.Drilling.WellBoreArchitecture.Model.OpenHoleSection": {
         "type": "object",
@@ -488,6 +535,44 @@
           "RotatingControlDevice"
         ],
         "type": "string"
+      },
+      "NORCE.Drilling.WellBoreArchitecture.Model.UsageStatisticsWellBoreArchitecture": {
+        "type": "object",
+        "properties": {
+          "LastSaved": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "BackUpInterval": {
+            "type": "string",
+            "format": "date-span"
+          },
+          "GetAllWellBoreArchitectureIdPerDay": {
+            "$ref": "#/components/schemas/NORCE.Drilling.WellBoreArchitecture.Model.History"
+          },
+          "GetAllWellBoreArchitectureMetaInfoPerDay": {
+            "$ref": "#/components/schemas/NORCE.Drilling.WellBoreArchitecture.Model.History"
+          },
+          "GetWellBoreArchitectureByIdPerDay": {
+            "$ref": "#/components/schemas/NORCE.Drilling.WellBoreArchitecture.Model.History"
+          },
+          "GetAllWellBoreArchitectureLightPerDay": {
+            "$ref": "#/components/schemas/NORCE.Drilling.WellBoreArchitecture.Model.History"
+          },
+          "GetAllWellBoreArchitecturePerDay": {
+            "$ref": "#/components/schemas/NORCE.Drilling.WellBoreArchitecture.Model.History"
+          },
+          "PostWellBoreArchitecturePerDay": {
+            "$ref": "#/components/schemas/NORCE.Drilling.WellBoreArchitecture.Model.History"
+          },
+          "PutWellBoreArchitectureByIdPerDay": {
+            "$ref": "#/components/schemas/NORCE.Drilling.WellBoreArchitecture.Model.History"
+          },
+          "DeleteWellBoreArchitectureByIdPerDay": {
+            "$ref": "#/components/schemas/NORCE.Drilling.WellBoreArchitecture.Model.History"
+          }
+        },
+        "additionalProperties": false
       },
       "NORCE.Drilling.WellBoreArchitecture.Model.WellBoreArchitecture": {
         "type": "object",
