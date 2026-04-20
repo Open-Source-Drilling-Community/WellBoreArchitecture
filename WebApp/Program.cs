@@ -13,6 +13,9 @@ WebPagesHostConfiguration webPagesConfiguration = new()
     RigHostURL = builder.Configuration["RigHostURL"] ?? string.Empty,
     WellBoreHostURL = builder.Configuration["WellBoreHostURL"] ?? string.Empty,
     WellBoreArchitectureHostURL = builder.Configuration["WellBoreArchitectureHostURL"] ?? string.Empty,
+    TrajectoryHostURL = builder.Configuration["TrajectoryHostURL"] ?? string.Empty,
+    CartographicProjectionHostURL = builder.Configuration["CartographicProjectionHostURL"] ?? string.Empty,
+    GeodeticDatumHostURL = builder.Configuration["GeodeticDatumHostURL"] ?? string.Empty,
     UnitConversionHostURL = builder.Configuration["UnitConversionHostURL"] ?? string.Empty,
 };
 
@@ -31,6 +34,7 @@ builder.Services.AddMudServices(config =>
 });
 builder.Services.AddSingleton<IWellBoreArchitectureWebPagesConfiguration>(webPagesConfiguration);
 builder.Services.AddSingleton<IWellBoreArchitectureAPIUtils, WellBoreArchitectureAPIUtils>();
+builder.Services.AddExternalWebPages(webPagesConfiguration);
 
 var app = builder.Build();
 

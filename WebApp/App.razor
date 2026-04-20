@@ -1,5 +1,5 @@
 <Router AppAssembly="@typeof(App).Assembly"
-        AdditionalAssemblies="new[] { typeof(NORCE.Drilling.WellBoreArchitecture.WebPages.Pages.WellBoreArchitectureMain).Assembly }">
+        AdditionalAssemblies="@NORCE.Drilling.WellBoreArchitecture.WebApp.ExternalRazorAssemblies.All">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
