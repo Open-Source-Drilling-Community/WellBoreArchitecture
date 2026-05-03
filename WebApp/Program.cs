@@ -39,7 +39,8 @@ builder.Services.AddExternalWebPages(webPagesConfiguration);
 var app = builder.Build();
 
 app.UseForwardedHeaders();
-app.UsePathBase("/WellBoreArchitecture/webapp");
+var basePath = "/wellborearchitecture/webapp";
+app.UsePathBase(basePath);
 
 if (!app.Environment.IsDevelopment())
 {
@@ -55,3 +56,4 @@ app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
 app.Run();
+

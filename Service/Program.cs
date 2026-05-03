@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -57,7 +57,7 @@ builder.Services.AddLegacyMcpTool<PingMcpTool>();
 
 var app = builder.Build();
 
-var basePath = "/WellBoreArchitecture/api";
+var basePath = "/wellborearchitecture/api";
 var scheme = "http";
 
 app.UsePathBase(basePath);
