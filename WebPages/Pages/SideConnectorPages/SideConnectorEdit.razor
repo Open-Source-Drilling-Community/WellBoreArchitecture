@@ -73,7 +73,7 @@
     };
     private List<SideElement> SideElements { get; set; } = new List<SideElement>();
     private List<SideElement> AvailableSideElements { get; set; } = new List<SideElement>();
-    private ICollection<ElementConnectivity> elementConnectivities { get; set; } = new List<ElementConnectivity>();
+    private List<ElementConnectivity> elementConnectivities { get; set; } = new List<ElementConnectivity>();
 
     private double? position = 0.0;
     private double? verticalDepth = 0.0;
@@ -82,7 +82,7 @@
     private SideElementType sideElementType = new SideElementType();
     private bool showTreeStruct = false;
     //Tree plot variables
-    private ICollection<ElementConnectivity> treePlotConectitvities = new List<ElementConnectivity>();
+    private List<ElementConnectivity> treePlotConectitvities = new List<ElementConnectivity>();
     private SideElement firstElementForPlot = new SideElement();
     private bool updatebool = false;
 

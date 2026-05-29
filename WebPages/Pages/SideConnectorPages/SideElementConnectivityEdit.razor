@@ -77,7 +77,7 @@
     [Parameter]
     public SideElement SideElement { get; set; } = new SideElement() { Type = SideElementType.Unknown };
     [Parameter]
-    public ICollection<ElementConnectivity>? ElementConnectivity { get; set; } = new List<ElementConnectivity>();
+    public List<ElementConnectivity>? ElementConnectivity { get; set; } = new List<ElementConnectivity>();
     [Parameter]
     public List<SideElement>? AvailableElements { get; set; } = new();
     [Parameter]

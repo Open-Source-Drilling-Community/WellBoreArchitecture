@@ -27,11 +27,11 @@
 </MudPaper>
 @code{
     [Parameter]
-    public ICollection<SideConnector> SideConnectors {get; set;}
+    public List<SideConnector> SideConnectors {get; set;}
     [Parameter]
     public string Class {get; set;} = "mb-4";
     [Parameter]
-    public EventCallback<ICollection<SideConnector>> SideConnectorsChanged { get; set; }
+    public EventCallback<List<SideConnector>> SideConnectorsChanged { get; set; }
 
     private bool showAlert = false;
     private int totalNumSideConnectors;
@@ -150,7 +150,7 @@
          await SideConnectorsChanged.InvokeAsync(SideConnectors);
     }
 
-    private static bool HasMeaningfulSideConnectorData(ICollection<SideConnector>? sideConnectors)
+    private static bool HasMeaningfulSideConnectorData(List<SideConnector>? sideConnectors)
     {
         if (sideConnectors == null || sideConnectors.Count == 0)
         {

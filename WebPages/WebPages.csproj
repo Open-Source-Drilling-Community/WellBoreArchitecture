@@ -37,6 +37,8 @@
 	<ItemGroup>
 		<Compile Include="..\ModelSharedOut\WellBoreArchitectureMergedModel.cs"
 				 Link="GeneratedDtos\%(RecursiveDir)%(Filename)%(Extension)" />
+		<Compile Include="..\ModelSharedOut\PseudoConstructors.cs"
+				 Link="GeneratedDtos\%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
 </Project>

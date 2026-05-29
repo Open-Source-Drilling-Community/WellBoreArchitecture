@@ -7,7 +7,7 @@
     [Parameter]
     public SideElement FirstSideElement {get; set;}
     [Parameter]
-    public ICollection<ElementConnectivity> ElementConnectivities { get; set; } = new List<ElementConnectivity>();
+    public List<ElementConnectivity> ElementConnectivities { get; set; } = new List<ElementConnectivity>();
     // Parameters control if there are relevant changes or not to avoid unnecessary calculations.
     [Parameter]
     public bool updatebool {get; set;}

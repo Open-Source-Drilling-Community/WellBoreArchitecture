@@ -30,7 +30,7 @@
 
 @code {
     [Parameter]
-    public ICollection<WellBoreArchitectureFluid> WellBoreArchitectureFluids { get; set; } = new List<WellBoreArchitectureFluid>();
+    public List<WellBoreArchitectureFluid> WellBoreArchitectureFluids { get; set; } = new List<WellBoreArchitectureFluid>();
     [Parameter]
     public string Class { get; set; } = "mb-4";
     int maxFluidNumber = 1;

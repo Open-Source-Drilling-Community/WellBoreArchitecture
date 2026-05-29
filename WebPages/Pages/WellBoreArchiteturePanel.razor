@@ -48,7 +48,8 @@
         <MudPaper Class="py-2 px-4">
             @RenderNamingSection()
         </MudPaper>
-
+        <DetailedEdit WellBoreArchitectureInstance="WellBoreArchitecture" ValueChanged="@OnDetailedEditChanged" />
+        @*
         @if (WellBoreArchitecture.WellHead != null)
         {
             <WellHeadEditor Class="py-2 px-4 mt-4" WellHead="@WellBoreArchitecture.WellHead" />
@@ -64,7 +65,7 @@
         @if (WellBoreArchitecture.CasingSections != null)
         {
             <CasingSectionMain Class="py-2 px-4 mt-4" CasingSections="@WellBoreArchitecture.CasingSections" />
-        }
+        }*@
         </MudItem>
     }
     else
@@ -836,6 +837,12 @@
     {
         await InitializeArchitectureAsync();
         await SyncDepthReferenceSourcesAsync();
+    }
+
+    private void OnDetailedEditChanged(WellBoreArchitecture updated)
+    {
+        WellBoreArchitecture = updated;
+        StateHasChanged();
     }
 
     private void SetEditorMode(ArchitectureEditorMode mode)
@@ -3053,8 +3060,11 @@
         await CommitActiveEditorAsync();
 
         var isEditMode = IsEditMode;
-        ApplySimplifiedRowsToDetailedSections();
-
+        if (EditorMode == ArchitectureEditorMode.Simplified)
+        {
+            ApplySimplifiedRowsToDetailedSections();
+        }
+        
         try
         {
             if (string.IsNullOrWhiteSpace(WellBoreArchitecture.Name))

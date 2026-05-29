@@ -1,0 +1,335 @@
+@inject ILogger<WellBoreArchitectureMain> logger
+@inject ISnackbar Snackbar
+@inject IWellBoreArchitectureAPIUtils Api
+
+
+@if (WellBoreArchitectureInstance != null)
+{
+    @*General properties*@
+    <MudPaper Class="@Class">
+        <MudToolBar Class="ml-n6 my-n4">
+            <MudText Typo="Typo.h6">General properties</MudText>
+        </MudToolBar>
+        <MudDivider Class="mb-2" />
+        <MudGrid Class="my-2">
+            <InputHeader xs="3" Text="Creation date" />
+            <InputHeader xs="3" Text="Last modification date" />
+        </MudGrid>
+        <MudGrid Class="my-2">
+            <MudItem xs="3">
+                <MudText Typo="Typo.body1">@WellBoreArchitectureInstance.CreationDate</MudText>
+            </MudItem>
+            <MudItem xs="3">
+                <MudText Typo="Typo.body1">@WellBoreArchitectureInstance.LastModificationDate</MudText>
+            </MudItem>
+        </MudGrid>
+        <MudGrid Class="my-2">
+            <InputHeader xs="4" Text="Name" />
+            <InputHeader xs="8" Text="Description" />
+        </MudGrid>
+        <MudGrid Class="my-2">
+            <MudItem xs="4">
+                <MudTextField @bind-Value="@WellBoreArchitectureInstance.Name" Variant="Variant.Text" />
+            </MudItem>
+            <MudItem xs="8">
+                <MudTextField @bind-Value="@WellBoreArchitectureInstance.Description" Variant="Variant.Text" />
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+
+    @*Well head*@
+    @if (WellBoreArchitectureInstance.WellHead != null)
+    {
+        <WellHeadEditor Class="@Class" WellHead="@WellBoreArchitectureInstance.WellHead" />
+    }
+
+    @*Fluids above ground level*@
+    @if (WellBoreArchitectureInstance.FluidsAboveGroundLevel != null)
+    {
+        <FluidPropertiesMain Class="@Class" WellBoreArchitectureFluids="@WellBoreArchitectureInstance.FluidsAboveGroundLevel" />
+    }
+
+    @*Surface sections*@
+    @if (WellBoreArchitectureInstance.SurfaceSections != null)
+    {
+        <SurfaceSectionMain Class="@Class" SurfaceSections="@WellBoreArchitectureInstance.SurfaceSections" />
+    }
+
+    @*Casing sections*@
+    @if (WellBoreArchitectureInstance.CasingSections != null)
+    {
+
+    <MudPaper Class="@Class">
+        <MudToolBar Class="ml-n6 my-n4 ">
+            <MudText Typo="Typo.h6">Casing section properties</MudText>
+            <MudSpacer />
+            <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Add" Color="Color.Secondary" OnClick="AddCasingSectionLine" Size="Size.Small"> Add line </MudButton>
+            <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Remove" Color="Color.Tertiary" OnClick="RemoveCasingSectionLine" Size="Size.Small"> Remove line</MudButton>
+        </MudToolBar>
+            <MudDivider Class="mb-2" />
+            @if (WellBoreArchitectureInstance.CasingSections == null)
+            {
+                <!-- If no value arrives, initialize a new list with treatment in regard to
+                OSDC drilling properties.-->
+                WellBoreArchitectureInstance.CasingSections = new List<CasingSection>{ PseudoConstructors.ConstructCasingSection() };                             
+            }
+            @if (WellBoreArchitectureInstance.CasingSections != null)
+            {
+                <MudTable T="CasingSection" Items="@WellBoreArchitectureInstance.CasingSections" Context="context">
+                    <HeaderContent>
+                        <MudTh>Top Depth [@(Parent.GetUnitLabel("DepthDrilling"))]</MudTh>
+                        <MudTh>Length [@(Parent.GetUnitLabel("Length"))]</MudTh>
+                        <MudTh>Top Cement Depth [@(Parent.GetUnitLabel("DepthDrilling"))]</MudTh>
+                        <MudTh>Casing Section Elements</MudTh>                
+                        <MudTh>Open Hole Section </MudTh>                                                        
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>
+                            <MudInputWithUnit VariantType="Variant.Text"
+                                       QuantityName="DepthDrilling"
+                                       SIValueNullable="context.TopDepth.GaussianValue.Mean"
+                                       SIValueNullableChanged="@(val => UpdateCasingSectionTopDepth(context, val))" />
+                        </MudTd>
+                        <MudTd>
+                            <MudInputWithUnit VariantType="Variant.Text"
+                                       QuantityName="Length"
+                                       SIValueNullable="context.Length.GaussianValue.Mean"
+                                       SIValueNullableChanged="@(val => UpdateCasingSectionLength(context, val))" />
+                        </MudTd>
+                        <MudTd>
+                            <MudInputWithUnit VariantType="Variant.Text"
+                                       QuantityName="DepthDrilling"
+                                       SIValueNullable="context.TopCementDepth.GaussianValue.Mean"
+                                       SIValueNullableChanged="@(val => UpdateCasingSectionTopCementDepth(context, val))" />
+                        </MudTd>
+                        <MudTd>
+                            <MudToolBar>
+                                <MudSpacer />
+                                <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Add" Color="Color.Secondary" OnClick="@(val => AddCasingSectionElementLine(context))" Size="Size.Small"> Add line </MudButton>
+                                <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Remove" Color="Color.Tertiary" OnClick="@(val => RemoveCasingSectionElementLine(context))" Size="Size.Small"> Remove line</MudButton>
+                            </MudToolBar>
+                            <MudTable T="CasingSectionElement" Items="context.CasingSectionElements" Context="casingElements">
+                                <HeaderContent>
+                                    <MudTh>OD [@(Parent.GetUnitLabel("DiameterPipeDrilling"))]</MudTh>
+                                    <MudTh>ID [@(Parent.GetUnitLabel("DiameterPipeDrilling"))]</MudTh>
+                                    <MudTh>Collar OD [@(Parent.GetUnitLabel("DiameterPipeDrilling"))]</MudTh>
+                                    <MudTh>Joint Length [@(Parent.GetUnitLabel("Length"))]</MudTh>                
+                                    <MudTh>Section Length [@(Parent.GetUnitLabel("DepthDrilling"))]</MudTh>                                    
+                                </HeaderContent>
+                                <RowTemplate>
+                                  <MudTd>
+                                        <MudInputWithUnit VariantType="Variant.Text"
+                                                   QuantityName="DiameterPipeDrilling"
+                                                   SIValueNullable="casingElements.BodyOD.GaussianValue.Mean"
+                                                   SIValueNullableChanged="@(val => UpdateElementBodyOD(casingElements, val))" />
+                                  </MudTd>
+                                  <MudTd>
+                                        <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                   QuantityName="DiameterPipeDrilling"
+                                                   SIValueNullable="casingElements.BodyID.GaussianValue.Mean"
+                                                   SIValueNullableChanged="@(val => UpdateElementBodyID(casingElements, val))" />
+                                  </MudTd>
+                                  <MudTd>
+                                        <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                   QuantityName="DiameterPipeDrilling"
+                                                   SIValueNullable="casingElements.CollarOD.GaussianValue.Mean"
+                                                   SIValueNullableChanged="@(val => UpdateElementCollarOD(casingElements, val))" />
+                                  </MudTd>
+                                  <MudTd>
+                                        <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                   QuantityName="Length"
+                                                   SIValueNullable="casingElements.JointLength.GaussianValue.Mean"
+                                                   SIValueNullableChanged="@(val => UpdateElementJointLength(casingElements, val))" />
+                                  </MudTd>
+                                  <MudTd>
+                                        <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                   QuantityName="Length"
+                                                   SIValueNullable="casingElements.SectionLength.GaussianValue.Mean"
+                                                   SIValueNullableChanged="@(val => UpdateElementSectionLength(casingElements, val))" />
+                                  </MudTd>
+                                </RowTemplate>                
+                            </MudTable>
+
+                        </MudTd>
+                        <MudTd>                     
+                            <MudToolBar>
+                                   <MudSpacer />
+                                   <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Add" Color="Color.Secondary" OnClick="@(val => AddBoreHole(context))" Size="Size.Small"> Add line </MudButton>
+                                   <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Remove" Color="Color.Tertiary" OnClick="@(val => RemoveBoreHole(context))" Size="Size.Small"> Remove line</MudButton>
+                               </MudToolBar>
+                               <MudTable T="BoreHoleSize" Items="context.OpenHoleSection.HoleSizes" Context="holeSize">
+                                   <HeaderContent>
+                                       <MudTh>OD [@(Parent.GetUnitLabel("DiameterPipeDrilling"))]</MudTh>
+                                       <MudTh>Length [@(Parent.GetUnitLabel("Length"))]</MudTh>                
+                                   </HeaderContent>
+                                   <RowTemplate>
+                                     <MudTd>
+                                           <MudInputWithUnit VariantType="Variant.Text"
+                                                      QuantityName="DiameterPipeDrilling"
+                                                      SIValueNullable="holeSize.HoleSize.GaussianValue.Mean"
+                                                      SIValueNullableChanged="@(val => UpdateBoreHoleSize(holeSize, val))" />
+                                     </MudTd>
+
+                                     <MudTd>
+                                           <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                      QuantityName="Length"
+                                                      SIValueNullable="holeSize.Length.GaussianValue.Mean"
+                                                      SIValueNullableChanged="@(val => UpdateBoreHoleLength(holeSize, val))" />
+                                     </MudTd>
+                                   </RowTemplate>                
+                               </MudTable>
+                        </MudTd>
+
+
+                    </RowTemplate>
+
+
+                </MudTable>
+                
+            }                     
+</MudPaper>
+
+
+    }
+}
+
+@code{
+    [CascadingParameter]
+    private MudUnitAndReferenceChoiceTag? Parent { get; set; }
+    [Parameter]
+    public WellBoreArchitecture WellBoreArchitectureInstance {get; set;} 
+    [Parameter]
+    public string Class {get; set;}
+    [Parameter]
+    public EventCallback<WellBoreArchitecture> ValueChanged { get; set; }
+    
+    private bool checkBoxOpenHole = true;
+
+    private async Task UpdateCasingSectionTopDepth(CasingSection section, double? val)
+    {
+        section.TopDepth.GaussianValue.Mean = val;
+        await SendMessage();
+    }
+
+    private async Task UpdateCasingSectionLength(CasingSection section, double? val)
+    {
+        section.Length.GaussianValue.Mean = val;
+        await SendMessage();
+    }
+
+    private async Task UpdateCasingSectionTopCementDepth(CasingSection section, double? val)
+    {
+        section.TopCementDepth.GaussianValue.Mean = val;
+        await SendMessage();
+    }
+
+    private async Task UpdateElementBodyOD(CasingSectionElement element, double? val)
+    {
+        element.BodyOD.GaussianValue.Mean = val;
+        await SendMessage();
+    }
+
+    private async Task UpdateElementBodyID(CasingSectionElement element, double? val)
+    {
+        element.BodyID.GaussianValue.Mean = val;
+        await SendMessage();
+    }
+
+    private async Task UpdateElementCollarOD(CasingSectionElement element, double? val)
+    {
+        element.CollarOD.GaussianValue.Mean = val;
+        await SendMessage();
+    }
+
+    private async Task UpdateElementJointLength(CasingSectionElement element, double? val)
+    {
+        element.JointLength.GaussianValue.Mean = val;
+        await SendMessage();
+    }
+
+    private async Task UpdateElementSectionLength(CasingSectionElement element, double? val)
+    {
+        element.SectionLength.GaussianValue.Mean = val;
+        await SendMessage();
+    }
+
+    private async Task UpdateBoreHoleSize(BoreHoleSize boreHoleSize, double? val)
+    {
+        boreHoleSize.HoleSize.GaussianValue.Mean = val;
+        await SendMessage();
+    }
+
+    private async Task UpdateBoreHoleLength(BoreHoleSize boreHoleSize, double? val)
+    {
+        boreHoleSize.Length.GaussianValue.Mean = val;
+        await SendMessage();
+    }
+
+    private async Task SendMessage()
+    {
+        await ValueChanged.InvokeAsync(WellBoreArchitectureInstance);
+    }  
+    private async Task AddCasingSectionLine()
+    {
+        if (WellBoreArchitectureInstance != null)
+        {
+            if (WellBoreArchitectureInstance.CasingSections == null)
+            {
+                WellBoreArchitectureInstance.CasingSections = new List<CasingSection>
+                    {
+                        PseudoConstructors.ConstructCasingSection()
+                    };
+            }
+            else
+            {
+                WellBoreArchitectureInstance.CasingSections.Add(PseudoConstructors.ConstructCasingSection());
+            }
+        }
+        await SendMessage();
+    }
+
+    private async Task RemoveCasingSectionLine()
+    {
+        if (WellBoreArchitectureInstance != null)
+        {
+            if (WellBoreArchitectureInstance.CasingSections != null)
+            {
+                if (WellBoreArchitectureInstance.CasingSections.Count > 1)
+                {
+                    WellBoreArchitectureInstance.CasingSections.RemoveAt(WellBoreArchitectureInstance.CasingSections.Count - 1);
+                }
+            }
+        }
+        await SendMessage();
+    }
+
+   private async Task AddCasingSectionElementLine(CasingSection casingSection)
+   {
+        casingSection.CasingSectionElements.Add(PseudoConstructors.ConstructCasingSectionElement());
+        await SendMessage();
+   }
+
+   private async Task RemoveCasingSectionElementLine(CasingSection casingSection)
+   {
+        if (casingSection.CasingSectionElements.Count > 0)
+            casingSection.CasingSectionElements.RemoveAt(casingSection.CasingSectionElements.Count-1);
+        await SendMessage();
+   }
+
+    private async Task AddBoreHole(CasingSection casingSection)
+   {
+        if (casingSection.OpenHoleSection != null)
+            casingSection.OpenHoleSection = PseudoConstructors.ConstructOpenHoleSection();
+
+        casingSection.OpenHoleSection.HoleSizes.Add(PseudoConstructors.ConstructBoreHoleSize());
+        await SendMessage();
+   }
+
+   private async Task RemoveBoreHole(CasingSection casingSection)
+   {
+        if (casingSection.OpenHoleSection.HoleSizes.Count > 0)
+            casingSection.OpenHoleSection.HoleSizes.RemoveAt(casingSection.OpenHoleSection.HoleSizes.Count-1);
+        await SendMessage();
+   }
+
+}

@@ -54,7 +54,7 @@
     [Parameter]
     public SurfaceSection SurfaceSectionsInstance {get; set;}
     [Parameter]
-    public ICollection<SideConnector> SideConnectors {get; set;} = new List<SideConnector>(){new SideConnector()};
+    public List<SideConnector> SideConnectors {get; set;} = new List<SideConnector>(){new SideConnector()};
     // Temporary variables used to safely populate surface section    
     private double? length = 0.0;
     private double? bodyOD = 0.0;
@@ -151,7 +151,7 @@
         if(val != null){recMakeUpTorque= (double) val;}
         SurfaceSectionsInstance.MakeUpTorqueRecommended = ConversionsFromOSDC.DoubleToScalar(val);        
     }           
-    void UpdateSideConnector(ICollection<SideConnector>? sideConnectors)
+    void UpdateSideConnector(List<SideConnector>? sideConnectors)
     {
         if (sideConnectors != null)
         {

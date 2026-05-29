@@ -145,7 +145,7 @@
         try
         {
             // get guid and name from external microservices
-            ICollection<Field> fields = await Api.ClientField.GetAllFieldAsync();
+            List<Field> fields = await Api.ClientField.GetAllFieldAsync();
             foreach (Field field in fields)
             {
                 if (!fieldDicts.ContainsKey(field.MetaInfo.ID))
@@ -153,7 +153,7 @@
                     fieldDicts.Add(field.MetaInfo.ID, field);
                 }
             }
-            ICollection<Cluster> clusters = await Api.ClientCluster.GetAllClusterAsync();
+            List<Cluster> clusters = await Api.ClientCluster.GetAllClusterAsync();
             foreach (Cluster cluster in clusters)
             {
                 if (!clusterDicts.ContainsKey(cluster.MetaInfo.ID))
@@ -161,7 +161,7 @@
                     clusterDicts.Add(cluster.MetaInfo.ID, cluster);
                 }
             }
-            ICollection<Well> wells = await Api.ClientWell.GetAllWellAsync();
+            List<Well> wells = await Api.ClientWell.GetAllWellAsync();
             foreach (Well well in wells)
             {
                 if (!wellDicts.ContainsKey(well.MetaInfo.ID))
@@ -169,7 +169,7 @@
                     wellDicts.Add(well.MetaInfo.ID, well);
                 }
             }
-            ICollection<RigLight> rigs = await Api.ClientRig.GetAllRigLightAsync();
+            List<RigLight> rigs = await Api.ClientRig.GetAllRigLightAsync();
             foreach (RigLight rig in rigs)
             {
                 if (!rigDicts.ContainsKey(rig.MetaInfo.ID))
@@ -177,7 +177,7 @@
                     rigDicts.Add(rig.MetaInfo.ID, rig);
                 }
             }
-            ICollection<WellBore> wellBores = await Api.ClientWellBore.GetAllWellBoreAsync();
+            List<WellBore> wellBores = await Api.ClientWellBore.GetAllWellBoreAsync();
             foreach (WellBore wellBore in wellBores)
             {
                 if (!wellBoreDicts.ContainsKey(wellBore.MetaInfo.ID))

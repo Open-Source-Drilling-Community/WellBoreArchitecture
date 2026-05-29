@@ -16,8 +16,8 @@
                 SurfaceSection surfaceSection = SurfaceSections.ElementAt<SurfaceSection>(i);
                 if (surfaceSection != null)
                 {
-                    <SurfaceSectionEditor SurfaceSectionsInstance="surfaceSection" SideConnectors="listSideConnectors.ElementAt<ICollection<SideConnector>>(i)" />
-                    surfaceSection.SideConnectors = listSideConnectors.ElementAt<ICollection<SideConnector>>(i);
+                    <SurfaceSectionEditor SurfaceSectionsInstance="surfaceSection" SideConnectors="listSideConnectors.ElementAt<List<SideConnector>>(i)" />
+                    surfaceSection.SideConnectors = listSideConnectors.ElementAt<List<SideConnector>>(i);
 
                     @if (SurfaceSections.Count > 1 && i < SurfaceSections.Count - 1)
                     {
@@ -42,12 +42,12 @@
 
 @code{
     [Parameter]
-    public ICollection<SurfaceSection> SurfaceSections {get; set;} = new List<SurfaceSection>();
+    public List<SurfaceSection> SurfaceSections {get; set;} = new List<SurfaceSection>();
     [Parameter]
     public string Class {get; set;} = "mb-4";
     //  Create a local list of side connectors to be edited and injected in SurfaceSections
     // SurfaceSections already contains an empty value as default
-    private ICollection<List<SideConnector>> listSideConnectors = new List<List<SideConnector>>
+    private List<List<SideConnector>> listSideConnectors = new List<List<SideConnector>>
     {
         new List<SideConnector>()
             {
@@ -79,7 +79,7 @@
             {
                 if (i < listSideConnectors.Count)
                 {
-                    if (listSideConnectors is List<ICollection<SideConnector>> list)
+                    if (listSideConnectors is List<List<SideConnector>> list)
                     {
                         list[i] = SurfaceSections.ElementAt<SurfaceSection>(i).SideConnectors;
                     }
