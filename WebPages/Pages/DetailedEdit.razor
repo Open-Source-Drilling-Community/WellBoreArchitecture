@@ -84,25 +84,25 @@
                         <MudTh>Open Hole Section </MudTh>                                                        
                     </HeaderContent>
                     <RowTemplate>
-                        <MudTd>
+                        <MudTd Style="vertical-align: top;">
                             <MudInputWithUnit VariantType="Variant.Text"
                                        QuantityName="DepthDrilling"
                                        SIValueNullable="context.TopDepth.GaussianValue.Mean"
                                        SIValueNullableChanged="@(val => UpdateCasingSectionTopDepth(context, val))" />
                         </MudTd>
-                        <MudTd>
+                        <MudTd Style="vertical-align: top;">
                             <MudInputWithUnit VariantType="Variant.Text"
                                        QuantityName="Length"
                                        SIValueNullable="context.Length.GaussianValue.Mean"
                                        SIValueNullableChanged="@(val => UpdateCasingSectionLength(context, val))" />
                         </MudTd>
-                        <MudTd>
+                        <MudTd Style="vertical-align: top;">
                             <MudInputWithUnit VariantType="Variant.Text"
                                        QuantityName="DepthDrilling"
                                        SIValueNullable="context.TopCementDepth.GaussianValue.Mean"
                                        SIValueNullableChanged="@(val => UpdateCasingSectionTopCementDepth(context, val))" />
                         </MudTd>
-                        <MudTd>
+                        <MudTd Style="vertical-align: top;">
                             <MudToolBar>
                                 <MudSpacer />
                                 <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Add" Color="Color.Secondary" OnClick="@(val => AddCasingSectionElementLine(context))" Size="Size.Small"> Add line </MudButton>
@@ -151,7 +151,7 @@
                             </MudTable>
 
                         </MudTd>
-                        <MudTd>                     
+                        <MudTd Style="vertical-align: top;">
                             <MudToolBar>
                                    <MudSpacer />
                                    <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Add" Color="Color.Secondary" OnClick="@(val => AddBoreHole(context))" Size="Size.Small"> Add line </MudButton>
