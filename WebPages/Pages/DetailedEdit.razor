@@ -64,6 +64,7 @@
             <MudText Typo="Typo.h6">Casing section properties</MudText>
             <MudSpacer />
             <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Add" Color="Color.Secondary" OnClick="AddCasingSectionLine" Size="Size.Small"> Add line </MudButton>
+            <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.ContentCopy" Color="Color.Primary" OnClick="CopyCasingSectionLine" Size="Size.Small"> Copy line </MudButton>
             <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Remove" Color="Color.Tertiary" OnClick="RemoveCasingSectionLine" Size="Size.Small"> Remove line</MudButton>
         </MudToolBar>
             <MudDivider Class="mb-2" />
@@ -106,6 +107,7 @@
                             <MudToolBar>
                                 <MudSpacer />
                                 <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Add" Color="Color.Secondary" OnClick="@(val => AddCasingSectionElementLine(context))" Size="Size.Small"> Add line </MudButton>
+                                <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.ContentCopy" Color="Color.Primary" OnClick="@(val => CopyCasingSectionElementLine(context))" Size="Size.Small"> Copy line </MudButton>
                                 <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Remove" Color="Color.Tertiary" OnClick="@(val => RemoveCasingSectionElementLine(context))" Size="Size.Small"> Remove line</MudButton>
                             </MudToolBar>
                             <MudTable T="CasingSectionElement" Items="context.CasingSectionElements" Context="casingElements">
@@ -155,6 +157,7 @@
                             <MudToolBar>
                                    <MudSpacer />
                                    <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Add" Color="Color.Secondary" OnClick="@(val => AddBoreHole(context))" Size="Size.Small"> Add line </MudButton>
+                                   <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.ContentCopy" Color="Color.Primary" OnClick="@(val => CopyBoreHole(context))" Size="Size.Small"> Copy line </MudButton>
                                    <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Remove" Color="Color.Tertiary" OnClick="@(val => RemoveBoreHole(context))" Size="Size.Small"> Remove line</MudButton>
                                </MudToolBar>
                                <MudTable T="BoreHoleSize" Items="context.OpenHoleSection.HoleSizes" Context="holeSize">
@@ -303,6 +306,17 @@
         await SendMessage();
     }
 
+    private async Task CopyCasingSectionLine()
+    {
+        if (WellBoreArchitectureInstance?.CasingSections?.Count > 0)
+        {
+            var last = WellBoreArchitectureInstance.CasingSections.Last();
+            var copy = JsonSerializer.Deserialize<CasingSection>(JsonSerializer.Serialize(last));
+            WellBoreArchitectureInstance.CasingSections.Add(copy);
+        }
+        await SendMessage();
+    }
+
    private async Task AddCasingSectionElementLine(CasingSection casingSection)
    {
         casingSection.CasingSectionElements.Add(PseudoConstructors.ConstructCasingSectionElement());
@@ -313,6 +327,17 @@
    {
         if (casingSection.CasingSectionElements.Count > 0)
             casingSection.CasingSectionElements.RemoveAt(casingSection.CasingSectionElements.Count-1);
+        await SendMessage();
+   }
+
+   private async Task CopyCasingSectionElementLine(CasingSection casingSection)
+   {
+        if (casingSection.CasingSectionElements.Count > 0)
+        {
+            var last = casingSection.CasingSectionElements.Last();
+            var copy = JsonSerializer.Deserialize<CasingSectionElement>(JsonSerializer.Serialize(last));
+            casingSection.CasingSectionElements.Add(copy);
+        }
         await SendMessage();
    }
 
@@ -329,6 +354,17 @@
    {
         if (casingSection.OpenHoleSection.HoleSizes.Count > 0)
             casingSection.OpenHoleSection.HoleSizes.RemoveAt(casingSection.OpenHoleSection.HoleSizes.Count-1);
+        await SendMessage();
+   }
+
+   private async Task CopyBoreHole(CasingSection casingSection)
+   {
+        if (casingSection.OpenHoleSection?.HoleSizes?.Count > 0)
+        {
+            var last = casingSection.OpenHoleSection.HoleSizes.Last();
+            var copy = JsonSerializer.Deserialize<BoreHoleSize>(JsonSerializer.Serialize(last));
+            casingSection.OpenHoleSection.HoleSizes.Add(copy);
+        }
         await SendMessage();
    }
 
