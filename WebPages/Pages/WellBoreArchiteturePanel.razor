@@ -833,6 +833,13 @@
     private IEqualityComparer<Well> WellComparer { get; } = new MetaInfoIdComparer<Well>(item => item?.MetaInfo?.ID);
     private IEqualityComparer<WellBore> WellBoreComparer { get; } = new MetaInfoIdComparer<WellBore>(item => item?.MetaInfo?.ID);
 
+    protected override bool ShouldRender() =>
+        WellBoreArchitecture != null &&
+        WellBoreArchitecture.WellHead != null &&
+        WellBoreArchitecture.FluidsAboveGroundLevel != null &&
+        WellBoreArchitecture.SurfaceSections != null &&
+        WellBoreArchitecture.CasingSections != null;
+
     protected override async Task OnParametersSetAsync()
     {
         await InitializeArchitectureAsync();
