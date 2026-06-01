@@ -310,7 +310,7 @@
                 WellBoreArchitectureInstance.CasingSections.Add(PseudoConstructors.ConstructCasingSection());
             }
         }
-        //await SendMessage();
+        await SendMessage();
     }
 
     private async Task RemoveCasingSectionLine()
@@ -325,7 +325,7 @@
                 }
             }
         }
-        //await SendMessage();
+        await SendMessage();
     }
 
     private async Task CopyCasingSectionLine()
@@ -335,20 +335,20 @@
             CasingSection last = WellBoreArchitectureInstance.CasingSections.Last();
             WellBoreArchitectureInstance.CasingSections.Add(DataUtils.CreateCopy(last));
         }
-        //await SendMessage();
+        await SendMessage();
     }
 
    private async Task AddCasingSectionElementLine(CasingSection casingSection)
    {
         casingSection.CasingSectionElements.Add(PseudoConstructors.ConstructCasingSectionElement());
-        //await SendMessage();
+        await SendMessage();
    }
 
    private async Task RemoveCasingSectionElementLine(CasingSection casingSection)
    {
         if (casingSection.CasingSectionElements.Count > 0)
             casingSection.CasingSectionElements.RemoveAt(casingSection.CasingSectionElements.Count-1);
-        //await SendMessage();
+        await SendMessage();
    }
 
    private async Task CopyCasingSectionElementLine(CasingSection casingSection)
@@ -358,7 +358,7 @@
             var last = casingSection.CasingSectionElements.Last();
             casingSection.CasingSectionElements.Add(DataUtils.CreateCopy(last));
         }
-        //await SendMessage();
+        await SendMessage();
    }
 
     private async Task AddBoreHole(CasingSection casingSection)
@@ -367,14 +367,14 @@
             casingSection.OpenHoleSection = PseudoConstructors.ConstructOpenHoleSection();
 
         casingSection.OpenHoleSection.HoleSizes.Add(PseudoConstructors.ConstructBoreHoleSize());
-        //await SendMessage();
+        await SendMessage();
    }
 
    private async Task RemoveBoreHole(CasingSection casingSection)
    {
         if (casingSection.OpenHoleSection.HoleSizes.Count > 0)
             casingSection.OpenHoleSection.HoleSizes.RemoveAt(casingSection.OpenHoleSection.HoleSizes.Count-1);
-        //await SendMessage();
+        await SendMessage();
    }
 
    private async Task CopyBoreHole(CasingSection casingSection)
@@ -384,7 +384,7 @@
             BoreHoleSize? last = casingSection.OpenHoleSection.HoleSizes.Last();
             casingSection.OpenHoleSection.HoleSizes.Add(DataUtils.CreateCopy(last));
         }
-        //await SendMessage();
+        await SendMessage();
    }
 
 }
