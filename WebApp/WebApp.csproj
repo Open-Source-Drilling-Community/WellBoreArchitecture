@@ -37,7 +37,6 @@
   <ItemGroup>
     <ProjectReference Include="..\WebPages\WebPages.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Content Update="wwwroot\css\site.css">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>

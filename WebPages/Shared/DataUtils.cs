@@ -1,3 +1,5 @@
+using NORCE.Drilling.WellBoreArchitecture.ModelShared;
+
 namespace NORCE.Drilling.WellBoreArchitecture.WebPages.Shared;
 
 public static class DataUtils
@@ -48,4 +50,55 @@ public static class DataUtils
     public static readonly string OutputXValuesQty = "DepthDrilling";
     public static readonly string OutputYValuesTitle = "Y value";
     public static readonly string OutputYValuesQty = "Length";
+    public static BoreHoleSize? CreateCopy(BoreHoleSize boreHoleSize)
+    {
+        return new BoreHoleSize
+        {
+            HoleSize = boreHoleSize.HoleSize,
+            Length = boreHoleSize.Length
+        };
+    }
+    public static CasingSection? CreateCopy(CasingSection casingSection)
+    {
+        List<CasingSectionElement> elements = new();
+        foreach (CasingSectionElement? ele in casingSection.CasingSectionElements)
+        {
+            if (ele != null)
+            {
+                elements.Add(CreateCopy(ele));                
+            }
+        }
+        return new CasingSection
+        {
+            TopDepth = casingSection.TopDepth,
+            Length = casingSection.Length, 
+            TopCementDepth = casingSection.TopCementDepth,
+            CasingSectionElements = elements,
+            CasingSectionSizeTable = casingSection.CasingSectionSizeTable,
+            OpenHoleSection = casingSection.OpenHoleSection
+        };
+    }
+    public static CasingSectionElement? CreateCopy(CasingSectionElement element)
+    {
+        return new CasingSectionElement
+        {
+            BodyOD = element.BodyOD,
+            BodyID = element.BodyID,
+            CollarOD = element.CollarOD,
+            JointLength = element.JointLength,
+            SectionLength = element.SectionLength,
+            MaxDLS = element.MaxDLS,
+            ConnectionType = element.ConnectionType,
+            Grade = element.Grade,
+            MaterialDensity = element.MaterialDensity,
+            YoungModulus = element.YoungModulus,
+            LinearWeight = element.LinearWeight,
+            TensileStrength = element.TensileStrength,
+            TorsionalStrength = element.TorsionalStrength,
+            BurstPressure = element.BurstPressure,
+            CollapsePressure = element.CollapsePressure,
+            YieldStress = element.YieldStress,
+            MakeUpTorqueRecommended = element.MakeUpTorqueRecommended
+        };
+    }
 }
