@@ -72,124 +72,148 @@
             {
                 <!-- If no value arrives, initialize a new list with treatment in regard to
                 OSDC drilling properties.-->
-                WellBoreArchitectureInstance.CasingSections = new List<CasingSection>{ PseudoConstructors.ConstructCasingSection() };                             
+                WellBoreArchitectureInstance.CasingSections = new List<CasingSection>{ PseudoConstructors.ConstructCasingSection() };
             }
             @if (WellBoreArchitectureInstance.CasingSections != null)
             {
-                <MudTable T="CasingSection" Items="@WellBoreArchitectureInstance.CasingSections" Context="context">
-                    <HeaderContent>
-                        <MudTh>Top Depth [@(Parent.GetUnitLabel("DepthDrilling"))]</MudTh>
-                        <MudTh>Length [@(Parent.GetUnitLabel("Length"))]</MudTh>
-                        <MudTh>Top Cement Depth [@(Parent.GetUnitLabel("DepthDrilling"))]</MudTh>
-                        <MudTh>Casing Section Elements</MudTh>                
-                        <MudTh>Open Hole Section </MudTh>                                                        
-                    </HeaderContent>
-                    <RowTemplate>
-                        <MudTd Style="vertical-align: top;">
-                            <MudInputWithUnit VariantType="Variant.Text"
-                                       QuantityName="DepthDrilling"
-                                       SIValueNullable="context.TopDepth.GaussianValue.Mean"
-                                       SIValueNullableChanged="@(val => UpdateCasingSectionTopDepth(context, val))" />
-                        </MudTd>
-                        <MudTd Style="vertical-align: top;">
-                            <MudInputWithUnit VariantType="Variant.Text"
-                                       QuantityName="Length"
-                                       SIValueNullable="context.Length.GaussianValue.Mean"
-                                       SIValueNullableChanged="@(val => UpdateCasingSectionLength(context, val))" />
-                        </MudTd>
-                        <MudTd Style="vertical-align: top;">
-                            <MudInputWithUnit VariantType="Variant.Text"
-                                       QuantityName="DepthDrilling"
-                                       SIValueNullable="context.TopCementDepth.GaussianValue.Mean"
-                                       SIValueNullableChanged="@(val => UpdateCasingSectionTopCementDepth(context, val))" />
-                        </MudTd>
-                        <MudTd Style="vertical-align: top;">
-                            <MudToolBar>
-                                <MudSpacer />
-                                <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Add" Color="Color.Secondary" OnClick="@(val => AddCasingSectionElementLine(context))" Size="Size.Small"> Add line </MudButton>
-                                <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.ContentCopy" Color="Color.Primary" OnClick="@(val => CopyCasingSectionElementLine(context))" Size="Size.Small"> Copy line </MudButton>
-                                <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Remove" Color="Color.Tertiary" OnClick="@(val => RemoveCasingSectionElementLine(context))" Size="Size.Small"> Remove line</MudButton>
-                            </MudToolBar>
-                            <MudTable T="CasingSectionElement" Items="context.CasingSectionElements" Context="casingElements">
-                                <HeaderContent>
-                                    <MudTh>OD [@(Parent.GetUnitLabel("DiameterPipeDrilling"))]</MudTh>
-                                    <MudTh>ID [@(Parent.GetUnitLabel("DiameterPipeDrilling"))]</MudTh>
-                                    <MudTh>Collar OD [@(Parent.GetUnitLabel("DiameterPipeDrilling"))]</MudTh>
-                                    <MudTh>Joint Length [@(Parent.GetUnitLabel("Length"))]</MudTh>                
-                                    <MudTh>Section Length [@(Parent.GetUnitLabel("DepthDrilling"))]</MudTh>                                    
-                                </HeaderContent>
-                                <RowTemplate>
-                                  <MudTd>
+                <MudExpansionPanels MultiExpansion="true" Class="mt-2">
+                    @{ int sectionIndex = 0; }
+                    @foreach (var context in WellBoreArchitectureInstance.CasingSections)
+                    {
+                        sectionIndex++;
+                        var capturedContext = context;
+                        var capturedIndex = sectionIndex;
+                        <MudExpansionPanel>
+                            <TitleContent>
+                                <div class="d-flex align-center gap-3">
+                                    <MudText Typo="Typo.subtitle1"><b>Section @capturedIndex</b></MudText>
+                                    <MudText Typo="Typo.body2" Class="mud-text-secondary">
+                                        Top Depth: @capturedContext.TopDepth?.GaussianValue?.Mean &nbsp;·&nbsp;
+                                        Length: @capturedContext.Length?.GaussianValue?.Mean &nbsp;·&nbsp;
+                                        Top Cement Depth: @capturedContext.TopCementDepth?.GaussianValue?.Mean
+                                    </MudText>
+                                </div>
+                            </TitleContent>
+                            <ChildContent>
+                                @* Scalar section properties *@
+                                <MudGrid Class="mb-4 px-2">
+                                    <MudItem xs="4">
+                                        <MudText Typo="Typo.caption" Class="mud-text-secondary">Top Depth [@(Parent?.GetUnitLabel("DepthDrilling"))]</MudText>
                                         <MudInputWithUnit VariantType="Variant.Text"
-                                                   QuantityName="DiameterPipeDrilling"
-                                                   SIValueNullable="casingElements.BodyOD.GaussianValue.Mean"
-                                                   SIValueNullableChanged="@(val => UpdateElementBodyOD(casingElements, val))" />
-                                  </MudTd>
-                                  <MudTd>
-                                        <MudInputWithUnitAdornment VariantType="Variant.Text"
-                                                   QuantityName="DiameterPipeDrilling"
-                                                   SIValueNullable="casingElements.BodyID.GaussianValue.Mean"
-                                                   SIValueNullableChanged="@(val => UpdateElementBodyID(casingElements, val))" />
-                                  </MudTd>
-                                  <MudTd>
-                                        <MudInputWithUnitAdornment VariantType="Variant.Text"
-                                                   QuantityName="DiameterPipeDrilling"
-                                                   SIValueNullable="casingElements.CollarOD.GaussianValue.Mean"
-                                                   SIValueNullableChanged="@(val => UpdateElementCollarOD(casingElements, val))" />
-                                  </MudTd>
-                                  <MudTd>
-                                        <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                   QuantityName="DepthDrilling"
+                                                   SIValueNullable="capturedContext.TopDepth?.GaussianValue?.Mean"
+                                                   SIValueNullableChanged="@(val => UpdateCasingSectionTopDepth(capturedContext, val))" />
+                                    </MudItem>
+                                    <MudItem xs="4">
+                                        <MudText Typo="Typo.caption" Class="mud-text-secondary">Length [@(Parent?.GetUnitLabel("Length"))]</MudText>
+                                        <MudInputWithUnit VariantType="Variant.Text"
                                                    QuantityName="Length"
-                                                   SIValueNullable="casingElements.JointLength.GaussianValue.Mean"
-                                                   SIValueNullableChanged="@(val => UpdateElementJointLength(casingElements, val))" />
-                                  </MudTd>
-                                  <MudTd>
-                                        <MudInputWithUnitAdornment VariantType="Variant.Text"
-                                                   QuantityName="Length"
-                                                   SIValueNullable="casingElements.SectionLength.GaussianValue.Mean"
-                                                   SIValueNullableChanged="@(val => UpdateElementSectionLength(casingElements, val))" />
-                                  </MudTd>
-                                </RowTemplate>                
-                            </MudTable>
+                                                   SIValueNullable="capturedContext.Length?.GaussianValue?.Mean"
+                                                   SIValueNullableChanged="@(val => UpdateCasingSectionLength(capturedContext, val))" />
+                                    </MudItem>
+                                    <MudItem xs="4">
+                                        <MudText Typo="Typo.caption" Class="mud-text-secondary">Top Cement Depth [@(Parent?.GetUnitLabel("DepthDrilling"))]</MudText>
+                                        <MudInputWithUnit VariantType="Variant.Text"
+                                                   QuantityName="DepthDrilling"
+                                                   SIValueNullable="capturedContext.TopCementDepth?.GaussianValue?.Mean"
+                                                   SIValueNullableChanged="@(val => UpdateCasingSectionTopCementDepth(capturedContext, val))" />
+                                    </MudItem>
+                                </MudGrid>
 
-                        </MudTd>
-                        <MudTd Style="vertical-align: top;">
-                            <MudToolBar>
-                                   <MudSpacer />
-                                   <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Add" Color="Color.Secondary" OnClick="@(val => AddBoreHole(context))" Size="Size.Small"> Add line </MudButton>
-                                   <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.ContentCopy" Color="Color.Primary" OnClick="@(val => CopyBoreHole(context))" Size="Size.Small"> Copy line </MudButton>
-                                   <MudButton Class="mx-2" StartIcon="@Icons.Material.Filled.Remove" Color="Color.Tertiary" OnClick="@(val => RemoveBoreHole(context))" Size="Size.Small"> Remove line</MudButton>
-                               </MudToolBar>
-                               <MudTable T="BoreHoleSize" Items="context.OpenHoleSection.HoleSizes" Context="holeSize">
-                                   <HeaderContent>
-                                       <MudTh>OD [@(Parent.GetUnitLabel("DiameterPipeDrilling"))]</MudTh>
-                                       <MudTh>Length [@(Parent.GetUnitLabel("Length"))]</MudTh>                
-                                   </HeaderContent>
-                                   <RowTemplate>
-                                     <MudTd>
-                                           <MudInputWithUnit VariantType="Variant.Text"
-                                                      QuantityName="DiameterPipeDrilling"
-                                                      SIValueNullable="holeSize.HoleSize.GaussianValue.Mean"
-                                                      SIValueNullableChanged="@(val => UpdateBoreHoleSize(holeSize, val))" />
-                                     </MudTd>
+                                <MudDivider Class="my-3" />
 
-                                     <MudTd>
-                                           <MudInputWithUnitAdornment VariantType="Variant.Text"
-                                                      QuantityName="Length"
-                                                      SIValueNullable="holeSize.Length.GaussianValue.Mean"
-                                                      SIValueNullableChanged="@(val => UpdateBoreHoleLength(holeSize, val))" />
-                                     </MudTd>
-                                   </RowTemplate>                
-                               </MudTable>
-                        </MudTd>
+                                @* Nested sub-tables side by side *@
+                                <MudGrid Class="px-2">
+                                    <MudItem xs="7">
+                                        <div class="d-flex align-center justify-space-between mb-2">
+                                            <MudText Typo="Typo.subtitle2">Casing Section Elements</MudText>
+                                            <div>
+                                                <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Secondary" OnClick="@(val => AddCasingSectionElementLine(capturedContext))" Size="Size.Small"> Add </MudButton>
+                                                <MudButton StartIcon="@Icons.Material.Filled.ContentCopy" Color="Color.Primary" OnClick="@(val => CopyCasingSectionElementLine(capturedContext))" Size="Size.Small"> Copy </MudButton>
+                                                <MudButton StartIcon="@Icons.Material.Filled.Remove" Color="Color.Tertiary" OnClick="@(val => RemoveCasingSectionElementLine(capturedContext))" Size="Size.Small"> Remove </MudButton>
+                                            </div>
+                                        </div>
+                                        <MudTable T="CasingSectionElement" Items="capturedContext.CasingSectionElements" Context="casingElements"
+                                                  Dense="true" Elevation="0" Bordered="true" Striped="true">
+                                            <HeaderContent>
+                                                <MudTh>OD [@(Parent?.GetUnitLabel("DiameterPipeDrilling"))]</MudTh>
+                                                <MudTh>ID [@(Parent?.GetUnitLabel("DiameterPipeDrilling"))]</MudTh>
+                                                <MudTh>Collar OD [@(Parent?.GetUnitLabel("DiameterPipeDrilling"))]</MudTh>
+                                                <MudTh>Joint Length [@(Parent?.GetUnitLabel("Length"))]</MudTh>
+                                                <MudTh>Section Length [@(Parent?.GetUnitLabel("DepthDrilling"))]</MudTh>
+                                            </HeaderContent>
+                                            <RowTemplate>
+                                                <MudTd>
+                                                    <MudInputWithUnit VariantType="Variant.Text"
+                                                               QuantityName="DiameterPipeDrilling"
+                                                               SIValueNullable="casingElements.BodyOD?.GaussianValue?.Mean"
+                                                               SIValueNullableChanged="@(val => UpdateElementBodyOD(casingElements, val))" />
+                                                </MudTd>
+                                                <MudTd>
+                                                    <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                               QuantityName="DiameterPipeDrilling"
+                                                               SIValueNullable="casingElements.BodyID?.GaussianValue?.Mean"
+                                                               SIValueNullableChanged="@(val => UpdateElementBodyID(casingElements, val))" />
+                                                </MudTd>
+                                                <MudTd>
+                                                    <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                               QuantityName="DiameterPipeDrilling"
+                                                               SIValueNullable="casingElements.CollarOD?.GaussianValue?.Mean"
+                                                               SIValueNullableChanged="@(val => UpdateElementCollarOD(casingElements, val))" />
+                                                </MudTd>
+                                                <MudTd>
+                                                    <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                               QuantityName="Length"
+                                                               SIValueNullable="casingElements.JointLength?.GaussianValue?.Mean"
+                                                               SIValueNullableChanged="@(val => UpdateElementJointLength(casingElements, val))" />
+                                                </MudTd>
+                                                <MudTd>
+                                                    <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                               QuantityName="Length"
+                                                               SIValueNullable="casingElements.SectionLength?.GaussianValue?.Mean"
+                                                               SIValueNullableChanged="@(val => UpdateElementSectionLength(casingElements, val))" />
+                                                </MudTd>
+                                            </RowTemplate>
+                                        </MudTable>
+                                    </MudItem>
 
-
-                    </RowTemplate>
-
-
-                </MudTable>
-                
-            }                     
+                                    <MudItem xs="5">
+                                        <div class="d-flex align-center justify-space-between mb-2">
+                                            <MudText Typo="Typo.subtitle2">Open Hole Section</MudText>
+                                            <div>
+                                                <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Secondary" OnClick="@(val => AddBoreHole(capturedContext))" Size="Size.Small"> Add </MudButton>
+                                                <MudButton StartIcon="@Icons.Material.Filled.ContentCopy" Color="Color.Primary" OnClick="@(val => CopyBoreHole(capturedContext))" Size="Size.Small"> Copy </MudButton>
+                                                <MudButton StartIcon="@Icons.Material.Filled.Remove" Color="Color.Tertiary" OnClick="@(val => RemoveBoreHole(capturedContext))" Size="Size.Small"> Remove </MudButton>
+                                            </div>
+                                        </div>
+                                        <MudTable T="BoreHoleSize" Items="capturedContext.OpenHoleSection?.HoleSizes" Context="holeSize"
+                                                  Dense="true" Elevation="0" Bordered="true" Striped="true">
+                                            <HeaderContent>
+                                                <MudTh>OD [@(Parent?.GetUnitLabel("DiameterPipeDrilling"))]</MudTh>
+                                                <MudTh>Length [@(Parent?.GetUnitLabel("Length"))]</MudTh>
+                                            </HeaderContent>
+                                            <RowTemplate>
+                                                <MudTd>
+                                                    <MudInputWithUnit VariantType="Variant.Text"
+                                                               QuantityName="DiameterPipeDrilling"
+                                                               SIValueNullable="holeSize.HoleSize?.GaussianValue?.Mean"
+                                                               SIValueNullableChanged="@(val => UpdateBoreHoleSize(holeSize, val))" />
+                                                </MudTd>
+                                                <MudTd>
+                                                    <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                               QuantityName="Length"
+                                                               SIValueNullable="holeSize.Length?.GaussianValue?.Mean"
+                                                               SIValueNullableChanged="@(val => UpdateBoreHoleLength(holeSize, val))" />
+                                                </MudTd>
+                                            </RowTemplate>
+                                        </MudTable>
+                                    </MudItem>
+                                </MudGrid>
+                            </ChildContent>
+                        </MudExpansionPanel>
+                    }
+                </MudExpansionPanels>
+            }
 </MudPaper>
 
 
@@ -202,12 +226,10 @@
     [Parameter]
     public WellBoreArchitecture WellBoreArchitectureInstance {get; set;} 
     [Parameter]
-    public string Class {get; set;}
+    public string Class {get; set;} = "mx-2 px-2";
     [Parameter]
     public EventCallback<WellBoreArchitecture> ValueChanged { get; set; }
     
-    private bool checkBoxOpenHole = true;
-
     private async Task UpdateCasingSectionTopDepth(CasingSection section, double? val)
     {
         section.TopDepth.GaussianValue.Mean = val;
@@ -310,9 +332,8 @@
     {
         if (WellBoreArchitectureInstance?.CasingSections?.Count > 0)
         {
-            var last = WellBoreArchitectureInstance.CasingSections.Last();
-            var copy = JsonSerializer.Deserialize<CasingSection>(JsonSerializer.Serialize(last));
-            WellBoreArchitectureInstance.CasingSections.Add(copy);
+            CasingSection last = WellBoreArchitectureInstance.CasingSections.Last();
+            WellBoreArchitectureInstance.CasingSections.Add(DataUtils.CreateCopy(last));
         }
         await SendMessage();
     }
@@ -335,15 +356,14 @@
         if (casingSection.CasingSectionElements.Count > 0)
         {
             var last = casingSection.CasingSectionElements.Last();
-            var copy = JsonSerializer.Deserialize<CasingSectionElement>(JsonSerializer.Serialize(last));
-            casingSection.CasingSectionElements.Add(copy);
+            casingSection.CasingSectionElements.Add(DataUtils.CreateCopy(last));
         }
         await SendMessage();
    }
 
     private async Task AddBoreHole(CasingSection casingSection)
    {
-        if (casingSection.OpenHoleSection != null)
+        if (casingSection.OpenHoleSection == null)
             casingSection.OpenHoleSection = PseudoConstructors.ConstructOpenHoleSection();
 
         casingSection.OpenHoleSection.HoleSizes.Add(PseudoConstructors.ConstructBoreHoleSize());
@@ -361,9 +381,8 @@
    {
         if (casingSection.OpenHoleSection?.HoleSizes?.Count > 0)
         {
-            var last = casingSection.OpenHoleSection.HoleSizes.Last();
-            var copy = JsonSerializer.Deserialize<BoreHoleSize>(JsonSerializer.Serialize(last));
-            casingSection.OpenHoleSection.HoleSizes.Add(copy);
+            BoreHoleSize? last = casingSection.OpenHoleSection.HoleSizes.Last();
+            casingSection.OpenHoleSection.HoleSizes.Add(DataUtils.CreateCopy(last));
         }
         await SendMessage();
    }

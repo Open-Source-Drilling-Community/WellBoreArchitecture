@@ -316,6 +316,8 @@
                         <MudText Typo="Typo.h6">Downhole architecture</MudText>
                         <MudSpacer />
                         <MudButton StartIcon="@Icons.Material.Filled.Add" Size="@Size.Small" OnClick="@AddCasingSection">Add row</MudButton>
+                        <MudButton StartIcon="@Icons.Material.Filled.ContentCopy" Size="@Size.Small" OnClick="@CopyCasingSectionLine">Copy last</MudButton>
+                        
                     </MudToolBar>
                     <MudDivider Class="mb-2" />
                     <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:0.75rem;align-items:center;" class="my-2">
@@ -384,6 +386,8 @@
                         <MudText Typo="Typo.h6">Open hole section</MudText>
                         <MudSpacer />
                         <MudButton StartIcon="@Icons.Material.Filled.Add" Size="@Size.Small" OnClick="@AddOpenHoleRow">Add row</MudButton>
+                        <MudButton StartIcon="@Icons.Material.Filled.ContentCopy" Size="@Size.Small" OnClick="@CopyOpenHole">Copy last</MudButton>
+
                     </MudToolBar>
                     <MudDivider Class="mb-2" />
                     <MudGrid Class="my-2">
@@ -832,6 +836,13 @@
     private IEqualityComparer<Cluster> ClusterComparer { get; } = new MetaInfoIdComparer<Cluster>(item => item?.MetaInfo?.ID);
     private IEqualityComparer<Well> WellComparer { get; } = new MetaInfoIdComparer<Well>(item => item?.MetaInfo?.ID);
     private IEqualityComparer<WellBore> WellBoreComparer { get; } = new MetaInfoIdComparer<WellBore>(item => item?.MetaInfo?.ID);
+
+    protected override bool ShouldRender() =>
+        WellBoreArchitecture != null &&
+        WellBoreArchitecture.WellHead != null &&
+        WellBoreArchitecture.FluidsAboveGroundLevel != null &&
+        WellBoreArchitecture.SurfaceSections != null &&
+        WellBoreArchitecture.CasingSections != null;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -3191,6 +3202,32 @@
             return id?.GetHashCode() ?? 0;
         }
     }
+
+    private async Task CopyCasingSectionLine()
+    {
+        if (WellBoreArchitecture?.CasingSections?.Count > 0)
+        {
+            CasingSection last = WellBoreArchitecture.CasingSections.Last();
+            WellBoreArchitecture.CasingSections.Add(DataUtils.CreateCopy(last));
+        }
+    }
+    private async Task CopyCasingSectionElementLine(CasingSection casingSection)
+    {
+         if (casingSection.CasingSectionElements.Count > 0)
+         {
+             var last = casingSection.CasingSectionElements.Last();
+             casingSection.CasingSectionElements.Add(DataUtils.CreateCopy(last));
+         }
+    }
+     private async Task CopyOpenHole()
+   {
+        if (OpenHoleRows?.Count > 0)
+        {
+            BoreHoleSize? last = OpenHoleRows.Last();
+            OpenHoleRows.Add(DataUtils.CreateCopy(last));
+        }
+   }
+
 }
 
 
