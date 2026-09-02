@@ -5,6 +5,7 @@ using OSDC.DotnetLibraries.General.DataManagement;
 using Microsoft.Data.Sqlite;
 using System.Text.Json;
 using System.Linq;
+using OSDC.Drilling.WellBoreArchitecture.Model;
 
 namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
 {
@@ -513,6 +514,67 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
                 _logger.LogWarning("The WellBoreArchitecture ID or the ID of some of its attributes are null or empty");
             }
             return false;
+        }
+
+        /// <summary>Creates a dependency-closed WellBoreArchitecture backup from one SQLite snapshot.</summary>
+        public WellBoreArchitectureBatchExportOutcome ExportBatch(WellBoreArchitectureBatchExportRequest? request)
+        {
+            using SqliteConnection? connection = _connectionManager.GetConnection();
+            if (connection == null) return WellBoreArchitectureBatchExporter.StorageFailure("The WellBoreArchitecture database is unavailable.");
+            using SqliteTransaction transaction = connection.BeginTransaction();
+            try
+            {
+                List<Model.WellBoreArchitecture?> architectures = ReadDocuments<Model.WellBoreArchitecture>(connection, transaction,
+                    "WellBoreArchitectureTable", "WellBoreArchitecture");
+                List<Model.WellBoreArchitectureIdentity> identities = ReadDocuments<Model.WellBoreArchitectureIdentity>(connection, transaction,
+                    "WellBoreArchitectureIdentityTable", "WellBoreArchitectureIdentity").Where(value => value != null).Cast<Model.WellBoreArchitectureIdentity>().ToList();
+                List<Model.WellBoreArchitectureFeatureCategory> categories = ReadDocuments<Model.WellBoreArchitectureFeatureCategory>(connection, transaction,
+                    "WellBoreArchitectureFeatureCategoryTable", "WellBoreArchitectureFeatureCategory").Where(value => value != null).Cast<Model.WellBoreArchitectureFeatureCategory>().ToList();
+                WellBoreArchitectureBatchExportOutcome outcome = WellBoreArchitectureBatchExporter.Create(request, architectures,
+                    DateTimeOffset.UtcNow, identities, categories);
+                transaction.Commit();
+                return outcome;
+            }
+            catch (Exception exception) when (exception is SqliteException or JsonException or InvalidOperationException)
+            {
+                try { transaction.Rollback(); } catch (InvalidOperationException) { }
+                _logger.LogError(exception, "Unable to create a dependency-closed WellBoreArchitecture backup");
+                return WellBoreArchitectureBatchExporter.StorageFailure("The stored WellBoreArchitectures or catalog dependencies could not be read.");
+            }
+        }
+
+        /// <summary>Validates and restores a WellBoreArchitecture backup in one transaction.</summary>
+        public WellBoreArchitectureBatchRestoreOutcome RestoreBatch(WellBoreArchitectureBatchRestoreRequest? request)
+        {
+            try
+            {
+                using SqliteConnection? connection = _connectionManager.GetConnection();
+                if (connection == null) return WellBoreArchitectureBatchRestorer.StorageFailure("The WellBoreArchitecture database is unavailable.");
+                return WellBoreArchitectureBatchRestorer.Restore(connection, request, DateTimeOffset.UtcNow);
+            }
+            catch (SqliteException exception)
+            {
+                _logger.LogError(exception, "Unable to open the WellBoreArchitecture database for batch restore");
+                return WellBoreArchitectureBatchRestorer.StorageFailure("The WellBoreArchitecture database is unavailable.");
+            }
+        }
+
+        private static List<T?> ReadDocuments<T>(SqliteConnection connection, SqliteTransaction transaction,
+            string table, string documentColumn)
+        {
+            using SqliteCommand command = connection.CreateCommand();
+            command.Transaction = transaction;
+            command.CommandText = $"SELECT {documentColumn} FROM {table} ORDER BY ID";
+            using SqliteDataReader reader = command.ExecuteReader();
+            List<T?> result = [];
+            while (reader.Read())
+            {
+                if (reader.IsDBNull(0)) throw new JsonException($"{table} contains a null document.");
+                T? value = JsonSerializer.Deserialize<T>(reader.GetString(0), JsonSettings.Options);
+                if (value == null) throw new JsonException($"{table} contains an invalid document.");
+                result.Add(value);
+            }
+            return result;
         }
 
         private bool ValidateAssignments(Model.WellBoreArchitecture architecture)

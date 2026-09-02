@@ -32,6 +32,10 @@ All endpoints are relative to `/WellBoreArchitecture/api/WellBoreArchitecture` a
 
 The parallel `/WellBoreArchitectureIdentity` and `/WellBoreArchitectureFeatureCategory` resources provide list/get/create/update/delete operations. Updates and deletes require `expectedModifiedUtc`; referenced definitions and referenced feature options cannot be removed. Architecture writes validate assignment IDs, catalog references, options, validity periods, and exclusivity.
 
+`POST /BatchExport` exports all architectures or an ordered selection as a dependency-closed, versioned JSON document. `POST /BatchRestore` validates and atomically restores one of those documents with explicit UUID-conflict and catalogue-mapping policies.
+
+Batch restore does not require or perform a database-schema migration. Catalogue mapping/creation, assignment-reference rewriting, and all architecture inserts or replacements execute in one SQLite transaction. Any validation, mapping, conflict, or storage failure rolls back the complete operation. `FailIfExists` and `MapExisting` are the conservative defaults exposed by the UI; replacing records or creating definitions requires an explicit choice.
+
 Swagger UI is served at `/WellBoreArchitecture/api/swagger` with a merged schema defined in `wwwroot/json-schema/WellBoreArchitectureMergedModel.json`.
 
 ## Build and run
@@ -64,6 +68,8 @@ dotnet test ServiceTest/ServiceTest.csproj
 ## MCP server
 
 The service publishes the architecture operations and user-manageable identity/feature catalogs as MCP tools. Catalog mutations use optimistic concurrency and enforce reference integrity; access-statistics operations are deliberately omitted.
+
+The MCP contract also publishes `well_bore_architecture_batch_export` and `well_bore_architecture_batch_restore`. They use the same strict version-1 document and transactional implementation as the REST endpoints.
 
 Descriptions distinguish compact discovery (`get_all_ids`, `get_all_meta_info`, and `get_all_light`) from complete construction-model retrieval. Create and update publish explicit nested schemas for the wellhead, fluid layers, surface equipment, side-circuit connectivity, casing elements, open-hole size tables, enums, and uncertainty wrappers. `MetaInfo.ID` is caller-owned, update path/body IDs must match, and `WellBoreID` is an external WellBore reference rather than the architecture's own identifier.
 

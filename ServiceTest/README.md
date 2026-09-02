@@ -6,9 +6,11 @@ This project validates the WellBoreArchitecture service API and its MCP surface.
 
 `SqlConnectionManagerSafetyTests.cs` verifies transactional creation, lossless adoption of the valid legacy table, and fail-safe rejection of unexpected, malformed, or newer schemas. The tests assert that marker rows and version metadata remain unchanged when startup is refused.
 
+`WellBoreArchitectureBatchBackupRestoreTests.cs` verifies dependency-closed export, transactional catalogue creation and architecture restore, and complete rollback when an assignment is invalid.
+
 ## MCP coverage
 
-- `McpToolRegistrationTests.cs` verifies the eight service REST tools and `ping`, including exclusion of usage-statistics operations.
+- `McpToolRegistrationTests.cs` verifies the ten architecture REST tools, identity/feature catalogue tools, and `ping`, including exclusion of usage-statistics operations.
 - The registration tests also guard detailed descriptions, the complete nested write schema, external WellBore references, ordered/required sections, exact enums, uncertainty-wrapper shapes, SI units, depth-reference guidance, and update ID matching.
 - `McpServerHttpTests.cs` exercises MCP initialization, tool listing, and representative calls against a running service.
 

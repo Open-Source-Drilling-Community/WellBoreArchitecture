@@ -228,5 +228,43 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Controllers
                 return NotFound();
             }
         }
+
+        /// <summary>Exports all WellBoreArchitectures or an ordered selection together with every referenced local catalog definition.</summary>
+        [HttpPost("BatchExport", Name = "BatchExportWellBoreArchitectures")]
+        [ProducesResponseType<WellBoreArchitectureBatchExportDocument>(StatusCodes.Status200OK)]
+        [ProducesResponseType<WellBoreArchitectureBatchErrorEnvelope>(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType<WellBoreArchitectureBatchErrorEnvelope>(StatusCodes.Status404NotFound)]
+        [ProducesResponseType<WellBoreArchitectureBatchErrorEnvelope>(StatusCodes.Status500InternalServerError)]
+        public ActionResult<WellBoreArchitectureBatchExportDocument> BatchExportWellBoreArchitectures(
+            [FromBody] WellBoreArchitectureBatchExportRequest? request)
+        {
+            WellBoreArchitectureBatchExportOutcome outcome = _wellBoreArchitectureManager.ExportBatch(request);
+            if (outcome.IsSuccess) return Ok(outcome.Document);
+            return outcome.FailureKind switch
+            {
+                WellBoreArchitectureBatchExportFailureKind.InvalidRequest => BadRequest(outcome.Error),
+                WellBoreArchitectureBatchExportFailureKind.WellNotFound => NotFound(outcome.Error),
+                _ => StatusCode(StatusCodes.Status500InternalServerError, outcome.Error)
+            };
+        }
+
+        /// <summary>Validates and atomically restores WellBoreArchitectures and their local catalog dependencies.</summary>
+        [HttpPost("BatchRestore", Name = "BatchRestoreWellBoreArchitectures")]
+        [ProducesResponseType<WellBoreArchitectureBatchRestoreResponse>(StatusCodes.Status200OK)]
+        [ProducesResponseType<WellBoreArchitectureBatchErrorEnvelope>(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType<WellBoreArchitectureBatchErrorEnvelope>(StatusCodes.Status409Conflict)]
+        [ProducesResponseType<WellBoreArchitectureBatchErrorEnvelope>(StatusCodes.Status500InternalServerError)]
+        public ActionResult<WellBoreArchitectureBatchRestoreResponse> BatchRestoreWellBoreArchitectures(
+            [FromBody] WellBoreArchitectureBatchRestoreRequest? request)
+        {
+            WellBoreArchitectureBatchRestoreOutcome outcome = _wellBoreArchitectureManager.RestoreBatch(request);
+            if (outcome.IsSuccess) return Ok(outcome.Response);
+            return outcome.FailureKind switch
+            {
+                WellBoreArchitectureBatchRestoreFailureKind.InvalidRequest => BadRequest(outcome.Error),
+                WellBoreArchitectureBatchRestoreFailureKind.Conflict => Conflict(outcome.Error),
+                _ => StatusCode(StatusCodes.Status500InternalServerError, outcome.Error)
+            };
+        }
     }
 }

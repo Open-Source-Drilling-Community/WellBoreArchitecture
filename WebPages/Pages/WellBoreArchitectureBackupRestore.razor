@@ -1,0 +1,225 @@
+@page "/WellBoreArchitectureBackupRestore"
+@implements IAsyncDisposable
+@inject ILogger<WellBoreArchitectureBackupRestore> logger
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@inject IWellBoreArchitectureAPIUtils Api
+@inject IJSRuntime JSRuntime
+
+<MudText Typo="Typo.h4" Class="mt-4 mb-4">WellBore Architecture backup and restore</MudText>
+@if (_busy) { <MudProgressLinear Indeterminate="true" Class="mb-3" /> }
+
+<MudExpansionPanels MultiExpansion="true">
+    <MudExpansionPanel Text="Backup WellBore Architectures" Expanded="true">
+        <MudText Typo="Typo.body2" Class="mb-3">
+            Export all architectures or an ordered selection to a versioned JSON file. Referenced identity and feature
+            definitions are included; WellBore IDs remain external references.
+        </MudText>
+        @if (_architectures == null)
+        {
+            <MudProgressLinear Indeterminate="true" />
+        }
+        else
+        {
+            <MudDataGrid T="WellBoreArchitecture" Items="@_architectures" MultiSelection="true"
+                         SelectedItems="@_selected" SelectedItemsChanged="SelectedChanged"
+                         QuickFilter="@ArchitectureFilter" Hover="true" ReadOnly="true" Elevation="0">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Available architectures</MudText><MudSpacer />
+                    <MudTextField @bind-Value="_search" Placeholder="Search" Immediate="true"
+                                  Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" />
+                </ToolBarContent>
+                <Columns>
+                    <SelectColumn T="WellBoreArchitecture" />
+                    <PropertyColumn Property="item => item.Name" Title="Name" />
+                    <PropertyColumn Property="item => item.Description" Title="Description" />
+                    <TemplateColumn Title="UUID"><CellTemplate>@(context.Item.MetaInfo?.ID.ToString() ?? "-")</CellTemplate></TemplateColumn>
+                </Columns>
+                <PagerContent><MudDataGridPager T="WellBoreArchitecture" /></PagerContent>
+            </MudDataGrid>
+            <MudButton Class="mt-4 me-2" Variant="Variant.Filled" Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Download" Disabled="@(_busy || _architectures.Count == 0)"
+                       OnClick="ExportAllAsync">Backup all (@_architectures.Count)</MudButton>
+            <MudButton Class="mt-4" Variant="Variant.Filled" Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Download" Disabled="@(_busy || _selected.Count == 0)"
+                       OnClick="ExportSelectedAsync">Backup selected (@_selected.Count)</MudButton>
+            @if (_backupErrors.Count != 0)
+            {
+                <MudAlert Severity="Severity.Error" Dense="true" Class="mt-3">
+                    @foreach (string error in _backupErrors) { <MudText Typo="Typo.body2">- @error</MudText> }
+                </MudAlert>
+            }
+        }
+    </MudExpansionPanel>
+
+    <MudExpansionPanel Text="Restore WellBore Architectures">
+        <MudAlert Severity="Severity.Info" Dense="true" Class="mb-3">
+            The server validates the entire backup and restores all records and catalogue mappings in one transaction.
+            If validation fails, the database is unchanged.
+        </MudAlert>
+        <label class="mud-button-root mud-button mud-button-filled mud-button-filled-primary mud-button-filled-size-medium">
+            Choose backup file
+            <InputFile OnChange="LoadFileAsync" accept=".json,application/json" style="display:none" />
+        </label>
+        @if (!string.IsNullOrWhiteSpace(_fileName)) { <MudText Typo="Typo.body2" Class="mt-2">Selected file: @_fileName</MudText> }
+
+        @if (_document != null)
+        {
+            <MudGrid Class="mt-3">
+                <MudItem xs="12" md="5"><MudText Typo="Typo.subtitle2">Format</MudText><MudText Typo="Typo.body2">@_document.FormatIdentifier</MudText></MudItem>
+                <MudItem xs="6" md="2"><MudText Typo="Typo.subtitle2">Schema</MudText><MudText Typo="Typo.body2">@_document.SchemaVersion</MudText></MudItem>
+                <MudItem xs="6" md="2"><MudText Typo="Typo.subtitle2">Records</MudText><MudText Typo="Typo.body2">@(_document.WellBoreArchitectures?.Count ?? 0)</MudText></MudItem>
+                <MudItem xs="12" md="3"><MudText Typo="Typo.subtitle2">Exported UTC</MudText><MudText Typo="Typo.body2">@_document.ExportedAtUtc.ToString("u")</MudText></MudItem>
+            </MudGrid>
+            @if (_validationErrors.Count != 0)
+            {
+                <MudAlert Severity="Severity.Error" Dense="true" Class="mt-3">
+                    @foreach (string error in _validationErrors) { <MudText Typo="Typo.body2">- @error</MudText> }
+                </MudAlert>
+            }
+            else
+            {
+                <MudText Typo="Typo.subtitle2" Class="mt-4 mb-1">Catalogue dependencies</MudText>
+                <MudRadioGroup T="WellBoreArchitectureBatchCatalogRestorePolicy" @bind-Value="_catalogPolicy">
+                    <MudRadio T="WellBoreArchitectureBatchCatalogRestorePolicy" Value="WellBoreArchitectureBatchCatalogRestorePolicy.MapExisting" Color="Color.Primary">
+                        Map compatible definitions already present on this server
+                    </MudRadio>
+                    <MudRadio T="WellBoreArchitectureBatchCatalogRestorePolicy" Value="WellBoreArchitectureBatchCatalogRestorePolicy.MapOrCreateMissing" Color="Color.Primary">
+                        Map compatible definitions and create missing definitions
+                    </MudRadio>
+                </MudRadioGroup>
+                <MudText Typo="Typo.subtitle2" Class="mt-4 mb-1">If an architecture UUID already exists</MudText>
+                <MudRadioGroup T="WellBoreArchitectureBatchRestoreConflictPolicy" @bind-Value="_conflictPolicy">
+                    <MudRadio T="WellBoreArchitectureBatchRestoreConflictPolicy" Value="WellBoreArchitectureBatchRestoreConflictPolicy.FailIfExists" Color="Color.Primary">Stop without making changes</MudRadio>
+                    <MudRadio T="WellBoreArchitectureBatchRestoreConflictPolicy" Value="WellBoreArchitectureBatchRestoreConflictPolicy.ReplaceExisting" Color="Color.Error">Replace the existing architecture</MudRadio>
+                </MudRadioGroup>
+                @if (_conflictPolicy == WellBoreArchitectureBatchRestoreConflictPolicy.ReplaceExisting)
+                {
+                    <MudAlert Severity="Severity.Warning" Dense="true" Class="mt-2">Matching records will be replaced only after the complete backup passes validation.</MudAlert>
+                }
+                <MudButton Class="mt-3" Variant="Variant.Filled"
+                           Color="@(_conflictPolicy == WellBoreArchitectureBatchRestoreConflictPolicy.ReplaceExisting ? Color.Error : Color.Primary)"
+                           StartIcon="@Icons.Material.Filled.Restore" Disabled="@(_busy || !CanRestore)" OnClick="RestoreAsync">
+                    Restore @(_document.WellBoreArchitectures?.Count ?? 0) architecture(s)
+                </MudButton>
+            }
+        }
+        @if (_serverErrors.Count != 0)
+        {
+            <MudAlert Severity="Severity.Error" Dense="true" Class="mt-3">
+                @foreach (string error in _serverErrors) { <MudText Typo="Typo.body2">- @error</MudText> }
+            </MudAlert>
+        }
+    </MudExpansionPanel>
+</MudExpansionPanels>
+
+@code {
+    private const long MaxBytes = 256L * 1024L * 1024L;
+    private const string ExpectedFormat = "OSDC.Drilling.WellBoreArchitecture.BatchExport";
+    private List<WellBoreArchitecture>? _architectures;
+    private HashSet<WellBoreArchitecture> _selected = [];
+    private readonly List<string> _backupErrors = [], _validationErrors = [], _serverErrors = [];
+    private string? _search, _fileName;
+    private bool _busy;
+    private WellBoreArchitectureBatchExportDocument? _document;
+    private WellBoreArchitectureBatchRestoreConflictPolicy _conflictPolicy = WellBoreArchitectureBatchRestoreConflictPolicy.FailIfExists;
+    private WellBoreArchitectureBatchCatalogRestorePolicy _catalogPolicy = WellBoreArchitectureBatchCatalogRestorePolicy.MapExisting;
+    private IJSObjectReference? _downloadModule;
+    private bool CanRestore => _document?.WellBoreArchitectures is { Count: > 0 } && _validationErrors.Count == 0;
+
+    protected override Task OnInitializedAsync() => LoadAsync();
+    private async Task LoadAsync()
+    {
+        try
+        {
+            _architectures = ((await Api.ClientWellBoreArchitecture.GetAllWellBoreArchitectureAsync()) ?? [])
+                .Where(item => item?.MetaInfo?.ID is Guid id && id != Guid.Empty).OrderBy(item => item.Name).ToList();
+            _selected = [];
+        }
+        catch (Exception ex) { logger.LogError(ex, "Unable to load architectures for backup"); _architectures = []; Snackbar.Add("Unable to load architectures for backup.", Severity.Error); }
+    }
+    private void SelectedChanged(HashSet<WellBoreArchitecture> value) => _selected = value;
+    private Task ExportAllAsync() => ExportAsync(WellBoreArchitectureBatchExportScope.All, null);
+    private Task ExportSelectedAsync() => ExportAsync(WellBoreArchitectureBatchExportScope.Selected,
+        _selected.Select(item => item.MetaInfo.ID).Order().ToList());
+    private async Task ExportAsync(WellBoreArchitectureBatchExportScope scope, List<Guid>? ids)
+    {
+        try
+        {
+            _busy = true; _backupErrors.Clear();
+            WellBoreArchitectureBatchExportDocument result = await Api.ClientWellBoreArchitecture.BatchExportWellBoreArchitecturesAsync(
+                new WellBoreArchitectureBatchExportRequest { Scope = scope, WellBoreArchitectureIDs = ids });
+            string json = JsonSerializer.Serialize(result, JsonOptions(true));
+            _downloadModule ??= await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/OSDC.Drilling.WellBoreArchitecture.WebPages/wellBoreArchitectureBatchBackup.js?v=20260902");
+            await _downloadModule.InvokeVoidAsync("downloadJson", $"wellbore-architecture-backup-{DateTime.UtcNow:yyyyMMddTHHmmssZ}.json", json);
+            Snackbar.Add($"Backed up {result.WellBoreArchitectures?.Count ?? 0} architecture(s).", Severity.Success);
+        }
+        catch (ApiException<WellBoreArchitectureBatchErrorEnvelope> ex) { ShowErrors(ex.Result, "Backup was rejected.", _backupErrors); }
+        catch (Exception ex) { logger.LogError(ex, "Unable to back up architectures"); _backupErrors.Add("Unable to back up architectures."); }
+        finally { _busy = false; }
+    }
+    private async Task LoadFileAsync(InputFileChangeEventArgs args)
+    {
+        _document = null; _validationErrors.Clear(); _serverErrors.Clear(); _fileName = args.File.Name;
+        try
+        {
+            await using System.IO.Stream stream = args.File.OpenReadStream(MaxBytes);
+            _document = await JsonSerializer.DeserializeAsync<WellBoreArchitectureBatchExportDocument>(stream, JsonOptions(false));
+            ValidateDocument();
+        }
+        catch (Exception ex) when (ex is JsonException or IOException or InvalidOperationException)
+        { logger.LogWarning(ex, "Unable to read backup {FileName}", args.File.Name); _document = null; _validationErrors.Add("The selected file is not a readable WellBore Architecture backup."); }
+    }
+    private void ValidateDocument()
+    {
+        if (_document == null) { _validationErrors.Add("The document is empty."); return; }
+        if (_document.FormatIdentifier != ExpectedFormat) _validationErrors.Add($"FormatIdentifier must be '{ExpectedFormat}'.");
+        if (_document.SchemaVersion != 1) _validationErrors.Add("SchemaVersion must be 1.");
+        if (_document.CatalogDependencies == null) _validationErrors.Add("CatalogDependencies is required.");
+        if (_document.ExportedAtUtc == default || _document.ExportedAtUtc.Offset != TimeSpan.Zero) _validationErrors.Add("ExportedAtUtc must be a UTC timestamp.");
+        if (_document.WellBoreArchitectures == null || _document.WellBoreArchitectures.Count == 0) { _validationErrors.Add("At least one architecture is required."); return; }
+        HashSet<Guid> ids = [];
+        foreach (WellBoreArchitecture item in _document.WellBoreArchitectures)
+        {
+            if (item?.MetaInfo?.ID is not Guid id || id == Guid.Empty) _validationErrors.Add("Every architecture must have a non-empty UUID.");
+            else if (!ids.Add(id)) _validationErrors.Add($"Architecture UUID '{id}' occurs more than once.");
+            if (item?.WellBoreID == Guid.Empty) _validationErrors.Add("WellBoreID must be omitted or a non-empty UUID.");
+        }
+    }
+    private async Task RestoreAsync()
+    {
+        if (!CanRestore || _document == null) return;
+        bool? confirmed = await DialogService.ShowMessageBoxAsync("Restore WellBore Architectures",
+            _conflictPolicy == WellBoreArchitectureBatchRestoreConflictPolicy.ReplaceExisting
+                ? $"Restore {_document.WellBoreArchitectures.Count} architecture(s) and replace matching UUIDs?"
+                : $"Restore {_document.WellBoreArchitectures.Count} architecture(s)? The operation stops if a UUID exists.",
+            yesText: _conflictPolicy == WellBoreArchitectureBatchRestoreConflictPolicy.ReplaceExisting ? "Restore and replace" : "Restore", cancelText: "Cancel");
+        if (confirmed != true) return;
+        try
+        {
+            _busy = true; _serverErrors.Clear();
+            WellBoreArchitectureBatchRestoreResponse result = await Api.ClientWellBoreArchitecture.BatchRestoreWellBoreArchitecturesAsync(
+                new WellBoreArchitectureBatchRestoreRequest { ConflictPolicy = _conflictPolicy, CatalogPolicy = _catalogPolicy, Document = _document });
+            Snackbar.Add($"Restore completed: {result.CreatedCount} created, {result.ReplacedCount} replaced.", Severity.Success);
+            await LoadAsync();
+        }
+        catch (ApiException<WellBoreArchitectureBatchErrorEnvelope> ex) { ShowErrors(ex.Result, "Restore was rejected.", _serverErrors); }
+        catch (Exception ex) { logger.LogError(ex, "Unable to restore architectures"); _serverErrors.Add("Unable to restore architectures."); }
+        finally { _busy = false; }
+    }
+    private void ShowErrors(WellBoreArchitectureBatchErrorEnvelope? envelope, string fallback, List<string> target)
+    {
+        target.Clear();
+        if (envelope?.Errors != null) target.AddRange(envelope.Errors.Select(error => $"{error.Property}: {error.Message}"));
+        if (target.Count == 0) target.Add(envelope?.Message ?? fallback);
+        Snackbar.Add(envelope?.Message ?? fallback, Severity.Error);
+    }
+    private static JsonSerializerOptions JsonOptions(bool indented)
+    {
+        JsonSerializerOptions options = new() { PropertyNameCaseInsensitive = true, WriteIndented = indented };
+        options.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()); return options;
+    }
+    private Func<WellBoreArchitecture, bool> ArchitectureFilter => item => string.IsNullOrWhiteSpace(_search) ||
+        $"{item.Name} {item.Description} {item.MetaInfo?.ID}".Contains(_search, StringComparison.OrdinalIgnoreCase);
+    public async ValueTask DisposeAsync() { if (_downloadModule != null) try { await _downloadModule.DisposeAsync(); } catch (JSDisconnectedException) { } }
+}

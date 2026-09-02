@@ -78,10 +78,11 @@ The current work has been funded by the [Research Council of Norway](https://www
 
 ## Current implementation
 
-- The service exposes all eight non-statistics WellBoreArchitecture REST operations as MCP tools, together with `ping`; usage-statistics endpoints are excluded.
+- The service exposes all ten non-statistics WellBoreArchitecture REST operations, including dependency-closed batch export and atomic batch restore, as MCP tools together with the identity/feature catalogue tools and `ping`; usage-statistics endpoints are excluded.
 - MCP is available over streamable HTTP at `/wellborearchitecture/api/mcp` and WebSocket at `/wellborearchitecture/api/mcp/ws`. Optional MCP-hub registration is disabled by default.
 - MCP tools now provide detailed operational descriptions and explicit schemas for wellheads, ordered surface/casing construction, fluids, side circuits, open-hole geometry, enums, and Gaussian/scalar drilling-property wrappers. The contract documents external `WellBoreID` references, SI units, wellhead-relative casing depths, caller-generated UUIDs, replacement updates, and the required non-empty surface-section list.
 - The UI integrates Vertical Datum data for mean-sea-level depth references.
+- The management menu includes a Backup / Restore page for versioned JSON backups of all or selected architectures. Restore uses explicit conflict/catalogue policies and one SQLite transaction, without a database-schema migration.
 - Embedded WebPages dependencies are aligned to Field 1.0.19, Cluster 1.0.12, Cartographic Projection 1.0.8, Geodetic Datum 1.0.7, Well 1.0.11, and WellBore 1.0.12.
 
 ## OSDC identity and database safety

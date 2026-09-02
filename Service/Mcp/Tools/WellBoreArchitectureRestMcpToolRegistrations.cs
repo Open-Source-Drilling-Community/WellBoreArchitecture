@@ -12,6 +12,8 @@ using OSDC.Drilling.WellBoreArchitecture.Service.Managers;
 using ArchitectureModel = OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitecture;
 using IdentityModel = OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureIdentity;
 using FeatureCategoryModel = OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureFeatureCategory;
+using BatchExportRequestModel = OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchExportRequest;
+using BatchRestoreRequestModel = OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchRestoreRequest;
 
 namespace OSDC.Drilling.WellBoreArchitecture.Service.Mcp.Tools;
 
@@ -29,6 +31,10 @@ public static class WellBoreArchitectureRestMcpToolRegistrations
             (sp, _, ct) => Invoke(ct, () => Controller(sp).GetAllWellBoreArchitectureLight()));
         services.AddLegacyMcpTool("well_bore_architecture_get_all", "Retrieve every wellbore architecture with complete wellhead, surface, casing, side-circuit, fluid, material, uncertainty, and open-hole data. This can be a large response; prefer IDs, metadata, or light records for discovery and retrieve one selected model by UUID.", McpToolArgumentHelpers.CreateEmptySchema(),
             (sp, _, ct) => Invoke(ct, () => Controller(sp).GetAllWellBoreArchitecture()));
+        services.AddLegacyMcpTool("well_bore_architecture_batch_export", "Create a read-only, schema-version-1 JSON backup of all stored WellBoreArchitectures or an explicitly ordered selection. The response contains complete construction records and only the identity definitions, feature categories, and options referenced by them. WellBoreID remains an external UUID reference. An invalid or missing selected record rejects the complete export.", McpToolArgumentHelpers.CreateWellBoreArchitectureBatchExportSchema(),
+            (sp, args, ct) => InvokeWithBodyResult<BatchExportRequestModel, OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchExportDocument>(args, "request", ct, request => Controller(sp).BatchExportWellBoreArchitectures(request)));
+        services.AddLegacyMcpTool("well_bore_architecture_batch_restore", "Validate and atomically restore a schema-version-1 WellBoreArchitecture backup. Catalogue UUIDs map by exact UUID or one compatible normalized name, and MapOrCreateMissing may create missing definitions and options. ReplaceExisting must be explicitly selected. Catalogue mapping, reference rewriting, definition creation, and all architecture writes share one transaction, so any validation, conflict, or storage failure leaves the database unchanged.", McpToolArgumentHelpers.CreateWellBoreArchitectureBatchRestoreSchema(),
+            (sp, args, ct) => InvokeWithBodyResult<BatchRestoreRequestModel, OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchRestoreResponse>(args, "request", ct, request => Controller(sp).BatchRestoreWellBoreArchitectures(request)));
         services.AddLegacyMcpTool("well_bore_architecture_create", "Persist a new complete wellbore architecture. Generate a non-empty wellBoreArchitecture.MetaInfo.ID first; an existing UUID produces a conflict. Supply at least one SurfaceSection, preserve top-to-bottom ordering, use WellBoreID only as an external reference, and encode physical values in SI through GaussianValue or DiracDistributionValue.", McpToolArgumentHelpers.CreateWellBoreArchitectureSchema(),
             (sp, args, ct) => InvokeWithBody<ArchitectureModel>(args, "wellBoreArchitecture", ct, data => Controller(sp).PostWellBoreArchitecture(data)));
         services.AddLegacyMcpTool("well_bore_architecture_update_by_id", "Replace an existing wellbore architecture. The path id must exactly match wellBoreArchitecture.MetaInfo.ID. Send the complete desired representation because omitted collections may be lost, retain at least one SurfaceSection, update LastModificationDate, preserve ordering/reference conventions, and use SI distribution values.", McpToolArgumentHelpers.CreateWellBoreArchitectureSchema(includeId: true),
@@ -85,6 +91,14 @@ public static class WellBoreArchitectureRestMcpToolRegistrations
         ct.ThrowIfCancellationRequested();
         return TryDeserialize(args, bodyName, out T? data, out JsonNode? error)
             ? Task.FromResult<JsonNode?>(McpActionResultConverter.FromActionResult(action(data))) : Task.FromResult(error);
+    }
+    private static Task<JsonNode?> InvokeWithBodyResult<TBody, TResult>(JsonObject? args, string bodyName,
+        CancellationToken ct, Func<TBody?, ActionResult<TResult>> action)
+    {
+        ct.ThrowIfCancellationRequested();
+        return TryDeserialize(args, bodyName, out TBody? data, out JsonNode? error)
+            ? Task.FromResult<JsonNode?>(McpActionResultConverter.FromActionResult(action(data)))
+            : Task.FromResult(error);
     }
     private static Task<JsonNode?> InvokeWithIdAndBody<T>(JsonObject? args, string bodyName, CancellationToken ct, Func<Guid, T?, ActionResult> action)
     {

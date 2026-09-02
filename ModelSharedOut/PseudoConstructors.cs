@@ -1967,6 +1967,106 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 					},
 			};
 		}
+		public static WellBoreArchitectureBatchCatalogDependencies ConstructWellBoreArchitectureBatchCatalogDependencies()
+		{
+			return new WellBoreArchitectureBatchCatalogDependencies
+			{
+				Identities = new List<WellBoreArchitectureIdentity>
+					{
+						ConstructWellBoreArchitectureIdentity(),
+					},
+				FeatureCategories = new List<WellBoreArchitectureFeatureCategory>
+					{
+						ConstructWellBoreArchitectureFeatureCategory(),
+					},
+			};
+		}
+		public static WellBoreArchitectureBatchCatalogMapping ConstructWellBoreArchitectureBatchCatalogMapping()
+		{
+			return new WellBoreArchitectureBatchCatalogMapping
+			{
+				Catalog = "Default Catalog",
+				Name = "Default Name",
+				SourceID = new Guid(),
+				LocalID = new Guid(),
+				Resolution = "Default Resolution",
+			};
+		}
+		public static WellBoreArchitectureBatchError ConstructWellBoreArchitectureBatchError()
+		{
+			return new WellBoreArchitectureBatchError
+			{
+				PositionIndex = null,
+				Property = "Default Property",
+				Code = "Default Code",
+				Message = "Default Message",
+			};
+		}
+		public static WellBoreArchitectureBatchErrorEnvelope ConstructWellBoreArchitectureBatchErrorEnvelope()
+		{
+			return new WellBoreArchitectureBatchErrorEnvelope
+			{
+				Error = "Default Error",
+				Message = "Default Message",
+				Errors = new List<WellBoreArchitectureBatchError>
+					{
+						ConstructWellBoreArchitectureBatchError(),
+					},
+			};
+		}
+		public static WellBoreArchitectureBatchExportDocument ConstructWellBoreArchitectureBatchExportDocument()
+		{
+			return new WellBoreArchitectureBatchExportDocument
+			{
+				FormatIdentifier = "Default FormatIdentifier",
+				SchemaVersion = 0,
+				ExportedAtUtc = DateTimeOffset.UtcNow,
+				CatalogDependencies = ConstructWellBoreArchitectureBatchCatalogDependencies(),
+				WellBoreArchitectures = new List<WellBoreArchitecture>
+					{
+						ConstructWellBoreArchitecture(),
+					},
+			};
+		}
+		public static WellBoreArchitectureBatchExportRequest ConstructWellBoreArchitectureBatchExportRequest()
+		{
+			return new WellBoreArchitectureBatchExportRequest
+			{
+				Scope = (WellBoreArchitectureBatchExportScope)0,
+				WellBoreArchitectureIDs = new List<Guid>
+					{
+						new Guid(),
+					},
+			};
+		}
+		public static WellBoreArchitectureBatchRestoreRequest ConstructWellBoreArchitectureBatchRestoreRequest()
+		{
+			return new WellBoreArchitectureBatchRestoreRequest
+			{
+				ConflictPolicy = (WellBoreArchitectureBatchRestoreConflictPolicy)0,
+				CatalogPolicy = (WellBoreArchitectureBatchCatalogRestorePolicy)0,
+				Document = ConstructWellBoreArchitectureBatchExportDocument(),
+			};
+		}
+		public static WellBoreArchitectureBatchRestoreResponse ConstructWellBoreArchitectureBatchRestoreResponse()
+		{
+			return new WellBoreArchitectureBatchRestoreResponse
+			{
+				RestoredAtUtc = DateTimeOffset.UtcNow,
+				CreatedCount = 0,
+				ReplacedCount = 0,
+				CreatedCatalogDefinitionCount = 0,
+				CreatedCatalogOptionCount = 0,
+				CatalogMappings = new List<WellBoreArchitectureBatchCatalogMapping>
+					{
+						ConstructWellBoreArchitectureBatchCatalogMapping(),
+					},
+				WellBoreArchitectureIDs = new List<Guid>
+					{
+						new Guid(),
+					},
+			};
+		}
 		public static WellBoreArchitectureFeatureAssignment ConstructWellBoreArchitectureFeatureAssignment()
 		{
 			return new WellBoreArchitectureFeatureAssignment

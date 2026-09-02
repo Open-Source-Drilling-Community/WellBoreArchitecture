@@ -39,6 +39,8 @@ dotnet run --project WebApp/WebApp.csproj
 ```
 The app serves the UI on the standard ASP.NET Core ports. Configure `WellBoreArchitectureHostURL` (and other URLs as required) so the UI can reach the backing services during local development.
 
+The **WellBore Architecture Management** menu includes **Backup / Restore**. It exports all architectures or a selected set and restores a version-1 JSON backup. Restore defaults to stopping on an existing UUID and mapping only compatible existing catalogue definitions; replacement and creation of missing definitions must be selected explicitly. The service commits the complete restore in one transaction.
+
 ## Docker and Helm packaging
 - The Dockerfile builds the `digiwells/osdcdrillingwellborearchitecturewebappclient` image published by the repository workflow.
 - `charts/osdcdrillingwellborearchitecturewebappclient` contains Helm manifests; adjust `values.yaml` (ingress path, URLs, secrets) before deploying.

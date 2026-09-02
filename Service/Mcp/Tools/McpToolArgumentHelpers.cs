@@ -228,6 +228,70 @@ internal static class McpToolArgumentHelpers
         ["required"] = new JsonArray("id", "expectedModifiedUtc"), ["additionalProperties"] = false
     };
 
+    public static JsonObject CreateWellBoreArchitectureBatchExportSchema() => new()
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["request"] = new JsonObject
+            {
+                ["type"] = "object",
+                ["properties"] = new JsonObject
+                {
+                    ["Scope"] = Enum("Choose All for every stored architecture or Selected for the supplied ordered UUID list.", "All", "Selected"),
+                    ["WellBoreArchitectureIDs"] = new JsonObject
+                    {
+                        ["type"] = new JsonArray("array", "null"), ["uniqueItems"] = true,
+                        ["items"] = String("Architecture resource UUID.", "uuid")
+                    }
+                },
+                ["required"] = new JsonArray("Scope"), ["additionalProperties"] = false
+            }
+        },
+        ["required"] = new JsonArray("request"), ["additionalProperties"] = false
+    };
+
+    public static JsonObject CreateWellBoreArchitectureBatchRestoreSchema()
+    {
+        JsonObject document = new()
+        {
+            ["type"] = "object",
+            ["properties"] = new JsonObject
+            {
+                ["FormatIdentifier"] = new JsonObject { ["type"] = "string", ["const"] = "OSDC.Drilling.WellBoreArchitecture.BatchExport" },
+                ["SchemaVersion"] = new JsonObject { ["type"] = "integer", ["const"] = 1 },
+                ["ExportedAtUtc"] = String("UTC timestamp at which the snapshot was created.", "date-time"),
+                ["CatalogDependencies"] = Object("Dependency-closed identity and feature catalogue subset.", new JsonObject
+                {
+                    ["Identities"] = new JsonObject { ["type"] = "array", ["items"] = IdentityDefinition() },
+                    ["FeatureCategories"] = new JsonObject { ["type"] = "array", ["items"] = FeatureCategoryDefinition() }
+                }, "Identities", "FeatureCategories"),
+                ["WellBoreArchitectures"] = new JsonObject
+                {
+                    ["type"] = "array", ["minItems"] = 1,
+                    ["items"] = new JsonObject { ["$ref"] = "#/$defs/WellBoreArchitecture" }
+                }
+            },
+            ["required"] = new JsonArray("FormatIdentifier", "SchemaVersion", "ExportedAtUtc", "CatalogDependencies", "WellBoreArchitectures"),
+            ["additionalProperties"] = false
+        };
+        return new JsonObject
+        {
+            ["type"] = "object",
+            ["properties"] = new JsonObject
+            {
+                ["request"] = Object("Atomic restore request.", new JsonObject
+                {
+                    ["ConflictPolicy"] = Enum("Fail safely on existing UUIDs or explicitly replace them.", "FailIfExists", "ReplaceExisting"),
+                    ["CatalogPolicy"] = Enum("Map existing compatible definitions or create missing definitions and options.", "MapExisting", "MapOrCreateMissing"),
+                    ["Document"] = document
+                }, "ConflictPolicy", "CatalogPolicy", "Document")
+            },
+            ["required"] = new JsonArray("request"), ["additionalProperties"] = false,
+            ["$defs"] = Definitions()
+        };
+    }
+
     private static JsonObject IdentityDefinition() => Object("User-managed identity definition.", new JsonObject
     {
         ["MetaInfo"] = new JsonObject { ["type"] = "object", ["properties"] = new JsonObject { ["ID"] = String("Caller-generated definition UUID.", "uuid") }, ["required"] = new JsonArray("ID"), ["additionalProperties"] = true },

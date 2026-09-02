@@ -75,6 +75,8 @@
                     @RenderNamingSection()
                 </MudPaper>
 
+                @RenderSimplifiedIdentityAndFeatureSections()
+
                 @if (WellBoreArchitecture.WellHead != null)
                 {
                     <WellHeadEditor Class="py-2 px-4 mb-4" WellHead="@WellBoreArchitecture.WellHead" />
@@ -777,6 +779,12 @@
     private (double? GroundMudLine, double? SeaWaterLevel, double? WellHead, double? RotaryTable, double? MeanSeaLevel) _lastDepthReferenceSnapshot;
     private bool _hasDepthReferenceSnapshot;
     private List<SimplifiedCasingRow> _simplifiedCasingRows = new();
+    private List<WellBoreArchitectureIdentity> _identityCatalog = new();
+    private List<WellBoreArchitectureFeatureCategory> _featureCatalog = new();
+    private IReadOnlyList<WellBoreArchitectureIdentityAssignment> IdentityAssignments =>
+        WellBoreArchitecture?.WellBoreArchitectureIdentityAssignments ?? new List<WellBoreArchitectureIdentityAssignment>();
+    private IReadOnlyList<WellBoreArchitectureFeatureAssignment> FeatureAssignments =>
+        WellBoreArchitecture?.WellBoreArchitectureFeatureAssignments ?? new List<WellBoreArchitectureFeatureAssignment>();
     private bool _includeBop = true;
     private bool _includeMarineRiser = true;
     private bool _includeLiftPump;
@@ -847,6 +855,8 @@
     protected override async Task OnParametersSetAsync()
     {
         await InitializeArchitectureAsync();
+        EnsureIdentityAndFeatureAssignments();
+        await LoadIdentityAndFeatureCatalogsAsync();
         await SyncDepthReferenceSourcesAsync();
     }
 
@@ -969,6 +979,129 @@
             }
         </MudGrid>
     </div>;
+
+    private RenderFragment RenderSimplifiedIdentityAndFeatureSections() => @<div>
+        <MudPaper Class="py-2 px-4 mb-4">
+            <div class="d-flex align-center mb-2">
+                <MudText Typo="Typo.h6">Identities</MudText>
+                <MudSpacer />
+                <MudButton Size="Size.Small" StartIcon="@Icons.Material.Filled.Add" OnClick="AddSimplifiedIdentityAssignment">Add identity</MudButton>
+            </div>
+            <MudDivider Class="mb-2" />
+            @if (IdentityAssignments.Count == 0)
+            {
+                <MudText Typo="Typo.body2" Class="mud-text-secondary">No identity values assigned.</MudText>
+            }
+            @foreach (var assignment in IdentityAssignments)
+            {
+                var capturedAssignment = assignment;
+                <MudGrid Class="my-1 align-center">
+                    <MudItem xs="5">
+                        <MudSelect T="Guid?" Label="Identity" Dense="true" @bind-Value="capturedAssignment.IdentityID">
+                            @foreach (var identity in _identityCatalog)
+                            {
+                                <MudSelectItem T="Guid?" Value="@((Guid?)identity.MetaInfo.ID)">@identity.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="6"><MudTextField Label="Value" Margin="MudBlazor.Margin.Dense" @bind-Value="capturedAssignment.Value" /></MudItem>
+                    <MudItem xs="1"><MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => RemoveSimplifiedIdentityAssignment(capturedAssignment))" /></MudItem>
+                </MudGrid>
+            }
+        </MudPaper>
+
+        <MudPaper Class="py-2 px-4 mb-4">
+            <div class="d-flex align-center mb-2">
+                <MudText Typo="Typo.h6">Features</MudText>
+                <MudSpacer />
+                <MudButton Size="Size.Small" StartIcon="@Icons.Material.Filled.Add" OnClick="AddSimplifiedFeatureAssignment">Add feature</MudButton>
+            </div>
+            <MudDivider Class="mb-2" />
+            @if (FeatureAssignments.Count == 0)
+            {
+                <MudText Typo="Typo.body2" Class="mud-text-secondary">No features assigned.</MudText>
+            }
+            @foreach (var assignment in FeatureAssignments)
+            {
+                var capturedAssignment = assignment;
+                <MudGrid Class="my-1 align-center">
+                    <MudItem xs="3">
+                        <MudSelect T="Guid?" Label="Category" Dense="true" Value="capturedAssignment.FeatureCategoryID" ValueChanged="@(value => SetSimplifiedFeatureCategory(capturedAssignment, value))">
+                            @foreach (var category in _featureCatalog)
+                            {
+                                <MudSelectItem T="Guid?" Value="@((Guid?)category.MetaInfo.ID)">@category.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="3">
+                        <MudSelect T="Guid?" Label="Option" Dense="true" @bind-Value="capturedAssignment.FeatureOptionID">
+                            @foreach (var option in SimplifiedOptionsFor(capturedAssignment))
+                            {
+                                <MudSelectItem T="Guid?" Value="@((Guid?)option.ID)">@option.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="2"><MudDatePicker Label="From" Date="ToSimplifiedDateTime(capturedAssignment.FromDate)" DateChanged="@(value => capturedAssignment.FromDate = ToSimplifiedDateTimeOffset(value))" Disabled="@(!SimplifiedFeatureHasValidity(capturedAssignment))" /></MudItem>
+                    <MudItem xs="2"><MudDatePicker Label="To" Date="ToSimplifiedDateTime(capturedAssignment.ToDate)" DateChanged="@(value => capturedAssignment.ToDate = ToSimplifiedDateTimeOffset(value))" Disabled="@(!SimplifiedFeatureHasValidity(capturedAssignment))" /></MudItem>
+                    <MudItem xs="1"><MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => RemoveSimplifiedFeatureAssignment(capturedAssignment))" /></MudItem>
+                </MudGrid>
+            }
+        </MudPaper>
+    </div>;
+
+    private void EnsureIdentityAndFeatureAssignments()
+    {
+        if (WellBoreArchitecture == null) return;
+        WellBoreArchitecture.WellBoreArchitectureIdentityAssignments ??= new();
+        WellBoreArchitecture.WellBoreArchitectureFeatureAssignments ??= new();
+    }
+
+    private async Task LoadIdentityAndFeatureCatalogsAsync()
+    {
+        if (_identityCatalog.Count == 0)
+            _identityCatalog = await Api.ClientWellBoreArchitecture.GetAllWellBoreArchitectureIdentityAsync();
+        if (_featureCatalog.Count == 0)
+            _featureCatalog = await Api.ClientWellBoreArchitecture.GetAllWellBoreArchitectureFeatureCategoryAsync();
+    }
+
+    private void AddSimplifiedIdentityAssignment()
+    {
+        EnsureIdentityAndFeatureAssignments();
+        WellBoreArchitecture!.WellBoreArchitectureIdentityAssignments.Add(new() { ID = Guid.NewGuid() });
+    }
+
+    private void RemoveSimplifiedIdentityAssignment(WellBoreArchitectureIdentityAssignment assignment) =>
+        WellBoreArchitecture?.WellBoreArchitectureIdentityAssignments.Remove(assignment);
+
+    private void AddSimplifiedFeatureAssignment()
+    {
+        EnsureIdentityAndFeatureAssignments();
+        WellBoreArchitecture!.WellBoreArchitectureFeatureAssignments.Add(new() { ID = Guid.NewGuid() });
+    }
+
+    private void RemoveSimplifiedFeatureAssignment(WellBoreArchitectureFeatureAssignment assignment) =>
+        WellBoreArchitecture?.WellBoreArchitectureFeatureAssignments.Remove(assignment);
+
+    private IEnumerable<WellBoreArchitectureFeatureOption> SimplifiedOptionsFor(WellBoreArchitectureFeatureAssignment assignment) =>
+        _featureCatalog.FirstOrDefault(category => category.MetaInfo.ID == assignment.FeatureCategoryID)?.Options ?? new();
+
+    private bool SimplifiedFeatureHasValidity(WellBoreArchitectureFeatureAssignment assignment) =>
+        _featureCatalog.FirstOrDefault(category => category.MetaInfo.ID == assignment.FeatureCategoryID)?.HasValidityPeriod == true;
+
+    private void SetSimplifiedFeatureCategory(WellBoreArchitectureFeatureAssignment assignment, Guid? categoryId)
+    {
+        assignment.FeatureCategoryID = categoryId;
+        assignment.FeatureOptionID = null;
+        if (!SimplifiedFeatureHasValidity(assignment))
+        {
+            assignment.FromDate = null;
+            assignment.ToDate = null;
+        }
+    }
+
+    private static DateTime? ToSimplifiedDateTime(DateTimeOffset? value) => value?.UtcDateTime;
+    private static DateTimeOffset? ToSimplifiedDateTimeOffset(DateTime? value) =>
+        value == null ? null : new DateTimeOffset(DateTime.SpecifyKind(value.Value, DateTimeKind.Utc));
 
     private async Task InitializeArchitectureAsync()
     {

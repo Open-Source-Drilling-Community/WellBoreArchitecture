@@ -222,6 +222,144 @@
         }
       }
     },
+    "/WellBoreArchitecture/BatchExport": {
+      "post": {
+        "tags": [
+          "WellBoreArchitecture"
+        ],
+        "operationId": "BatchExportWellBoreArchitectures",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchExportRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchExportRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchExportRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchExportDocument"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WellBoreArchitecture/BatchRestore": {
+      "post": {
+        "tags": [
+          "WellBoreArchitecture"
+        ],
+        "operationId": "BatchRestoreWellBoreArchitectures",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchRestoreRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchRestoreRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchRestoreRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchRestoreResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/WellBoreArchitectureFeatureCategory": {
       "get": {
         "tags": [
@@ -1141,6 +1279,221 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.CasingSection"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchCatalogDependencies": {
+        "type": "object",
+        "properties": {
+          "Identities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureIdentity"
+            },
+            "nullable": true
+          },
+          "FeatureCategories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureFeatureCategory"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchCatalogMapping": {
+        "type": "object",
+        "properties": {
+          "Catalog": {
+            "type": "string",
+            "nullable": true
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "SourceID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "LocalID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Resolution": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchCatalogRestorePolicy": {
+        "enum": [
+          "Unspecified",
+          "MapExisting",
+          "MapOrCreateMissing"
+        ],
+        "type": "string"
+      },
+      "OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchError": {
+        "type": "object",
+        "properties": {
+          "PositionIndex": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "Property": {
+            "type": "string",
+            "nullable": true
+          },
+          "Code": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchErrorEnvelope": {
+        "type": "object",
+        "properties": {
+          "Error": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          },
+          "Errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchError"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchExportDocument": {
+        "type": "object",
+        "properties": {
+          "FormatIdentifier": {
+            "type": "string",
+            "nullable": true
+          },
+          "SchemaVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ExportedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "CatalogDependencies": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchCatalogDependencies"
+          },
+          "WellBoreArchitectures": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitecture"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchExportRequest": {
+        "type": "object",
+        "properties": {
+          "Scope": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchExportScope"
+          },
+          "WellBoreArchitectureIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchExportScope": {
+        "enum": [
+          "Unspecified",
+          "All",
+          "Selected"
+        ],
+        "type": "string"
+      },
+      "OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchRestoreConflictPolicy": {
+        "enum": [
+          "Unspecified",
+          "FailIfExists",
+          "ReplaceExisting"
+        ],
+        "type": "string"
+      },
+      "OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchRestoreRequest": {
+        "type": "object",
+        "properties": {
+          "ConflictPolicy": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchRestoreConflictPolicy"
+          },
+          "CatalogPolicy": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchCatalogRestorePolicy"
+          },
+          "Document": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchExportDocument"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchRestoreResponse": {
+        "type": "object",
+        "properties": {
+          "RestoredAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "CreatedCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ReplacedCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CreatedCatalogDefinitionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CreatedCatalogOptionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CatalogMappings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchCatalogMapping"
+            },
+            "nullable": true
+          },
+          "WellBoreArchitectureIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
             },
             "nullable": true
           }

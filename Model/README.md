@@ -15,6 +15,8 @@ Most engineering quantities are modeled as `GaussianDrillingProperty` or `Scalar
 ### Aggregation
 `WellBoreArchitecture` is the aggregate root. It encapsulates metadata, identity and feature assignments, wellhead information, above-ground fluids, surface sections, and casing sections. Identity definitions and feature categories/options are user-manageable catalogs; assignments store stable UUID references to those definitions.
 
+`WellBoreArchitectureBatchExport.cs` defines the schema-versioned backup contract. A backup contains all or a selected ordered set of complete architectures plus only the identity definitions, feature categories, and feature options referenced by those records. Restore requests explicitly choose UUID-conflict and catalogue-mapping policies.
+
 ## Relationship with other solution projects
 - `Service/Service.csproj` references this project directly. Controllers and managers expose and persist the `Model` types in the REST API (see `Service/Controllers/WellBoreArchitectureController.cs`).
 - `ModelTest/ModelTest.csproj` depends on the model to exercise unit tests for serialization, realizations, and guard clauses.
