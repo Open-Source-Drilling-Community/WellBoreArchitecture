@@ -1,4 +1,4 @@
-﻿using OSDC.DotnetLibraries.General.DrillingProperties;
+using OSDC.DotnetLibraries.General.DrillingProperties;
 using OSDC.UnitConversion.Conversion;
 using OSDC.UnitConversion.Conversion.DrillingEngineering;
 using System;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NORCE.Drilling.WellBoreArchitecture.Model
+namespace OSDC.Drilling.WellBoreArchitecture.Model
 {
     public class BoreHoleSize
     {

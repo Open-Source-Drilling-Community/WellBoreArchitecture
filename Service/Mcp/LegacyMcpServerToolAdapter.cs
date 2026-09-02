@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
 
-namespace NORCE.Drilling.WellBoreArchitecture.Service.Mcp;
+namespace OSDC.Drilling.WellBoreArchitecture.Service.Mcp;
 
 /// <summary>
 /// Adapts the legacy <see cref="IMcpTool"/> abstraction to the ModelContextProtocol server tool contract.

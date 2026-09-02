@@ -1,4 +1,4 @@
-using NORCE.Drilling.WellBoreArchitecture.ModelShared;
+using OSDC.Drilling.WellBoreArchitecture.ModelShared;
 public class Conversions()
 {
     public GaussianDrillingProperty doubleToGaussian(double? val)

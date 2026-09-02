@@ -1,6 +1,6 @@
 using OSDC.DotnetLibraries.Drilling.WebAppUtils;
 
-namespace NORCE.Drilling.WellBoreArchitecture.WebPages;
+namespace OSDC.Drilling.WellBoreArchitecture.WebPages;
 
 public interface IWellBoreArchitectureWebPagesConfiguration :
     IFieldHostURL,

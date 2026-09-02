@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using static NORCE.Drilling.WellBoreArchitecture.Model.SurfaceSection;
+using System.Collections.Generic;
+using static OSDC.Drilling.WellBoreArchitecture.Model.SurfaceSection;
 
-namespace NORCE.Drilling.WellBoreArchitecture.Model
+namespace OSDC.Drilling.WellBoreArchitecture.Model
 {
     public class SurfaceSectionRealization
     {

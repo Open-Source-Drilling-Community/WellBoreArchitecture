@@ -1,12 +1,12 @@
-﻿using OSDC.DotnetLibraries.General.DrillingProperties;
+using OSDC.DotnetLibraries.General.DrillingProperties;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static NORCE.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureFluid;
+using static OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureFluid;
 
-namespace NORCE.Drilling.WellBoreArchitecture.Model
+namespace OSDC.Drilling.WellBoreArchitecture.Model
 {
     public class WellBoreArchitectureFluidRealization
     {

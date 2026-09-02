@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using static NORCE.Drilling.WellBoreArchitecture.Model.SideElement;
+using System.Collections.Generic;
+using static OSDC.Drilling.WellBoreArchitecture.Model.SideElement;
 
-namespace NORCE.Drilling.WellBoreArchitecture.Model
+namespace OSDC.Drilling.WellBoreArchitecture.Model
 {
     public class SideElementRealization
     {

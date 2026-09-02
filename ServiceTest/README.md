@@ -2,6 +2,10 @@
 
 This project validates the WellBoreArchitecture service API and its MCP surface.
 
+## Database safety coverage
+
+`SqlConnectionManagerSafetyTests.cs` verifies transactional creation, lossless adoption of the valid legacy table, and fail-safe rejection of unexpected, malformed, or newer schemas. The tests assert that marker rows and version metadata remain unchanged when startup is refused.
+
 ## MCP coverage
 
 - `McpToolRegistrationTests.cs` verifies the eight service REST tools and `ping`, including exclusion of usage-statistics operations.

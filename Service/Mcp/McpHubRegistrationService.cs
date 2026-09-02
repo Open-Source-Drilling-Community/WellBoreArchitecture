@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using NORCE.Drilling.WellBoreArchitecture.Service.Managers;
+using OSDC.Drilling.WellBoreArchitecture.Service.Managers;
 
-namespace NORCE.Drilling.WellBoreArchitecture.Service.Mcp;
+namespace OSDC.Drilling.WellBoreArchitecture.Service.Mcp;
 
 public sealed class McpHubRegistrationService : BackgroundService
 {

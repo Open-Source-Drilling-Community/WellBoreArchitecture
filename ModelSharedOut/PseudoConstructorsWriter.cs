@@ -3,13 +3,13 @@ using System.IO;
 using System.Text;
 using System.Linq;
 using System.Reflection;
-using NORCE.Drilling.WellBoreArchitecture.ModelShared;
+using OSDC.Drilling.WellBoreArchitecture.ModelShared;
  
-namespace NORCE.Drilling.WellBoreArchitecture.PseudoConstructorsWriter
+namespace OSDC.Drilling.WellBoreArchitecture.PseudoConstructorsWriter
     {
     class Writer
     {     
-        private static readonly string NAMESPACE = "NORCE.Drilling.WellBoreArchitecture.ModelShared";    
+        private static readonly string NAMESPACE = "OSDC.Drilling.WellBoreArchitecture.ModelShared";
         private static readonly string PSEUDO_CTOR = "PseudoConstructors.cs";
         private static readonly string MODELSHARED_FOLDER = "ModelSharedOut";
         private static string fullPath = ""; 

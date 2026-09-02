@@ -1,6 +1,6 @@
 # WellBoreArchitecture Solution
 
-This repository delivers a full stack for managing wellbore architecture data: a domain model, a REST microservice, a generated client library, automated tests, and a MudBlazor front-end. Everything targets .NET 8 and relies on the NORCE/OSDC drilling libraries for probabilistic properties and unit handling.
+This repository delivers the `OSDC.Drilling.WellBoreArchitecture` stack: a domain model, REST and MCP service, generated client library, automated tests, and MudBlazor front-end. Everything targets .NET 8 and uses the OSDC drilling libraries for probabilistic properties and unit handling.
 
 ## Repository layout
 | Project | Description | Depends on |
@@ -41,8 +41,8 @@ dotnet run --project WebApp/WebApp.csproj
 3. Commit the updated client so both `WebApp` and `ServiceTest` stay aligned with the REST contract.
 
 ## Deployment overview
-- Containers: Dockerfiles are provided for `Service` and `WebApp`, published under the Digiwells organization (`wellborearchitecturewellborearchitecture` images).
-- Orchestration: `WebApp/charts/norcedrillingwellborearchitecturewebappclient` and service charts (in sibling repositories) model Kubernetes deployments, ingress rules, secrets, and environment variables.
+- Containers: Dockerfiles are provided for `Service` and `WebApp`; CI publishes `digiwells/osdcdrillingwellborearchitectureservice` and `digiwells/osdcdrillingwellborearchitecturewebappclient` with semantic-version, `stable`, and commit-SHA tags.
+- Orchestration: `Service/charts/osdcdrillingwellborearchitectureservice` and `WebApp/charts/osdcdrillingwellborearchitecturewebappclient` contain the Kubernetes deployments and ingress configuration.
 - Base paths: Service is hosted at `/WellBoreArchitecture/api`; WebApp is served under `/WellBoreArchitecture/webapp`.
 
 Public environments:
@@ -83,3 +83,11 @@ The current work has been funded by the [Research Council of Norway](https://www
 - MCP tools now provide detailed operational descriptions and explicit schemas for wellheads, ordered surface/casing construction, fluids, side circuits, open-hole geometry, enums, and Gaussian/scalar drilling-property wrappers. The contract documents external `WellBoreID` references, SI units, wellhead-relative casing depths, caller-generated UUIDs, replacement updates, and the required non-empty surface-section list.
 - The UI integrates Vertical Datum data for mean-sea-level depth references.
 - Embedded WebPages dependencies are aligned to Field 1.0.19, Cluster 1.0.12, Cartographic Projection 1.0.8, Geodetic Datum 1.0.7, Well 1.0.11, and WellBore 1.0.12.
+
+## OSDC identity and database safety
+
+All WellBoreArchitecture-owned namespaces, generated contracts, Razor assets, package metadata, Docker images, workflows, and Helm chart identities use `OSDC.Drilling.WellBoreArchitecture`. The public HTTP base paths remain `/wellborearchitecture/api` and `/wellborearchitecture/webapp`, so existing external URLs do not change solely because of the identity migration.
+
+The SQLite filename and persistent-volume mount remain `WellBoreArchitecture.db` under `/home`. A valid unversioned legacy database is adopted in place by adding only a schema-version marker and missing index; rows and serialized documents are not rewritten. Unknown, malformed, empty-versioned, or newer schemas abort startup without dropping or rebuilding tables. The former automatic 90-day deletion service has been removed.
+
+Before a Kubernetes cutover, take and verify a snapshot of `wellborearchitecture-claim`, scale the legacy service deployment to zero so two SQLite writers cannot overlap, and use the existing claim through `persistence.existingClaim=wellborearchitecture-claim` if installing under a new Helm release. The service chart uses the `Recreate` strategy and marks newly managed PVCs with `helm.sh/resource-policy: keep`.

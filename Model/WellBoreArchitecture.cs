@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using OSDC.DotnetLibraries.General.Statistics;
 using OSDC.DotnetLibraries.General.DataManagement;
@@ -6,7 +6,7 @@ using OSDC.DotnetLibraries.Drilling.DrillingProperties;
 using System.Text.Json;
 
 
-namespace NORCE.Drilling.WellBoreArchitecture.Model
+namespace OSDC.Drilling.WellBoreArchitecture.Model
 {
     public class WellBoreArchitecture
     {

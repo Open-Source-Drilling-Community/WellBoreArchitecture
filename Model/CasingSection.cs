@@ -1,7 +1,7 @@
-﻿using OSDC.DotnetLibraries.General.DrillingProperties;
+using OSDC.DotnetLibraries.General.DrillingProperties;
 using System.Collections.Generic;
 
-namespace NORCE.Drilling.WellBoreArchitecture.Model
+namespace OSDC.Drilling.WellBoreArchitecture.Model
 {
     public class CasingSection
     {

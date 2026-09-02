@@ -1,16 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "norcedrillingwellborearchitectureservice.fullname" . }}
+  name: {{ include "osdcdrillingwellborearchitectureservice.fullname" . }}
   labels:
-    {{- include "norcedrillingwellborearchitectureservice.labels" . | nindent 4 }}
+    {{- include "osdcdrillingwellborearchitectureservice.labels" . | nindent 4 }}
 spec:
+  strategy:
+    type: {{ .Values.strategy.type }}
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "norcedrillingwellborearchitectureservice.selectorLabels" . | nindent 6 }}
+      {{- include "osdcdrillingwellborearchitectureservice.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,13 +20,13 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "norcedrillingwellborearchitectureservice.selectorLabels" . | nindent 8 }}
+        {{- include "osdcdrillingwellborearchitectureservice.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "norcedrillingwellborearchitectureservice.serviceAccountName" . }}
+      serviceAccountName: {{ include "osdcdrillingwellborearchitectureservice.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -54,8 +56,12 @@ spec:
             name: wellborearchitecturedb
       volumes:
       - name: wellborearchitecturedb
+        {{- if .Values.persistence.enabled }}
         persistentVolumeClaim:
-          claimName: wellborearchitecture-claim
+          claimName: {{ .Values.persistence.existingClaim | default .Values.persistence.claimName }}
+        {{- else }}
+        emptyDir: {}
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

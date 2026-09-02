@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using ModelContextProtocol;
 using ModelContextProtocol.Protocol;
 
-namespace NORCE.Drilling.WellBoreArchitecture.Service.Mcp;
+namespace OSDC.Drilling.WellBoreArchitecture.Service.Mcp;
 
 /// <summary>
 /// Implements a Model Context Protocol <see cref="ITransport"/> over ASP.NET Core WebSockets.

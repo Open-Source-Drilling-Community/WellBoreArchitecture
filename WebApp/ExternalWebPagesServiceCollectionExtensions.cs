@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace NORCE.Drilling.WellBoreArchitecture.WebApp;
+namespace OSDC.Drilling.WellBoreArchitecture.WebApp;
 
 public static class ExternalWebPagesServiceCollectionExtensions
 {

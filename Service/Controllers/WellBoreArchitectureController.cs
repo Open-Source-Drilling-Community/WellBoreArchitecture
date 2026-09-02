@@ -1,13 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using NORCE.Drilling.WellBoreArchitecture.Model;
+using OSDC.Drilling.WellBoreArchitecture.Model;
 using OSDC.DotnetLibraries.General.DataManagement;
-using NORCE.Drilling.WellBoreArchitecture.Service.Managers;
+using OSDC.Drilling.WellBoreArchitecture.Service.Managers;
 
-namespace NORCE.Drilling.WellBoreArchitecture.Service.Controllers
+namespace OSDC.Drilling.WellBoreArchitecture.Service.Controllers
 {
     [Produces("application/json")]
     [Route("[controller]")]

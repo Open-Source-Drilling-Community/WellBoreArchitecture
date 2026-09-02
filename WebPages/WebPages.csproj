@@ -5,10 +5,10 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-		<RootNamespace>NORCE.Drilling.WellBoreArchitecture.WebPages</RootNamespace>
-		<AssemblyName>NORCE.Drilling.WellBoreArchitecture.WebPages</AssemblyName>
-		<PackageId>NORCE.Drilling.WellBoreArchitecture.WebPages</PackageId>
-		<Title>NORCE.Drilling.WellBoreArchitecture.WebPages</Title>
+		<RootNamespace>OSDC.Drilling.WellBoreArchitecture.WebPages</RootNamespace>
+		<AssemblyName>OSDC.Drilling.WellBoreArchitecture.WebPages</AssemblyName>
+		<PackageId>OSDC.Drilling.WellBoreArchitecture.WebPages</PackageId>
+		<Title>OSDC.Drilling.WellBoreArchitecture.WebPages</Title>
 		<Authors>Eric Cayeux</Authors>
 		<Company>NORCE</Company>
 		<Description>Reusable Razor class library containing the WellBoreArchitecture editor pages, dependent components, and helper utilities. See the package README for setup, dependencies, and usage.</Description>

@@ -1,5 +1,5 @@
 using System.Net.Http.Headers;
-using NORCE.Drilling.WellBoreArchitecture.ModelShared;
+using OSDC.Drilling.WellBoreArchitecture.ModelShared;
 
 namespace ServiceTest
 {

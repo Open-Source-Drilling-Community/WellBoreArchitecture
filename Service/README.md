@@ -6,14 +6,13 @@ The `Service` project exposes the WellBoreArchitecture domain as a REST API back
 - `Service.csproj` – web SDK project referencing `Model`. NuGet dependencies cover SQLite (`Microsoft.Data.Sqlite`) and Swagger tooling (`Swashbuckle.AspNetCore.*`, `Microsoft.OpenApi`).
 - `Program.cs` – bootstraps the web host, sets the base path (`/WellBoreArchitecture/api`), wires dependency injection, configures Swagger UI, and maps controllers.
 - `Controllers/WellBoreArchitectureController.cs` – the public API surface; each action delegates to the manager layer and returns domain models (`Model.WellBoreArchitecture`, `WellBoreArchitectureLight`, etc.).
-- `Managers/SqlConnectionManager.cs` – singleton managing the SQLite database lifecycle (table creation, schema checks, backup of incompatible databases).
+- `Managers/SqlConnectionManager.cs` – singleton managing transactional creation, additive legacy adoption, schema-version checks, and fail-safe refusal of unknown structures.
 - `Managers/WellBoreArchitectureManager.cs` – singleton handling CRUD operations and serialization/deserialization of the domain objects.
-- `Managers/DatabaseCleanerService.cs` – `BackgroundService` that prunes records older than 90 days every 24 hours.
 - `SwaggerMiddlewareExtensions.cs` – middleware helpers that serve a merged OpenAPI document and adjust server URLs for reverse-proxy scenarios.
 - `JsonSettings.cs` – centralizes the `System.Text.Json` options so models keep their C# casing and enums are rendered as strings.
 
 ## Runtime data
-By default the service stores data in `..\home\WellBoreArchitecture.db` (relative to the service project). The `SqlConnectionManager` ensures the folder exists, validates schema, and creates backups when migrations are required. Most operations open short-lived SQLite connections for thread safety.
+By default the service stores data in `..\home\WellBoreArchitecture.db` (relative to the service project). The `SqlConnectionManager` ensures the folder exists and validates the database before use. A valid unversioned legacy database is adopted without rewriting rows; only the missing index and schema-version marker may be added transactionally. Unexpected, malformed, or newer schemas stop startup without changing data. No background retention process deletes old architectures. Most operations open short-lived SQLite connections for thread safety.
 
 ## Interaction with other solution projects
 - Depends on `Model` (domain types) and uses their `Realize()` logic before persistence when needed.
@@ -51,10 +50,12 @@ The service listens on the standard ASP.NET Core ports. Reverse proxies should f
 ```powershell
 dotnet test ServiceTest/ServiceTest.csproj
 ```
-The service itself does not include unit tests, but the `ServiceTest` project validates API interactions using the generated shared client.
+`ServiceTest` contains both self-contained database safety tests and live API/MCP tests using the generated shared client.
 
 ## Operational tips
-- Ensure file-system write access to `..\home` for SQLite database creation and backups.
+- Ensure file-system write access to `..\home` and independently back up `WellBoreArchitecture.db` before an upgrade.
+- Never run two service replicas against the same SQLite file. The Helm chart uses `Recreate`; during the NORCE-to-OSDC cutover, scale the old deployment to zero before starting the new identity.
+- Preserve and reuse `wellborearchitecture-claim`. When a new Helm release adopts it, set `persistence.existingClaim=wellborearchitecture-claim` so Helm does not attempt to create or replace the claim.
 - Regenerate the shared client (`ModelSharedOut`) after modifying controllers or DTOs to keep the generated schema in sync.
 - Keep swagger contract up to date by running a Debug build (or invoke the `CreateSwaggerJson` MSBuild target manually) whenever the API changes.
 

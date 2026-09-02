@@ -1,4 +1,4 @@
-﻿namespace NORCE.Drilling.WellBoreArchitecture.Model
+namespace OSDC.Drilling.WellBoreArchitecture.Model
 {
     public class SideConnectorRealization
     {

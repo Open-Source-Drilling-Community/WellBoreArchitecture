@@ -2,9 +2,9 @@ using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using ModelContextProtocol.Server;
-using NORCE.Drilling.WellBoreArchitecture.Service.Controllers;
-using NORCE.Drilling.WellBoreArchitecture.Service.Mcp;
-using NORCE.Drilling.WellBoreArchitecture.Service.Mcp.Tools;
+using OSDC.Drilling.WellBoreArchitecture.Service.Controllers;
+using OSDC.Drilling.WellBoreArchitecture.Service.Mcp;
+using OSDC.Drilling.WellBoreArchitecture.Service.Mcp.Tools;
 
 namespace ServiceTest;
 

@@ -4,8 +4,8 @@ using Microsoft.Extensions.Logging.Abstractions;
 using ModelContextProtocol.Client;
 using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
-using NORCE.Drilling.WellBoreArchitecture.Service.Mcp;
-using NORCE.Drilling.WellBoreArchitecture.Service.Mcp.Tools;
+using OSDC.Drilling.WellBoreArchitecture.Service.Mcp;
+using OSDC.Drilling.WellBoreArchitecture.Service.Mcp.Tools;
 
 namespace ServiceTest;
 

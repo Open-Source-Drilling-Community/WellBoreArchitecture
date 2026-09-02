@@ -7,7 +7,7 @@ using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NORCE.Drilling.WellBoreArchitecture.Service.Mcp;
+namespace OSDC.Drilling.WellBoreArchitecture.Service.Mcp;
 
 public static class McpServiceCollectionExtensions
 {

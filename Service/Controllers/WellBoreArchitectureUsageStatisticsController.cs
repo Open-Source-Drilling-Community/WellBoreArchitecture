@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using NORCE.Drilling.WellBoreArchitecture.Model;
+using OSDC.Drilling.WellBoreArchitecture.Model;
 
-namespace NORCE.Drilling.WellBoreArchitecture.Service.Controllers
+namespace OSDC.Drilling.WellBoreArchitecture.Service.Controllers
 {
     [Produces("application/json")]
     [Route("[controller]")]

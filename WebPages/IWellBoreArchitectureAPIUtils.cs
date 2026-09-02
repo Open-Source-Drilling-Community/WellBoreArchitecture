@@ -1,6 +1,6 @@
-using NORCE.Drilling.WellBoreArchitecture.ModelShared;
+using OSDC.Drilling.WellBoreArchitecture.ModelShared;
 
-namespace NORCE.Drilling.WellBoreArchitecture.WebPages;
+namespace OSDC.Drilling.WellBoreArchitecture.WebPages;
 
 public interface IWellBoreArchitectureAPIUtils
 {

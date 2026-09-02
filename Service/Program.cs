@@ -4,10 +4,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Protocol;
-using NORCE.Drilling.WellBoreArchitecture.Service;
-using NORCE.Drilling.WellBoreArchitecture.Service.Managers;
-using NORCE.Drilling.WellBoreArchitecture.Service.Mcp;
-using NORCE.Drilling.WellBoreArchitecture.Service.Mcp.Tools;
+using OSDC.Drilling.WellBoreArchitecture.Service;
+using OSDC.Drilling.WellBoreArchitecture.Service.Managers;
+using OSDC.Drilling.WellBoreArchitecture.Service.Mcp;
+using OSDC.Drilling.WellBoreArchitecture.Service.Mcp.Tools;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,11 +16,6 @@ builder.Services.AddSingleton(sp =>
     new SqlConnectionManager(
         $"Data Source={SqlConnectionManager.HOME_DIRECTORY}{SqlConnectionManager.DATABASE_FILENAME}",
         sp.GetRequiredService<ILogger<SqlConnectionManager>>()));
-
-// registering the database cleaner service through dependency injection
-builder.Services.AddHostedService(sp => new DatabaseCleanerService(
-    sp.GetRequiredService<ILogger<DatabaseCleanerService>>(),
-    sp.GetRequiredService<SqlConnectionManager>()));
 
 // serialization settings (using System.Json)
 builder.Services.AddControllers()

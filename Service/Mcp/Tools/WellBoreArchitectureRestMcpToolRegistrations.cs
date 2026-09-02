@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using NORCE.Drilling.WellBoreArchitecture.Service.Controllers;
-using NORCE.Drilling.WellBoreArchitecture.Service.Managers;
-using ArchitectureModel = NORCE.Drilling.WellBoreArchitecture.Model.WellBoreArchitecture;
+using OSDC.Drilling.WellBoreArchitecture.Service.Controllers;
+using OSDC.Drilling.WellBoreArchitecture.Service.Managers;
+using ArchitectureModel = OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitecture;
 
-namespace NORCE.Drilling.WellBoreArchitecture.Service.Mcp.Tools;
+namespace OSDC.Drilling.WellBoreArchitecture.Service.Mcp.Tools;
 
 public static class WellBoreArchitectureRestMcpToolRegistrations
 {

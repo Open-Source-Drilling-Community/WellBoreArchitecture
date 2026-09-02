@@ -1,6 +1,6 @@
 using OSDC.UnitConversion.DrillingRazorMudComponents;
 
-namespace NORCE.Drilling.WellBoreArchitecture.WebPages.Shared;
+namespace OSDC.Drilling.WellBoreArchitecture.WebPages.Shared;
 
 public class GroundMudLineDepthReferenceSource : IGroundMudLineDepthReferenceSource
 {

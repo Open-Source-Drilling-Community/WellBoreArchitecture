@@ -1,4 +1,4 @@
-# NORCE.Drilling.WellBoreArchitecture.WebPages
+# OSDC.Drilling.WellBoreArchitecture.WebPages
 
 Reusable Razor class library for the WellBoreArchitecture web UI.
 
@@ -27,7 +27,7 @@ The consuming app should:
 2. Provide an implementation of `IWellBoreArchitectureWebPagesConfiguration`.
 3. Register that configuration and `IWellBoreArchitectureAPIUtils` in DI.
 4. Add the `WebPages` assembly to the Blazor router `AdditionalAssemblies`.
-5. Reference the static asset script `_content/NORCE.Drilling.WellBoreArchitecture.WebPages/js/wellbore-architecture.js`.
+5. Reference the static asset script `_content/OSDC.Drilling.WellBoreArchitecture.WebPages/js/wellbore-architecture.js`.
 
 ## Required configuration
 

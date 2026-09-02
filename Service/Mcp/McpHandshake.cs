@@ -1,6 +1,6 @@
 using System.Text.Json.Nodes;
 
-namespace NORCE.Drilling.WellBoreArchitecture.Service.Mcp;
+namespace OSDC.Drilling.WellBoreArchitecture.Service.Mcp;
 
 public sealed record McpHandshake(
     string ProtocolVersion,

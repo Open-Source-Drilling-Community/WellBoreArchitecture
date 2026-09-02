@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using OSDC.DotnetLibraries.General.DrillingProperties;
 using OSDC.UnitConversion.Conversion;
 using OSDC.UnitConversion.Conversion.DrillingEngineering;
 
-namespace NORCE.Drilling.WellBoreArchitecture.Model
+namespace OSDC.Drilling.WellBoreArchitecture.Model
 {
     public class WellHead
     {

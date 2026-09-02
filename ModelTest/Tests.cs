@@ -1,9 +1,9 @@
 using OSDC.DotnetLibraries.Drilling.DrillingProperties;
 using OSDC.DotnetLibraries.General.DataManagement;
 using OSDC.DotnetLibraries.General.Statistics;
-using NORCE.Drilling.WellBoreArchitecture.Model;
+using OSDC.Drilling.WellBoreArchitecture.Model;
 
-namespace NORCE.Drilling.WellBoreArchitecture.ModelTest
+namespace OSDC.Drilling.WellBoreArchitecture.ModelTest
 {
     public class Tests
     {

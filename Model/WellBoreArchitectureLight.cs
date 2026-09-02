@@ -1,7 +1,7 @@
-﻿using OSDC.DotnetLibraries.General.DataManagement;
+using OSDC.DotnetLibraries.General.DataManagement;
 using System;
 
-namespace NORCE.Drilling.WellBoreArchitecture.Model
+namespace OSDC.Drilling.WellBoreArchitecture.Model
 {
     /// <summary>
     /// Light weight version of a WellBoreArchitecture

@@ -39,7 +39,7 @@ This generates API documentation under `Model/_site`. (DocFX must be installed s
 
 ## Usage example
 ```csharp
-using NORCE.Drilling.WellBoreArchitecture.Model;
+using OSDC.Drilling.WellBoreArchitecture.Model;
 using OSDC.DotnetLibraries.General.DrillingProperties;
 
 var architecture = new WellBoreArchitecture

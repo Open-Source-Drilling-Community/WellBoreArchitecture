@@ -15,7 +15,7 @@ The WebApp project is a Blazor Server UI that lets engineers browse, create, and
 - `Shared/` – helper classes and API plumbing:
   - `APIUtils.cs`, `APIGetMethods.cs` – configure `HttpClient` instances and provide strongly typed clients generated from `ModelSharedOut`.
   - `ConversionsFromOSDC.cs`, `DataUtils.cs`, `SharedFunctions.cs` – convert units, build defaults, and apply shared calculations.
-- `charts/` – Helm chart (`norcedrillingwellborearchitecturewebappclient`) used to deploy the container on Kubernetes.
+- `charts/` – Helm chart (`osdcdrillingwellborearchitecturewebappclient`) used to deploy the container on Kubernetes.
 - `wwwroot/` – static assets (MudBlazor themes, CSS, JS, favicon).
 
 ## Service dependencies
@@ -40,8 +40,8 @@ dotnet run --project WebApp/WebApp.csproj
 The app serves the UI on the standard ASP.NET Core ports. Configure `WellBoreArchitectureHostURL` (and other URLs as required) so the UI can reach the backing services during local development.
 
 ## Docker and Helm packaging
-- The Dockerfile builds the container image `wellborearchitecturewellborearchitecturewebappclient`, published under the Digiwells organization on Docker Hub.
-- `charts/norcedrillingwellborearchitecturewebappclient` contains Helm manifests; adjust `values.yaml` (ingress path, URLs, secrets) before deploying.
+- The Dockerfile builds the `digiwells/osdcdrillingwellborearchitecturewebappclient` image published by the repository workflow.
+- `charts/osdcdrillingwellborearchitecturewebappclient` contains Helm manifests; adjust `values.yaml` (ingress path, URLs, secrets) before deploying.
 
 ## Hosted environments
 - Dev Swagger UI: https://dev.digiwells.no/WellBoreArchitecture/api/swagger

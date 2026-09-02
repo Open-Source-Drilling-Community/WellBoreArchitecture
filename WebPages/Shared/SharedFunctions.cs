@@ -1,6 +1,6 @@
-using NORCE.Drilling.WellBoreArchitecture.ModelShared;
+using OSDC.Drilling.WellBoreArchitecture.ModelShared;
 
-namespace NORCE.Drilling.WellBoreArchitecture.WebPages.Shared;
+namespace OSDC.Drilling.WellBoreArchitecture.WebPages.Shared;
 
 public class Conversions
 {
