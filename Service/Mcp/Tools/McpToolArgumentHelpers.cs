@@ -88,8 +88,38 @@ internal static class McpToolArgumentHelpers
             ["featureCategoryId"] = NullableUuid("Feature category UUID assigned to the architecture."),
             ["featureOptionId"] = NullableUuid("Feature option UUID assigned to the architecture."),
             ["modifiedFromUtc"] = NullableDateTime("Inclusive lower LastModificationDate bound."),
-            ["modifiedToUtc"] = NullableDateTime("Inclusive upper LastModificationDate bound.")
+            ["modifiedToUtc"] = NullableDateTime("Inclusive upper LastModificationDate bound."),
+            ["isLinked"] = new JsonObject { ["type"] = new JsonArray("boolean", "null"), ["description"] = "True returns architectures linked to a WellBore; false returns explicit drafts whose WellBoreID is null." }
         },
+        ["additionalProperties"] = false
+    };
+
+    public static JsonObject CreateSectionMutationSchema(string definitionName, bool includeSectionId, bool includeBody, bool includeInsertAt = false)
+    {
+        var properties = new JsonObject
+        {
+            ["wellBoreArchitectureId"] = String("UUID from WellBoreArchitecture.MetaInfo.ID.", "uuid"),
+            ["expectedModifiedUtc"] = String("Opaque concurrency token: echo LastModificationDate exactly as returned by the latest read; do not parse or reformat it.", "date-time")
+        };
+        var required = new JsonArray("wellBoreArchitectureId", "expectedModifiedUtc");
+        if (includeSectionId) { properties["componentId"] = String("Stable nested ComponentID.", "uuid"); required.Add("componentId"); }
+        if (includeBody) { properties["section"] = Ref(definitionName, "Complete section payload with a non-empty ComponentID."); required.Add("section"); }
+        if (includeInsertAt) properties["insertAt"] = new JsonObject { ["type"] = new JsonArray("integer", "null"), ["minimum"] = 0, ["description"] = "Optional zero-based insertion position; omit to append." };
+        return new JsonObject { ["type"] = "object", ["properties"] = properties, ["required"] = required,
+            ["additionalProperties"] = false, ["$defs"] = Definitions() };
+    }
+
+    public static JsonObject CreateSectionReorderSchema() => new()
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["wellBoreArchitectureId"] = String("UUID from WellBoreArchitecture.MetaInfo.ID.", "uuid"),
+            ["expectedModifiedUtc"] = String("Opaque concurrency token: echo LastModificationDate exactly as returned by the latest read; do not parse or reformat it.", "date-time"),
+            ["orderedComponentIds"] = new JsonObject { ["type"] = "array", ["minItems"] = 1, ["uniqueItems"] = true,
+                ["items"] = String("Existing section ComponentID in desired top-to-bottom order.", "uuid") }
+        },
+        ["required"] = new JsonArray("wellBoreArchitectureId", "expectedModifiedUtc", "orderedComponentIds"),
         ["additionalProperties"] = false
     };
 
@@ -255,6 +285,7 @@ internal static class McpToolArgumentHelpers
 
         ["SurfaceSection"] = Object("Surface well-control or riser section above the wellhead, with uncertain dimensions/material properties and optional side circuitry.", new JsonObject
         {
+            ["ComponentID"] = String("Stable UUID used by granular nested-component mutations.", "uuid"),
             ["Type"] = Enum("Surface-section classification.", "Unknown", "BOP", "HighPressureRiser", "LowPressureRiser", "MarineRiser", "ExpansionJoint", "BellNipple", "Diverter", "RotatingControlDevice"),
             ["SectionLength"] = NullableGaussian("Section length in metres (m)."),
             ["BodyOD"] = NullableGaussian("Body outside diameter in metres (m)."),
@@ -274,6 +305,7 @@ internal static class McpToolArgumentHelpers
 
         ["SideConnector"] = Object("Connection point from a surface section into an auxiliary flow circuit.", new JsonObject
         {
+            ["ComponentID"] = String("Stable UUID used to address this nested connector.", "uuid"),
             ["Position"] = Ref("GaussianDrillingProperty", "Position along the host section in metres (m)."),
             ["VerticalDepth"] = Ref("GaussianDrillingProperty", "Vertical depth in metres (m), using the architecture's configured depth reference."),
             ["FirstSideElement"] = NullableRef("SideElement", "Root element of the side-circuit network."),
@@ -282,6 +314,7 @@ internal static class McpToolArgumentHelpers
 
         ["SideElement"] = Object("Pipe, hose, valve, choke, or pump in an auxiliary side circuit.", new JsonObject
         {
+            ["ComponentID"] = String("Stable UUID used to address this side-circuit element; ID below remains the physical inside diameter.", "uuid"),
             ["Name"] = NullableString("Human-readable side-element name."),
             ["Type"] = Enum("Side-element classification.", "Unknown", "Pipe", "Hose", "GateValve", "Choke", "Pump"),
             ["Length"] = Ref("GaussianDrillingProperty", "Element length in metres (m)."),
@@ -292,12 +325,14 @@ internal static class McpToolArgumentHelpers
 
         ["ElementConnectivity"] = Object("Directed connectivity between two full side-element definitions.", new JsonObject
         {
+            ["ComponentID"] = String("Stable UUID used to address this connectivity edge.", "uuid"),
             ["UpstreamElement"] = NullableRef("SideElement", "Upstream side-circuit element."),
             ["DownstreamElement"] = NullableRef("SideElement", "Downstream side-circuit element.")
         }),
 
         ["CasingSection"] = Object("Casing interval beginning at the wellhead. Depth properties are referenced to the wellhead and all lists describe the interval's construction.", new JsonObject
         {
+            ["ComponentID"] = String("Stable UUID used by granular nested-component mutations.", "uuid"),
             ["TopDepth"] = Ref("GaussianDrillingProperty", "Top depth in metres (m), explicitly referenced to the wellhead."),
             ["Length"] = Ref("GaussianDrillingProperty", "Casing-section length in metres (m)."),
             ["TopCementDepth"] = Ref("GaussianDrillingProperty", "Top-of-cement depth in metres (m), explicitly referenced to the wellhead."),
@@ -308,6 +343,7 @@ internal static class McpToolArgumentHelpers
 
         ["CasingSectionElement"] = Object("Casing tubular specification and interval length, with uncertainty wrappers for physical properties.", new JsonObject
         {
+            ["ComponentID"] = String("Stable UUID used to address this nested casing element.", "uuid"),
             ["BodyOD"] = Gaussian("Casing body outside diameter in metres (m)."),
             ["BodyID"] = Gaussian("Casing body inside diameter in metres (m)."),
             ["CollarOD"] = Gaussian("Casing collar outside diameter in metres (m)."),
@@ -329,11 +365,13 @@ internal static class McpToolArgumentHelpers
 
         ["OpenHoleSection"] = Object("Open-hole interval represented by ordered borehole-size rows.", new JsonObject
         {
+            ["ComponentID"] = String("Stable UUID used to address this nested open-hole interval.", "uuid"),
             ["HoleSizes"] = Array("BoreHoleSize", "Ordered hole-diameter and length rows for the open-hole interval.")
         }),
 
         ["BoreHoleSize"] = Object("Borehole diameter valid over a stated interval length.", new JsonObject
         {
+            ["ComponentID"] = String("Stable UUID used to address this nested size row.", "uuid"),
             ["HoleSize"] = Gaussian("Borehole diameter in metres (m)."),
             ["Length"] = Gaussian("Length over which the borehole diameter applies, in metres (m).")
         }),
@@ -436,9 +474,11 @@ internal static class McpToolArgumentHelpers
                 ["request"] = Object("Atomic restore request.", new JsonObject
                 {
                     ["ConflictPolicy"] = Enum("Fail safely on existing UUIDs or explicitly replace them.", "FailIfExists", "ReplaceExisting"),
-                    ["CatalogPolicy"] = Enum("Map existing compatible definitions or create missing definitions and options.", "MapExisting", "MapOrCreateMissing"),
+                    ["CatalogPolicy"] = Enum("Use exact UUID matches or create missing definitions/options while preserving their source UUIDs.", "MapExisting", "MapOrCreateMissing"),
+                    ["AllowNormalizedNameMapping"] = new JsonObject { ["type"] = "boolean", ["default"] = false,
+                        ["description"] = "Explicit opt-in for mapping a source catalogue item to a different local UUID by one compatible normalized name. Leave false unless a human has confirmed semantic identity." },
                     ["Document"] = document
-                }, "ConflictPolicy", "CatalogPolicy", "Document")
+                }, "ConflictPolicy", "CatalogPolicy", "AllowNormalizedNameMapping", "Document")
             },
             ["required"] = new JsonArray("request"), ["additionalProperties"] = false,
             ["$defs"] = Definitions()

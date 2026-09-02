@@ -11,6 +11,8 @@ namespace OSDC.Drilling.WellBoreArchitecture.Model
 {
     public class BoreHoleSize
     {
+        /// <summary>Stable identifier used to address this nested component independently.</summary>
+        public Guid ComponentID { get; set; }
         /// <summary>
         /// The hole size is a Gaussian distribution of quantity pipe diameter
         /// </summary>

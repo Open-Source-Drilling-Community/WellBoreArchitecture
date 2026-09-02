@@ -42,7 +42,7 @@ public static class WellBoreArchitectureBatchRestorer
             int createdOptions = 0;
             bool createMissing = request.CatalogPolicy == WellBoreArchitectureBatchCatalogRestorePolicy.MapOrCreateMissing;
 
-            ResolveDependencies(request.Document.CatalogDependencies, catalogs, createMissing, mappings,
+            ResolveDependencies(request.Document.CatalogDependencies, catalogs, createMissing, request.AllowNormalizedNameMapping, mappings,
                 mappingErrors, restoredAtUtc, ref createdDefinitions, ref createdOptions);
             if (mappingErrors.Count != 0)
             {
@@ -51,6 +51,18 @@ public static class WellBoreArchitectureBatchRestorer
                     "Catalog references could not be resolved unambiguously. No changes were made.", mappingErrors);
             }
             RewriteReferences(wellBores, mappings);
+
+            List<WellBoreArchitectureBatchError> componentErrors = [];
+            for (int index = 0; index < wellBores.Count; index++)
+                if (!WellBoreArchitectureComponentIdentity.Ensure(wellBores[index]))
+                    componentErrors.Add(Error(index, "Document.WellBoreArchitectures", "duplicate_component_uuid",
+                        "Nested ComponentID values must be unique within an architecture."));
+            if (componentErrors.Count != 0)
+            {
+                transaction.Rollback();
+                return Failure(WellBoreArchitectureBatchRestoreFailureKind.InvalidRequest, "invalid_component_ids",
+                    "One or more restored architectures contain duplicate component IDs. No changes were made.", componentErrors);
+            }
 
             List<WellBoreArchitectureBatchError> assignmentErrors = [];
             for (int index = 0; index < wellBores.Count; index++)
@@ -205,28 +217,28 @@ public static class WellBoreArchitectureBatchRestorer
     }
 
     private static void ResolveDependencies(WellBoreArchitectureBatchCatalogDependencies dependencies, CatalogState local,
-        bool createMissing, List<WellBoreArchitectureBatchCatalogMapping> mappings, List<WellBoreArchitectureBatchError> errors,
+        bool createMissing, bool allowNormalizedNameMapping, List<WellBoreArchitectureBatchCatalogMapping> mappings, List<WellBoreArchitectureBatchError> errors,
         DateTimeOffset now, ref int createdDefinitions, ref int createdOptions)
     {
         foreach (WellBoreArchitectureIdentity source in dependencies.Identities ?? [])
         {
             Guid sourceId = source.MetaInfo!.ID;
-            WellBoreArchitectureIdentity? target = ResolveFlat(sourceId, source.Name, local.Identities, createMissing, errors);
+            WellBoreArchitectureIdentity? target = ResolveFlat(sourceId, source.Name, local.Identities, createMissing, allowNormalizedNameMapping, errors);
             bool created = false;
             if (target == null && createMissing && !HasErrorFor(errors, sourceId))
             {
-                target = new WellBoreArchitectureIdentity { MetaInfo = new MetaInfo { ID = Guid.NewGuid() }, Name = source.Name,
+                target = new WellBoreArchitectureIdentity { MetaInfo = new MetaInfo { ID = sourceId }, Name = source.Name,
                     CreationDate = now, LastModificationDate = now };
                 local.Identities.Add(target); local.DirtyIdentities.Add(target); createdDefinitions++; created = true;
             }
             if (target != null) AddMapping(mappings, "Identity", source.Name, sourceId, target.MetaInfo!.ID,
-                sourceId == target.MetaInfo.ID ? "exact_uuid" : created ? "created" : "normalized_name");
+                created ? "created_preserving_uuid" : sourceId == target.MetaInfo.ID ? "exact_uuid" : "normalized_name_with_consent");
         }
         foreach (WellBoreArchitectureFeatureCategory source in dependencies.FeatureCategories ?? [])
-            ResolveCategory(source, local, createMissing, mappings, errors, now, ref createdDefinitions, ref createdOptions);
+            ResolveCategory(source, local, createMissing, allowNormalizedNameMapping, mappings, errors, now, ref createdDefinitions, ref createdOptions);
     }
 
-    private static void ResolveCategory(WellBoreArchitectureFeatureCategory source, CatalogState local, bool createMissing,
+    private static void ResolveCategory(WellBoreArchitectureFeatureCategory source, CatalogState local, bool createMissing, bool allowNormalizedNameMapping,
         List<WellBoreArchitectureBatchCatalogMapping> mappings, List<WellBoreArchitectureBatchError> errors, DateTimeOffset now,
         ref int createdDefinitions, ref int createdOptions)
     {
@@ -240,6 +252,7 @@ public static class WellBoreArchitectureBatchRestorer
         if (target == null)
         {
             List<WellBoreArchitectureFeatureCategory> matches = local.Features.Where(value => SameName(value.Name, source.Name)).ToList();
+            if (matches.Count != 0 && !allowNormalizedNameMapping) { AddMappingConsentRequired(errors, "feature category", sourceId, source.Name); return; }
             if (matches.Count > 1) { AddAmbiguous(errors, "feature category", sourceId, source.Name); return; }
             if (matches.Count == 1)
             {
@@ -249,7 +262,7 @@ public static class WellBoreArchitectureBatchRestorer
             }
             else if (createMissing)
             {
-                target = new WellBoreArchitectureFeatureCategory { MetaInfo = new MetaInfo { ID = Guid.NewGuid() }, Name = source.Name,
+                target = new WellBoreArchitectureFeatureCategory { MetaInfo = new MetaInfo { ID = sourceId }, Name = source.Name,
                     IsExclusive = source.IsExclusive, HasValidityPeriod = source.HasValidityPeriod, Options = [],
                     CreationDate = now, LastModificationDate = now };
                 local.Features.Add(target); local.DirtyFeatures.Add(target); createdDefinitions++; created = true;
@@ -257,7 +270,7 @@ public static class WellBoreArchitectureBatchRestorer
             else { AddMissing(errors, "feature category", sourceId, source.Name); return; }
         }
         AddMapping(mappings, "FeatureCategory", source.Name, sourceId, target.MetaInfo!.ID,
-            sourceId == target.MetaInfo.ID ? "exact_uuid" : created ? "created" : "normalized_name");
+            created ? "created_preserving_uuid" : sourceId == target.MetaInfo.ID ? "exact_uuid" : "normalized_name_with_consent");
         foreach (WellBoreArchitectureFeatureOption sourceOption in source.Options ?? [])
         {
             WellBoreArchitectureFeatureOption? targetOption = (target.Options ?? []).FirstOrDefault(value => value.ID == sourceOption.ID);
@@ -267,23 +280,24 @@ public static class WellBoreArchitectureBatchRestorer
             if (targetOption == null)
             {
                 List<WellBoreArchitectureFeatureOption> matches = (target.Options ?? []).Where(value => SameName(value.Name, sourceOption.Name)).ToList();
+                if (matches.Count != 0 && !allowNormalizedNameMapping) { AddMappingConsentRequired(errors, "feature option", sourceOption.ID, sourceOption.Name); continue; }
                 if (matches.Count > 1) { AddAmbiguous(errors, "feature option", sourceOption.ID, sourceOption.Name); continue; }
                 if (matches.Count == 1) targetOption = matches[0];
                 else if (createMissing)
                 {
-                    targetOption = new WellBoreArchitectureFeatureOption { ID = Guid.NewGuid(), Name = sourceOption.Name };
+                    targetOption = new WellBoreArchitectureFeatureOption { ID = sourceOption.ID, Name = sourceOption.Name };
                     target.Options ??= []; target.Options.Add(targetOption); target.LastModificationDate = now;
                     local.DirtyFeatures.Add(target); createdOptions++; optionCreated = true;
                 }
                 else { AddMissing(errors, "feature option", sourceOption.ID, sourceOption.Name); continue; }
             }
             AddMapping(mappings, "FeatureOption", sourceOption.Name, sourceOption.ID, targetOption.ID,
-                sourceOption.ID == targetOption.ID ? "exact_uuid" : optionCreated ? "created" : "normalized_name");
+                optionCreated ? "created_preserving_uuid" : sourceOption.ID == targetOption.ID ? "exact_uuid" : "normalized_name_with_consent");
         }
     }
 
     private static WellBoreArchitectureIdentity? ResolveFlat(Guid sourceId, string? sourceName, List<WellBoreArchitectureIdentity> local,
-        bool createMissing, List<WellBoreArchitectureBatchError> errors)
+        bool createMissing, bool allowNormalizedNameMapping, List<WellBoreArchitectureBatchError> errors)
     {
         WellBoreArchitectureIdentity? exact = local.FirstOrDefault(value => value.MetaInfo!.ID == sourceId);
         if (exact != null)
@@ -292,6 +306,11 @@ public static class WellBoreArchitectureBatchRestorer
             return HasErrorFor(errors, sourceId) ? null : exact;
         }
         List<WellBoreArchitectureIdentity> matches = local.Where(value => SameName(value.Name, sourceName)).ToList();
+        if (matches.Count != 0 && !allowNormalizedNameMapping)
+        {
+            AddMappingConsentRequired(errors, "identity", sourceId, sourceName);
+            return null;
+        }
         if (matches.Count == 1) return matches[0];
         if (matches.Count > 1) AddAmbiguous(errors, "identity", sourceId, sourceName);
         else if (!createMissing) AddMissing(errors, "identity", sourceId, sourceName);
@@ -414,6 +433,9 @@ public static class WellBoreArchitectureBatchRestorer
     private static void AddMissing(List<WellBoreArchitectureBatchError> errors, string kind, Guid id, string? name) => errors.Add(Error(null, $"Document.CatalogDependencies[{id}]", "catalog_definition_missing", $"No compatible local {kind} exists for '{name}' ({id}), and creation is disabled."));
     private static void AddAmbiguous(List<WellBoreArchitectureBatchError> errors, string kind, Guid id, string? name) => errors.Add(Error(null, $"Document.CatalogDependencies[{id}]", "ambiguous_catalog_match", $"More than one local {kind} has normalized name '{name}' for source UUID '{id}'."));
     private static void AddSemanticConflict(List<WellBoreArchitectureBatchError> errors, string kind, Guid id, string? name) => errors.Add(Error(null, $"Document.CatalogDependencies[{id}]", "catalog_semantic_conflict", $"The local {kind} corresponding to '{name}' ({id}) has incompatible semantics."));
+    private static void AddMappingConsentRequired(List<WellBoreArchitectureBatchError> errors, string kind, Guid id, string? name) => errors.Add(Error(null,
+        $"Document.CatalogDependencies[{id}]", "normalized_name_mapping_requires_consent",
+        $"A local {kind} named '{name}' has a different UUID. Set AllowNormalizedNameMapping=true only after confirming that the definitions are semantically identical."));
     private static void AddMapping(List<WellBoreArchitectureBatchCatalogMapping> mappings, string catalog, string? name, Guid source, Guid local, string resolution) => mappings.Add(new() { Catalog = catalog, Name = name ?? "", SourceID = source, LocalID = local, Resolution = resolution });
     private static WellBoreArchitectureBatchRestoreOutcome Failure(WellBoreArchitectureBatchRestoreFailureKind kind, string error, string message, List<WellBoreArchitectureBatchError> errors) => new() { FailureKind = kind, Error = new() { Error = error, Message = message, Errors = errors } };
     private static WellBoreArchitectureBatchError Error(int? index, string property, string code, string message) => new() { PositionIndex = index, Property = property, Code = code, Message = message };

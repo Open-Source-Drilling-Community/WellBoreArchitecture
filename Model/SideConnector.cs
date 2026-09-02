@@ -1,10 +1,13 @@
 using System.Collections.Generic;
+using System;
 using OSDC.DotnetLibraries.General.DrillingProperties;
 
 namespace OSDC.Drilling.WellBoreArchitecture.Model
 {
     public class SideConnector
     {
+        /// <summary>Stable identifier used to address this nested component independently.</summary>
+        public Guid ComponentID { get; set; }
         /// <summary>
         /// The position of the side connector along the element
         /// </summary>

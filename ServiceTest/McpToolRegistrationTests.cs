@@ -46,6 +46,14 @@ public sealed class McpToolRegistrationTests
         "well_bore_architecture_feature_assignment_add",
         "well_bore_architecture_feature_assignment_update_by_id",
         "well_bore_architecture_feature_assignment_delete_by_id",
+        "well_bore_architecture_surface_section_add",
+        "well_bore_architecture_surface_section_update_by_id",
+        "well_bore_architecture_surface_section_delete_by_id",
+        "well_bore_architecture_surface_section_reorder",
+        "well_bore_architecture_casing_section_add",
+        "well_bore_architecture_casing_section_update_by_id",
+        "well_bore_architecture_casing_section_delete_by_id",
+        "well_bore_architecture_casing_section_reorder",
         "well_bore_architecture_identity_get_all_ids",
         "well_bore_architecture_identity_get_all_meta_info",
         "well_bore_architecture_feature_category_get_all_ids",
@@ -109,6 +117,7 @@ public sealed class McpToolRegistrationTests
         Assert.That(json, Does.Contain("ordered from top to bottom"));
         Assert.That(json, Does.Contain("CasingSectionElements"));
         Assert.That(json, Does.Contain("ElementConnectivities"));
+        Assert.That(json, Does.Contain("ComponentID"));
         Assert.That(json, Does.Contain("RotatingControlDevice"));
     }
 
@@ -160,7 +169,11 @@ public sealed class McpToolRegistrationTests
                      "well_bore_architecture_details_update", "well_bore_architecture_well_bore_link_update",
                      "well_bore_architecture_identity_assignment_add", "well_bore_architecture_identity_assignment_update_by_id",
                      "well_bore_architecture_identity_assignment_delete_by_id", "well_bore_architecture_feature_assignment_add",
-                     "well_bore_architecture_feature_assignment_update_by_id", "well_bore_architecture_feature_assignment_delete_by_id"
+                     "well_bore_architecture_feature_assignment_update_by_id", "well_bore_architecture_feature_assignment_delete_by_id",
+                     "well_bore_architecture_surface_section_add", "well_bore_architecture_surface_section_update_by_id",
+                     "well_bore_architecture_surface_section_delete_by_id", "well_bore_architecture_surface_section_reorder",
+                     "well_bore_architecture_casing_section_add", "well_bore_architecture_casing_section_update_by_id",
+                     "well_bore_architecture_casing_section_delete_by_id", "well_bore_architecture_casing_section_reorder"
                  })
         {
             JsonObject schema = (JsonObject)_tools[name].InputSchema!;
@@ -179,6 +192,31 @@ public sealed class McpToolRegistrationTests
         Assert.That(schema, Does.Contain("identityValue"));
         Assert.That(schema, Does.Contain("featureCategoryId"));
         Assert.That(schema, Does.Contain("modifiedFromUtc"));
+        Assert.That(schema, Does.Contain("isLinked"));
+    }
+
+    [Test]
+    public void Section_mutations_use_stable_ids_and_explicit_ordering()
+    {
+        string add = _tools["well_bore_architecture_surface_section_add"].InputSchema!.ToJsonString();
+        string update = _tools["well_bore_architecture_casing_section_update_by_id"].InputSchema!.ToJsonString();
+        string reorder = _tools["well_bore_architecture_surface_section_reorder"].InputSchema!.ToJsonString();
+        Assert.Multiple(() =>
+        {
+            Assert.That(add, Does.Contain("ComponentID"));
+            Assert.That(add, Does.Contain("insertAt"));
+            Assert.That(update, Does.Contain("componentId"));
+            Assert.That(reorder, Does.Contain("orderedComponentIds"));
+            Assert.That(reorder, Does.Contain("\"uniqueItems\":true"));
+        });
+    }
+
+    [Test]
+    public void Restore_requires_explicit_consent_for_normalized_name_mapping()
+    {
+        string schema = _tools["well_bore_architecture_batch_restore"].InputSchema!.ToJsonString();
+        Assert.That(schema, Does.Contain("AllowNormalizedNameMapping"));
+        Assert.That(schema, Does.Contain("\"default\":false"));
     }
 
     [Test]

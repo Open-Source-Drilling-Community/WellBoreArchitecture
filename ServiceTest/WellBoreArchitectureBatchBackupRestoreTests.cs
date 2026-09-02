@@ -53,7 +53,32 @@ public sealed class WellBoreArchitectureBatchBackupRestoreTests
             Assert.That(Count(connection, "WellBoreArchitectureFeatureCategoryTable"), Is.EqualTo(1));
             Assert.That(outcome.Response!.CreatedCatalogDefinitionCount, Is.EqualTo(2));
             Assert.That(outcome.Response.CatalogMappings, Has.Count.EqualTo(3));
+            Assert.That(outcome.Response.CatalogMappings.All(mapping => mapping.SourceID == mapping.LocalID), Is.True);
         });
+    }
+
+    [Test]
+    public void Normalized_name_mapping_requires_explicit_consent()
+    {
+        using SqliteConnection connection = CreateDatabase();
+        Guid localIdentityId = Guid.NewGuid(), sourceIdentityId = Guid.NewGuid();
+        Guid categoryId = Guid.NewGuid(), optionId = Guid.NewGuid();
+        WellBoreArchitectureBatchRestoreOutcome first = WellBoreArchitectureBatchRestorer.Restore(connection,
+            RestoreRequest(ArchitectureWithAssignments(localIdentityId, categoryId, optionId),
+                Identity(localIdentityId, "Planning name"), Category(categoryId, false, true, (optionId, "Planned"))), DateTimeOffset.UtcNow);
+        Assert.That(first.IsSuccess, Is.True);
+
+        WellBoreArchitectureBatchRestoreRequest request = RestoreRequest(
+            ArchitectureWithAssignments(sourceIdentityId, categoryId, optionId),
+            Identity(sourceIdentityId, " planning   name "), Category(categoryId, false, true, (optionId, "Planned")));
+        WellBoreArchitectureBatchRestoreOutcome denied = WellBoreArchitectureBatchRestorer.Restore(connection, request, DateTimeOffset.UtcNow);
+        Assert.That(denied.IsSuccess, Is.False);
+        Assert.That(denied.Error!.Errors.Any(error => error.Code == "normalized_name_mapping_requires_consent"), Is.True);
+
+        request.AllowNormalizedNameMapping = true;
+        WellBoreArchitectureBatchRestoreOutcome allowed = WellBoreArchitectureBatchRestorer.Restore(connection, request, DateTimeOffset.UtcNow);
+        Assert.That(allowed.IsSuccess, Is.True);
+        Assert.That(allowed.Response!.CatalogMappings.Any(mapping => mapping.SourceID == sourceIdentityId && mapping.LocalID == localIdentityId), Is.True);
     }
 
     [Test]

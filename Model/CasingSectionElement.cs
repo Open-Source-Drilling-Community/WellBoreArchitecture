@@ -1,9 +1,12 @@
 using OSDC.DotnetLibraries.General.DrillingProperties;
+using System;
 
 namespace OSDC.Drilling.WellBoreArchitecture.Model
 {
     public class CasingSectionElement
     {
+        /// <summary>Stable identifier used to address this nested component independently.</summary>
+        public Guid ComponentID { get; set; }
 
         /// <summary>
         /// Casing joint OD

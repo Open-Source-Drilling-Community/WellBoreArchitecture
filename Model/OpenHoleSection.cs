@@ -1,9 +1,12 @@
 using System.Collections.Generic;
+using System;
 
 namespace OSDC.Drilling.WellBoreArchitecture.Model
 {
 	public class OpenHoleSection
 	{
+		/// <summary>Stable identifier used to address this nested component independently.</summary>
+		public Guid ComponentID { get; set; }
 		/// <summary>
 		/// the list of hole size of the open hole section
 		/// </summary>

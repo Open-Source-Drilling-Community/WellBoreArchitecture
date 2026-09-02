@@ -15,6 +15,8 @@ using IdentityModel = OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitect
 using FeatureCategoryModel = OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureFeatureCategory;
 using IdentityAssignmentModel = OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureIdentityAssignment;
 using FeatureAssignmentModel = OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureFeatureAssignment;
+using SurfaceSectionModel = OSDC.Drilling.WellBoreArchitecture.Model.SurfaceSection;
+using CasingSectionModel = OSDC.Drilling.WellBoreArchitecture.Model.CasingSection;
 using BatchExportRequestModel = OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchExportRequest;
 using BatchRestoreRequestModel = OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchRestoreRequest;
 
@@ -34,13 +36,13 @@ public static class WellBoreArchitectureRestMcpToolRegistrations
             (sp, args, ct) => InvokeById(args, ct, id => Controller(sp).GetWellBoreArchitectureById(id)));
         services.AddLegacyMcpTool("well_bore_architecture_get_all_light", "List lightweight wellbore-architecture records containing metadata, name, description, and timestamps. Use this for human-readable discovery and selection; it intentionally omits WellBoreID and all construction geometry and material data.", McpToolArgumentHelpers.CreateEmptySchema(),
             (sp, _, ct) => Invoke(ct, () => Controller(sp).GetAllWellBoreArchitectureLight()));
-        services.AddLegacyMcpTool("well_bore_architecture_get_all", "Retrieve every wellbore architecture with complete wellhead, surface, casing, side-circuit, fluid, material, uncertainty, and open-hole data. This can be a large response; prefer IDs, metadata, or light records for discovery and retrieve one selected model by UUID.", McpToolArgumentHelpers.CreateEmptySchema(),
+        services.AddLegacyMcpTool("well_bore_architecture_get_all", "Legacy unbounded convenience operation that retrieves every complete wellbore architecture. This can be a very large response and may be removed in a future major contract version; new clients must use well_bore_architecture_search, lightweight discovery, and get-by-id.", McpToolArgumentHelpers.CreateEmptySchema(),
             (sp, _, ct) => Invoke(ct, () => Controller(sp).GetAllWellBoreArchitecture()));
         services.AddLegacyMcpTool("well_bore_architecture_search", "Return one deterministic page of complete WellBoreArchitectures together with the total match count. Filters may target name, external WellBore UUID, identity definition/value, feature category/option, and modification dates; results are ordered by resource UUID.", McpToolArgumentHelpers.CreateSearchSchema(),
             InvokeSearch);
         services.AddLegacyMcpTool("well_bore_architecture_batch_export", "Create a read-only, schema-version-1 JSON backup of all stored WellBoreArchitectures or an explicitly ordered selection. The response contains complete construction records and only the identity definitions, feature categories, and options referenced by them. WellBoreID remains an external UUID reference. An invalid or missing selected record rejects the complete export.", McpToolArgumentHelpers.CreateWellBoreArchitectureBatchExportSchema(),
             (sp, args, ct) => InvokeWithBodyResult<BatchExportRequestModel, OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchExportDocument>(args, "request", ct, request => Controller(sp).BatchExportWellBoreArchitectures(request)));
-        services.AddLegacyMcpTool("well_bore_architecture_batch_restore", "Validate and atomically restore a schema-version-1 WellBoreArchitecture backup. Catalogue UUIDs map by exact UUID or one compatible normalized name, and MapOrCreateMissing may create missing definitions and options. ReplaceExisting must be explicitly selected. Catalogue mapping, reference rewriting, definition creation, and all architecture writes share one transaction, so any validation, conflict, or storage failure leaves the database unchanged.", McpToolArgumentHelpers.CreateWellBoreArchitectureBatchRestoreSchema(),
+        services.AddLegacyMcpTool("well_bore_architecture_batch_restore", "Validate and atomically restore a schema-version-1 backup. Exact catalogue UUID matching is the safe default; missing definitions preserve source UUIDs. Mapping by normalized name requires explicit AllowNormalizedNameMapping consent and still rejects ambiguity or incompatible semantics. Catalogue mapping and all writes share one transaction, so any failure leaves the database unchanged.", McpToolArgumentHelpers.CreateWellBoreArchitectureBatchRestoreSchema(),
             (sp, args, ct) => InvokeWithBodyResult<BatchRestoreRequestModel, OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchRestoreResponse>(args, "request", ct, request => Controller(sp).BatchRestoreWellBoreArchitectures(request)));
         services.AddLegacyMcpTool("well_bore_architecture_create", "Persist a new complete wellbore architecture. Generate a non-empty wellBoreArchitecture.MetaInfo.ID first; an existing UUID produces a conflict. Supply at least one SurfaceSection, preserve top-to-bottom ordering, use WellBoreID only as an external reference, and encode physical values in SI through GaussianValue or DiracDistributionValue.", McpToolArgumentHelpers.CreateWellBoreArchitectureSchema(),
             (sp, args, ct) => InvokeWithBody<ArchitectureModel>(args, "wellBoreArchitecture", ct, data => Controller(sp).PostWellBoreArchitecture(data)));
@@ -50,6 +52,10 @@ public static class WellBoreArchitectureRestMcpToolRegistrations
             (sp, args, ct) => InvokeObjectMutation(sp, args, "details", ct, (stored, body) => { stored.Name = NodeString(body, "Name"); stored.Description = NodeString(body, "Description"); }));
         services.AddLegacyMcpTool("well_bore_architecture_well_bore_link_update", "Update only the externally-owned WellBoreID relationship without resending construction arrays or assignments. The reference is not synchronously validated; expectedModifiedUtc protects against stale writes and the complete updated architecture is returned.", McpToolArgumentHelpers.CreateWellBoreLinkMutationSchema(),
             (sp, args, ct) => InvokeObjectMutation(sp, args, "link", ct, (stored, body) => stored.WellBoreID = NodeGuid(body, "WellBoreID")));
+        AddSectionTools<SurfaceSectionModel>(services, "surface_section", "SurfaceSection",
+            architecture => architecture.SurfaceSections ??= []);
+        AddSectionTools<CasingSectionModel>(services, "casing_section", "CasingSection",
+            architecture => architecture.CasingSections ??= []);
         services.AddLegacyMcpTool("well_bore_architecture_identity_assignment_add", "Add one identity assignment without resending the complete architecture. Supply a caller-generated non-empty assignment UUID and the latest parent revision; definition references and duplicate IDs are validated before the updated architecture is committed.", McpToolArgumentHelpers.CreateIdentityAssignmentMutationSchema(false, true),
             (sp, args, ct) => InvokeAssignmentMutation<IdentityAssignmentModel>(sp, args, false, ct, (stored, value, _) => (stored.WellBoreArchitectureIdentityAssignments ??= []).Add(value)));
         services.AddLegacyMcpTool("well_bore_architecture_identity_assignment_update_by_id", "Replace one identity assignment selected by assignmentId without resending unrelated architecture data. The body ID must equal assignmentId and expectedModifiedUtc must match the latest parent revision; the updated architecture is returned.", McpToolArgumentHelpers.CreateIdentityAssignmentMutationSchema(true, true),
@@ -77,6 +83,24 @@ public static class WellBoreArchitectureRestMcpToolRegistrations
             (sp, value) => FeatureController(sp).Post(value), (sp, id, expected, value) => FeatureController(sp).Put(id, expected, value),
             (sp, id, expected) => FeatureController(sp).Delete(id, expected));
         return services;
+    }
+
+    private static void AddSectionTools<T>(IServiceCollection services, string toolSegment, string definitionName,
+        Func<ArchitectureModel, List<T>> sections) where T : class
+    {
+        string prefix = "well_bore_architecture_" + toolSegment;
+        services.AddLegacyMcpTool(prefix + "_add", $"Add one {definitionName} at an optional top-to-bottom position without replacing the rest of the architecture. Supply a caller-generated non-empty ComponentID and echo expectedModifiedUtc exactly from the latest read; duplicate component IDs and invalid positions change nothing.",
+            McpToolArgumentHelpers.CreateSectionMutationSchema(definitionName, false, true, true),
+            (sp, args, ct) => InvokeSectionAdd(sp, args, sections, ct));
+        services.AddLegacyMcpTool(prefix + "_update_by_id", $"Replace one {definitionName} selected by stable componentId without resending other sections. section.ComponentID must equal componentId and expectedModifiedUtc is an opaque token copied exactly from the latest read.",
+            McpToolArgumentHelpers.CreateSectionMutationSchema(definitionName, true, true),
+            (sp, args, ct) => InvokeSectionUpdate(sp, args, sections, ct));
+        services.AddLegacyMcpTool(prefix + "_delete_by_id", $"Delete one {definitionName} selected by stable componentId. The latest opaque expectedModifiedUtc token is required; deleting the final SurfaceSection is rejected by architecture validation.",
+            McpToolArgumentHelpers.CreateSectionMutationSchema(definitionName, true, false),
+            (sp, args, ct) => InvokeSectionDelete(sp, args, sections, ct));
+        services.AddLegacyMcpTool(prefix + "_reorder", $"Reorder all existing {definitionName} values top-to-bottom by stable ComponentID without resending their engineering payloads. The list must contain every current section ID exactly once and expectedModifiedUtc must be copied from the latest read.",
+            McpToolArgumentHelpers.CreateSectionReorderSchema(),
+            (sp, args, ct) => InvokeSectionReorder(sp, args, sections, ct));
     }
 
     private static void AddCatalogDiscoveryTools(IServiceCollection services, string prefix, string entityName,
@@ -123,6 +147,90 @@ public static class WellBoreArchitectureRestMcpToolRegistrations
         if (args?[bodyName] is not JsonObject body)
             return Task.FromResult<JsonNode?>(McpToolResponses.CreateValidationError($"Argument '{bodyName}' is required and must be an object."));
         return Task.FromResult<JsonNode?>(Mutate(sp, id, expected, stored => { mutation(stored, body); return stored; }));
+    }
+
+    private static Task<JsonNode?> InvokeSectionAdd<T>(IServiceProvider sp, JsonObject? args,
+        Func<ArchitectureModel, List<T>> select, CancellationToken ct) where T : class
+    {
+        ct.ThrowIfCancellationRequested();
+        if (!TryMutationHeader(args, "wellBoreArchitectureId", out Guid architectureId, out DateTimeOffset expected, out JsonNode? error)) return Task.FromResult(error);
+        if (!TryDeserialize(args, "section", out T? section, out error)) return Task.FromResult(error);
+        Guid componentId = ComponentId(section!);
+        if (componentId == Guid.Empty) return Task.FromResult<JsonNode?>(McpToolResponses.CreateValidationError("section.ComponentID must be a non-empty caller-generated UUID."));
+        int? insertAt = null;
+        if (args?["insertAt"] is JsonNode positionNode && positionNode.GetValueKind() != JsonValueKind.Null)
+        {
+            try { insertAt = positionNode.GetValue<int>(); }
+            catch (Exception ex) when (ex is InvalidOperationException or FormatException)
+            { return Task.FromResult<JsonNode?>(McpToolResponses.CreateValidationError("insertAt must be a non-negative integer.")); }
+        }
+        return Task.FromResult<JsonNode?>(Mutate(sp, architectureId, expected, stored =>
+        {
+            if (ContainsComponentId(stored, componentId)) throw new MutationConflictException($"ComponentID '{componentId}' already exists in this architecture.");
+            List<T> values = select(stored);
+            int index = insertAt ?? values.Count;
+            if (index < 0 || index > values.Count) throw new MutationValidationException($"insertAt must be between 0 and {values.Count}.");
+            values.Insert(index, section!);
+            return stored;
+        }));
+    }
+
+    private static Task<JsonNode?> InvokeSectionUpdate<T>(IServiceProvider sp, JsonObject? args,
+        Func<ArchitectureModel, List<T>> select, CancellationToken ct) where T : class
+    {
+        ct.ThrowIfCancellationRequested();
+        if (!TryMutationHeader(args, "wellBoreArchitectureId", out Guid architectureId, out DateTimeOffset expected, out JsonNode? error)) return Task.FromResult(error);
+        if (!McpToolArgumentHelpers.TryParseGuid(args, "componentId", out Guid componentId, out error)) return Task.FromResult(error);
+        if (!TryDeserialize(args, "section", out T? section, out error)) return Task.FromResult(error);
+        if (ComponentId(section!) != componentId) return Task.FromResult<JsonNode?>(McpToolResponses.CreateValidationError("componentId must equal section.ComponentID."));
+        return Task.FromResult<JsonNode?>(Mutate(sp, architectureId, expected, stored =>
+        {
+            List<T> values = select(stored);
+            int index = values.FindIndex(value => ComponentId(value) == componentId);
+            if (index < 0) throw new MutationNotFoundException("The section does not exist on this architecture.");
+            values[index] = section!;
+            return stored;
+        }));
+    }
+
+    private static Task<JsonNode?> InvokeSectionDelete<T>(IServiceProvider sp, JsonObject? args,
+        Func<ArchitectureModel, List<T>> select, CancellationToken ct) where T : class
+    {
+        ct.ThrowIfCancellationRequested();
+        if (!TryMutationHeader(args, "wellBoreArchitectureId", out Guid architectureId, out DateTimeOffset expected, out JsonNode? error)) return Task.FromResult(error);
+        if (!McpToolArgumentHelpers.TryParseGuid(args, "componentId", out Guid componentId, out error)) return Task.FromResult(error);
+        return Task.FromResult<JsonNode?>(Mutate(sp, architectureId, expected, stored =>
+        {
+            List<T> values = select(stored);
+            int removed = values.RemoveAll(value => ComponentId(value) == componentId);
+            if (removed == 0) throw new MutationNotFoundException("The section does not exist on this architecture.");
+            return stored;
+        }));
+    }
+
+    private static Task<JsonNode?> InvokeSectionReorder<T>(IServiceProvider sp, JsonObject? args,
+        Func<ArchitectureModel, List<T>> select, CancellationToken ct) where T : class
+    {
+        ct.ThrowIfCancellationRequested();
+        if (!TryMutationHeader(args, "wellBoreArchitectureId", out Guid architectureId, out DateTimeOffset expected, out JsonNode? error)) return Task.FromResult(error);
+        if (args?["orderedComponentIds"] is not JsonArray requested)
+            return Task.FromResult<JsonNode?>(McpToolResponses.CreateValidationError("orderedComponentIds is required and must be an array."));
+        var ids = new List<Guid>();
+        foreach (JsonNode? node in requested)
+            if (node == null || !Guid.TryParse(node.ToString(), out Guid parsed) || parsed == Guid.Empty)
+                return Task.FromResult<JsonNode?>(McpToolResponses.CreateValidationError("Every orderedComponentIds item must be a non-empty UUID."));
+            else ids.Add(parsed);
+        if (ids.Count != ids.Distinct().Count()) return Task.FromResult<JsonNode?>(McpToolResponses.CreateValidationError("orderedComponentIds must not contain duplicates."));
+        return Task.FromResult<JsonNode?>(Mutate(sp, architectureId, expected, stored =>
+        {
+            List<T> values = select(stored);
+            Dictionary<Guid, T> current = values.ToDictionary(ComponentId);
+            if (ids.Count != current.Count || ids.Any(id => !current.ContainsKey(id)))
+                throw new MutationValidationException("orderedComponentIds must contain every current section ComponentID exactly once.");
+            values.Clear();
+            values.AddRange(ids.Select(id => current[id]));
+            return stored;
+        }));
     }
 
     private static Task<JsonNode?> InvokeAssignmentMutation<T>(IServiceProvider sp, JsonObject? args,
@@ -211,6 +319,8 @@ public static class WellBoreArchitectureRestMcpToolRegistrations
             Guid? optionId = GuidFilter("featureOptionId");
             DateTimeOffset? from = DateFilter("modifiedFromUtc");
             DateTimeOffset? to = DateFilter("modifiedToUtc");
+            bool? isLinked = args?["isLinked"] is JsonNode linkedNode && linkedNode.GetValueKind() != JsonValueKind.Null
+                ? linkedNode.GetValue<bool>() : null;
             if (from > to) return Task.FromResult<JsonNode?>(McpToolResponses.CreateValidationError("modifiedFromUtc must not be after modifiedToUtc."));
 
             IEnumerable<ArchitectureModel> query = (Manager(sp).GetAllWellBoreArchitecture() ?? [])
@@ -223,6 +333,7 @@ public static class WellBoreArchitectureRestMcpToolRegistrations
             if (optionId.HasValue) query = query.Where(value => value.WellBoreArchitectureFeatureAssignments?.Any(a => a.FeatureOptionID == optionId) == true);
             if (from.HasValue) query = query.Where(value => Revision(value) >= from.Value);
             if (to.HasValue) query = query.Where(value => Revision(value) <= to.Value);
+            if (isLinked.HasValue) query = query.Where(value => isLinked.Value ? value.WellBoreID.HasValue : !value.WellBoreID.HasValue);
             List<ArchitectureModel> matches = query.OrderBy(value => value.MetaInfo!.ID).ToList();
             return Task.FromResult<JsonNode?>(Success(new { Offset = offset, Limit = limit, TotalCount = matches.Count, Items = matches.Skip(offset).Take(limit).ToList() }));
         }
@@ -251,7 +362,37 @@ public static class WellBoreArchitectureRestMcpToolRegistrations
             }
             catch (MutationConflictException ex) { return Error(409, "already_exists", ex.Message); }
             catch (MutationNotFoundException ex) { return Error(404, "not_found", ex.Message); }
+            catch (MutationValidationException ex) { return Error(400, "invalid_component_mutation", ex.Message); }
         }
+    }
+
+    private static Guid ComponentId<T>(T value) => value switch
+    {
+        SurfaceSectionModel surface => surface.ComponentID,
+        CasingSectionModel casing => casing.ComponentID,
+        _ => Guid.Empty
+    };
+
+    private static bool ContainsComponentId(ArchitectureModel architecture, Guid id)
+    {
+        bool SideElementHas(OSDC.Drilling.WellBoreArchitecture.Model.SideElement? value) => value?.ComponentID == id;
+        foreach (var surface in architecture.SurfaceSections ?? [])
+        {
+            if (surface.ComponentID == id) return true;
+            foreach (var connector in surface.SideConnectors ?? [])
+            {
+                if (connector.ComponentID == id || SideElementHas(connector.FirstSideElement)) return true;
+                foreach (var connectivity in connector.ElementConnectivities ?? [])
+                    if (connectivity.ComponentID == id || SideElementHas(connectivity.UpstreamElement) || SideElementHas(connectivity.DownstreamElement)) return true;
+            }
+        }
+        foreach (var casing in architecture.CasingSections ?? [])
+        {
+            if (casing.ComponentID == id || casing.OpenHoleSection?.ComponentID == id) return true;
+            if ((casing.CasingSectionElements ?? []).Any(value => value.ComponentID == id)) return true;
+            if ((casing.OpenHoleSection?.HoleSizes ?? []).Any(value => value.ComponentID == id)) return true;
+        }
+        return false;
     }
 
     private static void ReplaceIdentityAssignment(ArchitectureModel stored, IdentityAssignmentModel value, Guid? id)
@@ -324,6 +465,7 @@ public static class WellBoreArchitectureRestMcpToolRegistrations
 
     private sealed class MutationConflictException(string message) : Exception(message);
     private sealed class MutationNotFoundException(string message) : Exception(message);
+    private sealed class MutationValidationException(string message) : Exception(message);
 
     private static Task<JsonNode?> Invoke<T>(CancellationToken ct, Func<ActionResult<T>> action)
     {

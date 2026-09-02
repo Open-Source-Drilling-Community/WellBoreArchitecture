@@ -51,6 +51,11 @@ public sealed class WellBoreArchitectureBatchRestoreRequest
 {
     public WellBoreArchitectureBatchRestoreConflictPolicy ConflictPolicy { get; set; }
     public WellBoreArchitectureBatchCatalogRestorePolicy CatalogPolicy { get; set; }
+    /// <summary>
+    /// Explicitly permits normalized-name catalogue mapping when source and local UUIDs differ.
+    /// False is the safe default; exact UUID matches and newly created definitions preserve source IDs.
+    /// </summary>
+    public bool AllowNormalizedNameMapping { get; set; }
     public WellBoreArchitectureBatchExportDocument? Document { get; set; }
 }
 

@@ -1,10 +1,13 @@
 using OSDC.DotnetLibraries.General.DrillingProperties;
 using System.Collections.Generic;
+using System;
 
 namespace OSDC.Drilling.WellBoreArchitecture.Model
 {
     public class CasingSection
     {
+        /// <summary>Stable identifier used to address this nested component independently.</summary>
+        public Guid ComponentID { get; set; }
 
         /// <summary>
         /// the top depth of the casing section is a Gaussian value that is Depth quantity and that is referred to the Well-head.

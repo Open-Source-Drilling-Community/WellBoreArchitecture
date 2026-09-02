@@ -889,6 +889,10 @@
       "OSDC.Drilling.WellBoreArchitecture.Model.BoreHoleSize": {
         "type": "object",
         "properties": {
+          "ComponentID": {
+            "type": "string",
+            "format": "uuid"
+          },
           "HoleSize": {
             "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DrillingProperties.GaussianDrillingProperty"
           },
@@ -901,6 +905,10 @@
       "OSDC.Drilling.WellBoreArchitecture.Model.CasingSection": {
         "type": "object",
         "properties": {
+          "ComponentID": {
+            "type": "string",
+            "format": "uuid"
+          },
           "TopDepth": {
             "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DrillingProperties.GaussianDrillingProperty"
           },
@@ -933,6 +941,10 @@
       "OSDC.Drilling.WellBoreArchitecture.Model.CasingSectionElement": {
         "type": "object",
         "properties": {
+          "ComponentID": {
+            "type": "string",
+            "format": "uuid"
+          },
           "BodyOD": {
             "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DrillingProperties.GaussianDrillingProperty"
           },
@@ -1006,6 +1018,10 @@
       "OSDC.Drilling.WellBoreArchitecture.Model.ElementConnectivity": {
         "type": "object",
         "properties": {
+          "ComponentID": {
+            "type": "string",
+            "format": "uuid"
+          },
           "UpstreamElement": {
             "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.SideElement"
           },
@@ -1038,6 +1054,10 @@
       "OSDC.Drilling.WellBoreArchitecture.Model.OpenHoleSection": {
         "type": "object",
         "properties": {
+          "ComponentID": {
+            "type": "string",
+            "format": "uuid"
+          },
           "HoleSizes": {
             "type": "array",
             "items": {
@@ -1051,6 +1071,10 @@
       "OSDC.Drilling.WellBoreArchitecture.Model.SideConnector": {
         "type": "object",
         "properties": {
+          "ComponentID": {
+            "type": "string",
+            "format": "uuid"
+          },
           "Position": {
             "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DrillingProperties.GaussianDrillingProperty"
           },
@@ -1073,6 +1097,10 @@
       "OSDC.Drilling.WellBoreArchitecture.Model.SideElement": {
         "type": "object",
         "properties": {
+          "ComponentID": {
+            "type": "string",
+            "format": "uuid"
+          },
           "Name": {
             "type": "string",
             "nullable": true
@@ -1109,6 +1137,10 @@
       "OSDC.Drilling.WellBoreArchitecture.Model.SurfaceSection": {
         "type": "object",
         "properties": {
+          "ComponentID": {
+            "type": "string",
+            "format": "uuid"
+          },
           "Type": {
             "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.SurfaceSectionType"
           },
@@ -1452,6 +1484,9 @@
           },
           "CatalogPolicy": {
             "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchCatalogRestorePolicy"
+          },
+          "AllowNormalizedNameMapping": {
+            "type": "boolean"
           },
           "Document": {
             "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchExportDocument"

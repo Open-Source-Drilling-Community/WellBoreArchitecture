@@ -217,6 +217,8 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
                             wellBoreArchitecture = JsonSerializer.Deserialize<Model.WellBoreArchitecture>(data, JsonSettings.Options);
                             if (wellBoreArchitecture != null && wellBoreArchitecture.MetaInfo != null && !wellBoreArchitecture.MetaInfo.ID.Equals(guid))
                                 throw new SqliteException("SQLite database corrupted: returned WellBoreArchitecture is null or has been jsonified with the wrong ID.", 1);
+                            if (wellBoreArchitecture != null && !WellBoreArchitectureComponentIdentity.Ensure(wellBoreArchitecture))
+                                throw new SqliteException("SQLite database corrupted: nested component IDs are duplicated.", 1);
                         }
                         else
                         {
@@ -263,6 +265,8 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
                     {
                         string data = reader.GetString(0);
                         Model.WellBoreArchitecture? wellBoreArchitecture = JsonSerializer.Deserialize<Model.WellBoreArchitecture>(data, JsonSettings.Options);
+                        if (wellBoreArchitecture != null && !WellBoreArchitectureComponentIdentity.Ensure(wellBoreArchitecture))
+                            throw new SqliteException("SQLite database corrupted: nested component IDs are duplicated.", 1);
                         vals.Add(wellBoreArchitecture);
                     }
                     _logger.LogInformation("Returning the list of existing WellBoreArchitecture from WellBoreArchitectureTable");
@@ -338,6 +342,11 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
         /// <returns>true if the given WellBoreArchitecture has been added successfully to the microservice database</returns>
         public bool AddWellBoreArchitecture(Model.WellBoreArchitecture? wellBoreArchitecture)
         {
+            if (wellBoreArchitecture != null && !WellBoreArchitectureComponentIdentity.Ensure(wellBoreArchitecture))
+            {
+                _logger.LogWarning("WellBoreArchitecture contains empty or duplicate nested component IDs");
+                return false;
+            }
             if (wellBoreArchitecture != null && !ValidateAssignments(wellBoreArchitecture))
             {
                 _logger.LogWarning("WellBoreArchitecture contains invalid identity or feature assignments");
@@ -441,6 +450,11 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
         /// <returns>true if the given WellBoreArchitecture has been updated successfully</returns>
         public bool UpdateWellBoreArchitectureById(Guid guid, Model.WellBoreArchitecture? wellBoreArchitecture)
         {
+            if (wellBoreArchitecture != null && !WellBoreArchitectureComponentIdentity.Ensure(wellBoreArchitecture))
+            {
+                _logger.LogWarning("WellBoreArchitecture contains empty or duplicate nested component IDs");
+                return false;
+            }
             if (wellBoreArchitecture != null && !ValidateAssignments(wellBoreArchitecture))
             {
                 _logger.LogWarning("WellBoreArchitecture contains invalid identity or feature assignments");
