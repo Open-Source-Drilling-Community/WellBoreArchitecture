@@ -1,12 +1,28 @@
 <MudNavMenu>
-    <MudNavLink Href="/WellBoreArchitecture/webapp/" Match="NavLinkMatch.All">Home</MudNavLink>
-    <MudNavLink Href="/WellBoreArchitecture/webapp/WellBoreArchitecture" Match="NavLinkMatch.All">Well Bore Architecture</MudNavLink>
-    <MudNavLink Href="/WellBoreArchitecture/webapp/WellBore" Match="NavLinkMatch.All">WellBore</MudNavLink>
-    <MudNavLink Href="/WellBoreArchitecture/webapp/Well" Match="NavLinkMatch.All">Well</MudNavLink>
-    <MudNavLink Href="/WellBoreArchitecture/webapp/Cluster" Match="NavLinkMatch.All">Cluster</MudNavLink>
-    <MudNavLink Href="/WellBoreArchitecture/webapp/Field" Match="NavLinkMatch.All">Field</MudNavLink>
-    <MudNavLink Href="/WellBoreArchitecture/webapp/CartographicProjection" Match="NavLinkMatch.All">Cartographic Projection</MudNavLink>
-    <MudNavLink Href="/WellBoreArchitecture/webapp/GeodeticDatum" Match="NavLinkMatch.All">Geodetic Datum</MudNavLink>
-    <MudNavLink Href="/WellBoreArchitecture/webapp/Spheroid" Match="NavLinkMatch.All">Spheroid</MudNavLink>
-    <MudNavLink Href="/WellBoreArchitecture/webapp/StatisticsWellBoreArchitecture" Match="NavLinkMatch.Prefix">Usage Statistics</MudNavLink>
+    <MudNavLink Href="/WellBoreArchitecture/webapp/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+
+    <MudNavGroup Title="WellBore Architecture Management" Expanded="true">
+        <MudNavLink Href="/WellBoreArchitecture/webapp/WellBoreArchitecture" Match="NavLinkMatch.All">WellBore Architecture</MudNavLink>
+        <MudNavLink Href="/WellBoreArchitecture/webapp/WellBoreArchitectureIdentities" Match="NavLinkMatch.All">Identities</MudNavLink>
+        <MudNavLink Href="/WellBoreArchitecture/webapp/WellBoreArchitectureFeatures" Match="NavLinkMatch.All">Features</MudNavLink>
+    </MudNavGroup>
+
+    <MudNavGroup Title="Contextual Data" Expanded="false">
+        <MudNavLink Href="/WellBoreArchitecture/webapp/WellBore" Match="NavLinkMatch.All">WellBore</MudNavLink>
+        <MudNavLink Href="/WellBoreArchitecture/webapp/Well" Match="NavLinkMatch.All">Well</MudNavLink>
+        <MudNavLink Href="/WellBoreArchitecture/webapp/Cluster" Match="NavLinkMatch.All">Cluster</MudNavLink>
+        <MudNavLink Href="/WellBoreArchitecture/webapp/Field" Match="NavLinkMatch.All">Field</MudNavLink>
+        <MudNavLink Href="/WellBoreArchitecture/webapp/Rig" Match="NavLinkMatch.Prefix">Rig</MudNavLink>
+    </MudNavGroup>
+
+    <MudNavGroup Title="Calculators" Expanded="false">
+        <MudNavLink Href="/WellBoreArchitecture/webapp/FieldCartographicConverter" Match="NavLinkMatch.All">Cartographic Conversion</MudNavLink>
+        <MudNavLink Href="/WellBoreArchitecture/webapp/EarthVerticalDatumCalculation" Match="NavLinkMatch.All">Vertical Datum Conversion</MudNavLink>
+        <MudNavLink Href="/WellBoreArchitecture/webapp/EarthGravityCalculation" Match="NavLinkMatch.All">Earth Gravity Evaluation</MudNavLink>
+        <MudNavLink Href="/WellBoreArchitecture/webapp/EarthMagneticFieldCalculation" Match="NavLinkMatch.All">Earth Magnetic Field Evaluation</MudNavLink>
+    </MudNavGroup>
+
+    <MudNavGroup Title="Monitoring" Expanded="false">
+        <MudNavLink Href="/WellBoreArchitecture/webapp/StatisticsWellBoreArchitecture" Match="NavLinkMatch.All">Usage Statistics</MudNavLink>
+    </MudNavGroup>
 </MudNavMenu>

@@ -34,9 +34,9 @@ public interface IWellBoreArchitectureAPIUtils
     HttpClient HttpClientWellBore { get; }
     Client ClientWellBore { get; }
 
-    string HostNameVerticalDatum { get; }
-    string HostBasePathVerticalDatum { get; }
-    HttpClient HttpClientVerticalDatum { get; }
+    string HostNameEarthVerticalDatum { get; }
+    string HostBasePathEarthVerticalDatum { get; }
+    HttpClient HttpClientEarthVerticalDatum { get; }
 
     string HostNameUnitConversion { get; }
     string HostBasePathUnitConversion { get; }

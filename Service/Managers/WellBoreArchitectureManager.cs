@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using OSDC.DotnetLibraries.General.DataManagement;
 using Microsoft.Data.Sqlite;
 using System.Text.Json;
+using System.Linq;
 
 namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
 {
@@ -336,6 +337,11 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
         /// <returns>true if the given WellBoreArchitecture has been added successfully to the microservice database</returns>
         public bool AddWellBoreArchitecture(Model.WellBoreArchitecture? wellBoreArchitecture)
         {
+            if (wellBoreArchitecture != null && !ValidateAssignments(wellBoreArchitecture))
+            {
+                _logger.LogWarning("WellBoreArchitecture contains invalid identity or feature assignments");
+                return false;
+            }
             if (wellBoreArchitecture != null && wellBoreArchitecture.MetaInfo != null && wellBoreArchitecture.MetaInfo.ID != Guid.Empty)
             {
                 //calculate outputs
@@ -434,6 +440,11 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
         /// <returns>true if the given WellBoreArchitecture has been updated successfully</returns>
         public bool UpdateWellBoreArchitectureById(Guid guid, Model.WellBoreArchitecture? wellBoreArchitecture)
         {
+            if (wellBoreArchitecture != null && !ValidateAssignments(wellBoreArchitecture))
+            {
+                _logger.LogWarning("WellBoreArchitecture contains invalid identity or feature assignments");
+                return false;
+            }
             bool success = true;
             if (guid != Guid.Empty && wellBoreArchitecture != null && wellBoreArchitecture.MetaInfo != null && wellBoreArchitecture.MetaInfo.ID == guid)
             {
@@ -503,6 +514,45 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
             }
             return false;
         }
+
+        private bool ValidateAssignments(Model.WellBoreArchitecture architecture)
+        {
+            architecture.WellBoreArchitectureIdentityAssignments ??= [];
+            architecture.WellBoreArchitectureFeatureAssignments ??= [];
+            if (architecture.WellBoreArchitectureIdentityAssignments.Any(value => value.ID == Guid.Empty) ||
+                architecture.WellBoreArchitectureIdentityAssignments.GroupBy(value => value.ID).Any(group => group.Count() > 1) ||
+                architecture.WellBoreArchitectureFeatureAssignments.Any(value => value.ID == Guid.Empty) ||
+                architecture.WellBoreArchitectureFeatureAssignments.GroupBy(value => value.ID).Any(group => group.Count() > 1))
+                return false;
+
+            HashSet<Guid> identities = new WellBoreArchitectureIdentityManager(_connectionManager).GetAll()
+                .Select(value => value.MetaInfo!.ID).ToHashSet();
+            if (architecture.WellBoreArchitectureIdentityAssignments.Any(value => value.IdentityID is not Guid id || !identities.Contains(id)))
+                return false;
+
+            Dictionary<Guid, Model.WellBoreArchitectureFeatureCategory> categories =
+                new WellBoreArchitectureFeatureCategoryManager(_connectionManager).GetAll().ToDictionary(value => value.MetaInfo!.ID);
+            foreach (Model.WellBoreArchitectureFeatureAssignment assignment in architecture.WellBoreArchitectureFeatureAssignments)
+            {
+                if (assignment.FeatureCategoryID is not Guid categoryId || !categories.TryGetValue(categoryId, out var category) ||
+                    assignment.FeatureOptionID is not Guid optionId || category.Options?.Any(option => option.ID == optionId) != true)
+                    return false;
+                if (!category.HasValidityPeriod && (assignment.FromDate != null || assignment.ToDate != null)) return false;
+                if (assignment.FromDate > assignment.ToDate) return false;
+            }
+            foreach (var category in categories.Values.Where(value => value.IsExclusive))
+            {
+                var assignments = architecture.WellBoreArchitectureFeatureAssignments.Where(value => value.FeatureCategoryID == category.MetaInfo!.ID).ToList();
+                for (int i = 0; i < assignments.Count; i++)
+                    for (int j = i + 1; j < assignments.Count; j++)
+                        if (PeriodsOverlap(assignments[i], assignments[j])) return false;
+            }
+            return true;
+        }
+
+        private static bool PeriodsOverlap(Model.WellBoreArchitectureFeatureAssignment left, Model.WellBoreArchitectureFeatureAssignment right) =>
+            (left.ToDate == null || right.FromDate == null || left.ToDate >= right.FromDate) &&
+            (right.ToDate == null || left.FromDate == null || right.ToDate >= left.FromDate);
 
         /// <summary>
         /// Deletes the WellBoreArchitecture of given ID from the microservice database

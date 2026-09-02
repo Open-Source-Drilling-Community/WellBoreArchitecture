@@ -11,5 +11,5 @@ public interface IWellBoreArchitectureWebPagesConfiguration :
     IWellBoreArchitectureHostURL,
     IUnitConversionHostURL
 {
-    string VerticalDatumHostURL { get; set; }
+    string? EarthVerticalDatumHostURL { get; set; }
 }

@@ -28,6 +28,10 @@ public sealed class SqlConnectionManagerSafetyTests
             {
                 Assert.That(ScalarLong(connection,
                     "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='WellBoreArchitectureTable'"), Is.EqualTo(1));
+                Assert.That(ScalarLong(connection,
+                    "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='WellBoreArchitectureIdentityTable'"), Is.EqualTo(1));
+                Assert.That(ScalarLong(connection,
+                    "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='WellBoreArchitectureFeatureCategoryTable'"), Is.EqualTo(1));
                 Assert.That(ScalarLong(connection, "PRAGMA user_version"),
                     Is.EqualTo(SqlConnectionManager.CURRENT_SCHEMA_VERSION));
             });
@@ -60,6 +64,57 @@ public sealed class SqlConnectionManagerSafetyTests
                     Is.EqualTo(SqlConnectionManager.CURRENT_SCHEMA_VERSION));
                 Assert.That(ScalarLong(verification,
                     "SELECT COUNT(*) FROM sqlite_master WHERE type='index' AND name='WellBoreArchitectureTableIndex'"), Is.EqualTo(1));
+                Assert.That(ScalarLong(verification,
+                    "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='WellBoreArchitectureIdentityTable'"), Is.EqualTo(1));
+                Assert.That(ScalarLong(verification,
+                    "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='WellBoreArchitectureFeatureCategoryTable'"), Is.EqualTo(1));
+            });
+        });
+    }
+
+    [Test]
+    public void Version_one_database_is_upgraded_additively_without_rewriting_architectures()
+    {
+        WithDatabase(path =>
+        {
+            using (SqliteConnection connection = Open(path))
+            {
+                CreateExpectedTable(connection);
+                Execute(connection, "INSERT INTO WellBoreArchitectureTable (ID,Name,WellBoreArchitecture) VALUES ('marker','preserve-me','{\"Name\":\"preserve-me\"}')");
+                Execute(connection, "PRAGMA user_version = 1");
+            }
+            _ = Manager(path);
+            using SqliteConnection verification = Open(path);
+            Assert.Multiple(() =>
+            {
+                Assert.That(ScalarString(verification, "SELECT WellBoreArchitecture FROM WellBoreArchitectureTable WHERE ID='marker'"), Is.EqualTo("{\"Name\":\"preserve-me\"}"));
+                Assert.That(ScalarLong(verification, "PRAGMA user_version"), Is.EqualTo(2));
+                Assert.That(ScalarLong(verification, "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='WellBoreArchitectureIdentityTable'"), Is.EqualTo(1));
+                Assert.That(ScalarLong(verification, "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='WellBoreArchitectureFeatureCategoryTable'"), Is.EqualTo(1));
+            });
+        });
+    }
+
+    [Test]
+    public void Default_identity_and_feature_catalogs_are_seeded_without_touching_architecture_rows()
+    {
+        WithDatabase(path =>
+        {
+            SqlConnectionManager connections = Manager(path);
+            var identities = new WellBoreArchitectureIdentityManager(connections).GetAll();
+            var features = new WellBoreArchitectureFeatureCategoryManager(connections).GetAll();
+            using SqliteConnection verification = Open(path);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(identities.Select(value => value.Name), Is.EquivalentTo(new[]
+                {
+                    "NameForPlanning", "NameForCompanyReporting", "NameForRegulatoryReporting", "Nickname", "NameForOperationReporting"
+                }));
+                Assert.That(features.Select(value => value.Name), Is.EquivalentTo(new[] { "Lifecycle", "ApprovalStatus", "SectionRole", "DrillingMethod" }));
+                Assert.That(features.Single(value => value.Name == "DrillingMethod").Options!.Select(value => value.Name),
+                    Does.Contain("Geosteered"));
+                Assert.That(ScalarLong(verification, "SELECT COUNT(*) FROM WellBoreArchitectureTable"), Is.Zero);
             });
         });
     }

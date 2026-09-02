@@ -13,7 +13,7 @@ The `Model` project contains the domain objects that describe a full wellbore ar
 Most engineering quantities are modeled as `GaussianDrillingProperty` or `ScalarDrillingProperty`. Each domain object implements a `Realize()` method that samples those distributions (currently by calling `Value.Realize()` from the OSDC packages) and returns the associated `*Realization` class with concrete doubles. This pattern lets consumers choose between storing full probabilistic descriptions and using single deterministic snapshots.
 
 ### Aggregation
-`WellBoreArchitecture` is the aggregate root. It encapsulates metadata, wellhead information, above-ground fluids, surface sections, and casing sections. `WellBoreArchitecture.Calculate()` currently performs a minimal validation (ensuring at least one surface section) and can be extended with additional derived calculations.
+`WellBoreArchitecture` is the aggregate root. It encapsulates metadata, identity and feature assignments, wellhead information, above-ground fluids, surface sections, and casing sections. Identity definitions and feature categories/options are user-manageable catalogs; assignments store stable UUID references to those definitions.
 
 ## Relationship with other solution projects
 - `Service/Service.csproj` references this project directly. Controllers and managers expose and persist the `Model` types in the REST API (see `Service/Controllers/WellBoreArchitectureController.cs`).

@@ -4,7 +4,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 	{
 		public static MetaInfo ConstructMetaInfo()
 			{
-				return new MetaInfo
+				return new MetaInfo 
 				{
 					ID = Guid.NewGuid(),
 					HttpHostName = "https://dev.digiwells.no/",
@@ -15,7 +15,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 
 		public static MetaInfo ConstructMetaInfo(Guid id)
 			{
-				return new MetaInfo
+				return new MetaInfo 
 				{
 					ID = id,
 					HttpHostName = "https://dev.digiwells.no/",
@@ -32,10 +32,10 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				Description = "Default Description",
 				CreationDate = DateTimeOffset.UtcNow,
 				LastModificationDate = DateTimeOffset.UtcNow,
-				FieldID = null,
-				IsSingleWell = false,
-				RigID = null,
-				IsFixedPlatform = false,
+				FieldID = null, 
+				IsSingleWell = false, 
+				RigID = null, 
+				IsFixedPlatform = false, 
 				ReferenceLatitude = ConstructGaussianDrillingProperty(),
 				ReferenceLongitude = ConstructGaussianDrillingProperty(),
 				ReferenceDepth = ConstructGaussianDrillingProperty(),
@@ -52,7 +52,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 			return new CountPerDay
 			{
 				Date = DateTimeOffset.UtcNow,
-				Count = 0,
+				Count = 0, 
 			};
 		}
 		public static History ConstructHistory()
@@ -104,10 +104,10 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 		{
 			return new GaussianDistribution
 			{
-				MinValue = 0.0,
-				MaxValue = 0.0,
-				Mean = null,
-				StandardDeviation = null,
+				MinValue = 0.0, 
+				MaxValue = 0.0, 
+				Mean = null, 
+				StandardDeviation = null, 
 			};
 		}
 		public static UsageStatisticsCartographicProjection ConstructUsageStatisticsCartographicProjection()
@@ -146,7 +146,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				Description = "Default Description",
 				CreationDate = DateTimeOffset.UtcNow,
 				LastModificationDate = DateTimeOffset.UtcNow,
-				CartographicProjectionID = null,
+				CartographicProjectionID = null, 
 				CartographicCoordinateList = new List<CartographicCoordinate>
 					{
 						ConstructCartographicCoordinate(),
@@ -157,11 +157,11 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 		{
 			return new CartographicCoordinate
 			{
-				Northing = null,
-				Easting = null,
-				VerticalDepth = null,
+				Northing = null, 
+				Easting = null, 
+				VerticalDepth = null, 
 				GeodeticCoordinate = ConstructGeodeticCoordinate(),
-				GridConvergenceDatum = null,
+				GridConvergenceDatum = null, 
 			};
 		}
 		public static CartographicProjection ConstructCartographicProjection()
@@ -174,38 +174,38 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				CreationDate = DateTimeOffset.UtcNow,
 				LastModificationDate = DateTimeOffset.UtcNow,
 				ProjectionType = (ProjectionType)0,
-				GeodeticDatumID = null,
-				LatitudeOrigin = null,
-				Latitude1 = null,
-				Latitude2 = null,
-				LatitudeTrueScale = null,
-				LongitudeOrigin = null,
-				Scaling = null,
-				FalseEasting = null,
-				FalseNorthing = null,
-				Zone = 0,
-				IsSouth = false,
-				IsHyperbolic = false,
-				ProjectionHeight = null,
-				HeightViewPoint = null,
+				GeodeticDatumID = null, 
+				LatitudeOrigin = null, 
+				Latitude1 = null, 
+				Latitude2 = null, 
+				LatitudeTrueScale = null, 
+				LongitudeOrigin = null, 
+				Scaling = null, 
+				FalseEasting = null, 
+				FalseNorthing = null, 
+				Zone = 0, 
+				IsSouth = false, 
+				IsHyperbolic = false, 
+				ProjectionHeight = null, 
+				HeightViewPoint = null, 
 				Sweep = (AxisType)0,
-				AzimuthCentralLine = null,
-				Weight = null,
-				Landsat = null,
-				Path = null,
-				Alpha = null,
-				Gamma = null,
-				Longitude1 = null,
-				Longitude2 = null,
-				LongitudeCentralPoint = null,
-				NoOffset = false,
-				NoRotation = false,
+				AzimuthCentralLine = null, 
+				Weight = null, 
+				Landsat = null, 
+				Path = null, 
+				Alpha = null, 
+				Gamma = null, 
+				Longitude1 = null, 
+				Longitude2 = null, 
+				LongitudeCentralPoint = null, 
+				NoOffset = false, 
+				NoRotation = false, 
 				AreaNormalizationTransform = (AreaNormalizationTransformType)0,
-				PegLatitude = null,
-				PegLongitude = null,
-				PegHeading = null,
-				N = null,
-				Q = null,
+				PegLatitude = null, 
+				PegLongitude = null, 
+				PegHeading = null, 
+				N = null, 
+				Q = null, 
 			};
 		}
 		public static CartographicProjectionType ConstructCartographicProjectionType()
@@ -213,49 +213,49 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 			return new CartographicProjectionType
 			{
 				Projection = (ProjectionType)0,
-				UseLatitudeOrigin = false,
-				UseLatitude1 = false,
-				UseLatitude2 = false,
-				UseLatitudeTrueScale = false,
-				UseLongitudeOrigin = false,
-				UseScaling = false,
-				UseFalseEastingNorthing = false,
-				UseZone = false,
-				UseSouth = false,
-				UseHyperbolic = false,
-				UseProjectionHeight = false,
-				UseHeightViewPoint = false,
-				UseSweep = false,
-				UseAzimuthCentralLine = false,
-				UseWeight = false,
-				UseLandsat = false,
-				UsePath = false,
-				UseAlpha = false,
-				UseGamma = false,
-				UseLongitude1 = false,
-				UseLongitude2 = false,
-				UseLongitudeCentralPoint = false,
-				UseNoOffset = false,
-				UseNoRotation = false,
-				UseAreaNormalizationTransform = false,
-				UsePegLatitude = false,
-				UsePegLongitude = false,
-				UsePegHeading = false,
-				UseN = false,
-				UseQ = false,
+				UseLatitudeOrigin = false, 
+				UseLatitude1 = false, 
+				UseLatitude2 = false, 
+				UseLatitudeTrueScale = false, 
+				UseLongitudeOrigin = false, 
+				UseScaling = false, 
+				UseFalseEastingNorthing = false, 
+				UseZone = false, 
+				UseSouth = false, 
+				UseHyperbolic = false, 
+				UseProjectionHeight = false, 
+				UseHeightViewPoint = false, 
+				UseSweep = false, 
+				UseAzimuthCentralLine = false, 
+				UseWeight = false, 
+				UseLandsat = false, 
+				UsePath = false, 
+				UseAlpha = false, 
+				UseGamma = false, 
+				UseLongitude1 = false, 
+				UseLongitude2 = false, 
+				UseLongitudeCentralPoint = false, 
+				UseNoOffset = false, 
+				UseNoRotation = false, 
+				UseAreaNormalizationTransform = false, 
+				UsePegLatitude = false, 
+				UsePegLongitude = false, 
+				UsePegHeading = false, 
+				UseN = false, 
+				UseQ = false, 
 			};
 		}
 		public static GeodeticCoordinate ConstructGeodeticCoordinate()
 		{
 			return new GeodeticCoordinate
 			{
-				LatitudeWGS84 = null,
-				LongitudeWGS84 = null,
-				VerticalDepthWGS84 = null,
-				LatitudeDatum = null,
-				LongitudeDatum = null,
-				VerticalDepthDatum = null,
-				OctreeDepth = 0,
+				LatitudeWGS84 = null, 
+				LongitudeWGS84 = null, 
+				VerticalDepthWGS84 = null, 
+				LatitudeDatum = null, 
+				LongitudeDatum = null, 
+				VerticalDepthDatum = null, 
+				OctreeDepth = 0, 
 				OctreeCode = ConstructOctreeCodeLong(),
 			};
 		}
@@ -263,9 +263,9 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 		{
 			return new OctreeCodeLong
 			{
-				Depth = 0,
-				CodeHigh = 0,
-				CodeLow = 0,
+				Depth = 0, 
+				CodeHigh = 0, 
+				CodeLow = 0, 
 			};
 		}
 		public static UsageStatisticsGeodeticDatum ConstructUsageStatisticsGeodeticDatum()
@@ -325,7 +325,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				Description = "Default Description",
 				CreationDate = DateTimeOffset.UtcNow,
 				LastModificationDate = DateTimeOffset.UtcNow,
-				IsDefault = false,
+				IsDefault = false, 
 				Spheroid = ConstructSpheroid(),
 				DeltaX = ConstructScalarDrillingProperty(),
 				DeltaY = ConstructScalarDrillingProperty(),
@@ -345,19 +345,19 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				Description = "Default Description",
 				CreationDate = DateTimeOffset.UtcNow,
 				LastModificationDate = DateTimeOffset.UtcNow,
-				IsDefault = false,
+				IsDefault = false, 
 				SemiMajorAxis = ConstructScalarDrillingProperty(),
-				IsSemiMajorAxisSet = false,
+				IsSemiMajorAxisSet = false, 
 				SemiMinorAxis = ConstructScalarDrillingProperty(),
-				IsSemiMinorAxisSet = false,
+				IsSemiMinorAxisSet = false, 
 				Eccentricity = ConstructScalarDrillingProperty(),
-				IsEccentricitySet = false,
+				IsEccentricitySet = false, 
 				SquaredEccentricity = ConstructScalarDrillingProperty(),
-				IsSquaredEccentricitySet = false,
+				IsSquaredEccentricitySet = false, 
 				Flattening = ConstructScalarDrillingProperty(),
-				IsFlatteningSet = false,
+				IsFlatteningSet = false, 
 				InverseFlattening = ConstructScalarDrillingProperty(),
-				IsInverseFlatteningSet = false,
+				IsInverseFlatteningSet = false, 
 			};
 		}
 		public static ScalarDrillingProperty ConstructScalarDrillingProperty()
@@ -371,27 +371,27 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 		{
 			return new Point3D
 			{
-				X = null,
-				Y = null,
-				Z = null,
+				X = null, 
+				Y = null, 
+				Z = null, 
 			};
 		}
 		public static Bounds ConstructBounds()
 		{
 			return new Bounds
 			{
-				MinX = null,
-				MaxX = null,
-				MinY = null,
-				MaxY = null,
-				MinZ = null,
-				MaxZ = null,
-				MiddleX = null,
-				MiddleY = null,
-				MiddleZ = null,
-				IntervalX = null,
-				IntervalY = null,
-				IntervalZ = null,
+				MinX = null, 
+				MaxX = null, 
+				MinY = null, 
+				MaxY = null, 
+				MinZ = null, 
+				MaxZ = null, 
+				MiddleX = null, 
+				MiddleY = null, 
+				MiddleZ = null, 
+				IntervalX = null, 
+				IntervalY = null, 
+				IntervalZ = null, 
 				Center = ConstructPoint3D(),
 			};
 		}
@@ -399,9 +399,9 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 		{
 			return new DiracDistribution
 			{
-				MinValue = 0.0,
-				MaxValue = 0.0,
-				Value = null,
+				MinValue = 0.0, 
+				MaxValue = 0.0, 
+				Value = null, 
 			};
 		}
 		public static Field ConstructField()
@@ -413,7 +413,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				Description = "Default Description",
 				CreationDate = DateTimeOffset.UtcNow,
 				LastModificationDate = DateTimeOffset.UtcNow,
-				CartographicProjectionID = null,
+				CartographicProjectionID = null, 
 			};
 		}
 		public static FieldCartographicConversionSet ConstructFieldCartographicConversionSet()
@@ -425,7 +425,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				Description = "Default Description",
 				CreationDate = DateTimeOffset.UtcNow,
 				LastModificationDate = DateTimeOffset.UtcNow,
-				FieldID = null,
+				FieldID = null, 
 				CartographicCoordinateList = new List<CartographicCoordinate>
 					{
 						ConstructCartographicCoordinate(),
@@ -467,9 +467,9 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
 				AccumulatorClass = (AccumulatorClass)0,
-				Capacity = null,
-				MaxLimitDesignPressure = null,
-				MaxLimitOperatingPressure = null,
+				Capacity = null, 
+				MaxLimitDesignPressure = null, 
+				MaxLimitOperatingPressure = null, 
 			};
 		}
 		public static AutoDriller ConstructAutoDriller()
@@ -483,18 +483,18 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
 				ControlMode = (AutodrillerControlMode)0,
-				MaxLimitRop = null,
-				MinLimitRop = null,
-				MaxLimitWob = null,
-				MinLimitWob = null,
-				MaxLimitDifferentialPressure = null,
-				MinLimitDifferentialPressure = null,
-				MaxLimitTrq = null,
-				MinLimitTrq = null,
-				SetpointWob = null,
-				SetpointRop = null,
-				SetpointDiffp = null,
-				SetpointTrq = null,
+				MaxLimitRop = null, 
+				MinLimitRop = null, 
+				MaxLimitWob = null, 
+				MinLimitWob = null, 
+				MaxLimitDifferentialPressure = null, 
+				MinLimitDifferentialPressure = null, 
+				MaxLimitTrq = null, 
+				MinLimitTrq = null, 
+				SetpointWob = null, 
+				SetpointRop = null, 
+				SetpointDiffp = null, 
+				SetpointTrq = null, 
 			};
 		}
 		public static AuxSolidsControl ConstructAuxSolidsControl()
@@ -508,10 +508,10 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
 				SolidsControlClass = (SolidsControlClass)0,
-				DesanderOn = null,
-				DesilterOn = null,
-				DegasserOn = null,
-				CentrifugeOn = null,
+				DesanderOn = null, 
+				DesilterOn = null, 
+				DegasserOn = null, 
+				CentrifugeOn = null, 
 			};
 		}
 		public static BopLineDefinition ConstructBopLineDefinition()
@@ -519,9 +519,9 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 			return new BopLineDefinition
 			{
 				BopLinesClass = (BopLineClass)0,
-				LineOd = null,
-				LineId = null,
-				Length = null,
+				LineOd = null, 
+				LineId = null, 
+				Length = null, 
 			};
 		}
 		public static BopStack ConstructBopStack()
@@ -537,9 +537,9 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				BopStackClass = (BopStackClass)0,
 				UnitReferenceList = "Default UnitReferenceList",
 				BopControlType = (ControllerType)0,
-				BoreDiameter = null,
-				Height = null,
-				Weight = null,
+				BoreDiameter = null, 
+				Height = null, 
+				Weight = null, 
 				BopComponents = new List<BopStackComponentDefinition>
 					{
 						ConstructBopStackComponentDefinition(),
@@ -548,15 +548,15 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 					{
 						ConstructBopLineDefinition(),
 					},
-				MaxLimitDesignPressure = null,
-				MaxLimitOperatingPressure = null,
-				MinLimitOperatingPressure = null,
-				BopLineMaxLimitDesignPressure = null,
-				BopLineMaxLimitOperatingPressure = null,
-				CasingPressure = null,
-				KillLinePressure = null,
-				ChokeLinePressure = null,
-				ShutInDrillpipePressure = null,
+				MaxLimitDesignPressure = null, 
+				MaxLimitOperatingPressure = null, 
+				MinLimitOperatingPressure = null, 
+				BopLineMaxLimitDesignPressure = null, 
+				BopLineMaxLimitOperatingPressure = null, 
+				CasingPressure = null, 
+				KillLinePressure = null, 
+				ChokeLinePressure = null, 
+				ShutInDrillpipePressure = null, 
 			};
 		}
 		public static BopStackComponentDefinition ConstructBopStackComponentDefinition()
@@ -564,8 +564,8 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 			return new BopStackComponentDefinition
 			{
 				BopStackComponentClass = (BopComponentClass)0,
-				BoreDiameter = null,
-				Height = null,
+				BoreDiameter = null, 
+				Height = null, 
 			};
 		}
 		public static CasingDriveSystem ConstructCasingDriveSystem()
@@ -579,15 +579,15 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
 				CsgDrvClass = (CasingDriveClass)0,
-				HoistingCapacity = null,
-				Length = null,
-				MaxLimitDesignTorque = null,
-				MaxLimitDesignPressure = null,
-				MaxLimitDesignRotationSpeed = null,
-				MaxLimitTorque = null,
-				MaxLimitPressure = null,
-				MaxLimitRotationSpeed = null,
-				MaxLimitPushDown = null,
+				HoistingCapacity = null, 
+				Length = null, 
+				MaxLimitDesignTorque = null, 
+				MaxLimitDesignPressure = null, 
+				MaxLimitDesignRotationSpeed = null, 
+				MaxLimitTorque = null, 
+				MaxLimitPressure = null, 
+				MaxLimitRotationSpeed = null, 
+				MaxLimitPushDown = null, 
 			};
 		}
 		public static CasingRunningTool ConstructCasingRunningTool()
@@ -625,23 +625,23 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
 				PumpClass = (PumpClass)0,
-				PlungerDiameter = null,
-				StrokeLength = null,
+				PlungerDiameter = null, 
+				StrokeLength = null, 
 				CementPumpDisplacement = new List<CementPumpDisplacementPoint>
 					{
 						ConstructCementPumpDisplacementPoint(),
 					},
-				MaxLimitPressure = null,
-				MaxLimitFlowRate = null,
+				MaxLimitPressure = null, 
+				MaxLimitFlowRate = null, 
 			};
 		}
 		public static CementPumpDisplacementPoint ConstructCementPumpDisplacementPoint()
 		{
 			return new CementPumpDisplacementPoint
 			{
-				StrokeRate = null,
-				FlowRate = null,
-				Pressure = null,
+				StrokeRate = null, 
+				FlowRate = null, 
+				Pressure = null, 
 			};
 		}
 		public static CementUnit ConstructCementUnit()
@@ -656,7 +656,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				SerialNumber = "Default SerialNumber",
 				Mounting = (MountingType)0,
 				Features = "Default Features",
-				NumberOfPumps = null,
+				NumberOfPumps = null, 
 			};
 		}
 		public static Centrifuge ConstructCentrifuge()
@@ -671,8 +671,8 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 		{
 			return new ChokeCvCurvePoint
 			{
-				Pressure = null,
-				Flow = null,
+				Pressure = null, 
+				Flow = null, 
 			};
 		}
 		public static ChokeManifold ConstructChokeManifold()
@@ -686,12 +686,12 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
 				ChokeControlClass = (ControlClass)0,
-				MaxLimitDesignPressure = null,
-				MaxLimitOperatingPressure = null,
-				MinLimitOperatingPressure = null,
-				MaxLimitTestPressure = null,
-				MaxLimitOperatingTemperature = null,
-				MinLimitOperatingTemperature = null,
+				MaxLimitDesignPressure = null, 
+				MaxLimitOperatingPressure = null, 
+				MinLimitOperatingPressure = null, 
+				MaxLimitTestPressure = null, 
+				MaxLimitOperatingTemperature = null, 
+				MinLimitOperatingTemperature = null, 
 			};
 		}
 		public static CoilDriveSystem ConstructCoilDriveSystem()
@@ -705,25 +705,25 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
 				CoilDrvClass = (MountingType)0,
-				ReelPayloadCapacity = null,
-				ReelPayloadLength = null,
-				ReelRemainingLength = null,
-				InjectorHeadRadius = null,
-				InjectorHeadMinTubingOd = null,
-				InjHeadDesignPullCapacity = null,
-				InjHeadDesignSnubCapacity = null,
-				InjHeadPullCapacity = null,
-				InjHeadSnubCapacity = null,
-				InjHeadMaxSpeed = null,
-				CtLoad = null,
-				CtWeightOnBit = null,
-				CtCoilSpeed = null,
-				CtCircPressure = null,
-				CtWellheadPressure = null,
-				CtEngineSpeed = null,
-				CtInjHeadDrivePressure = null,
-				CtInjTubingReelDrivePress = null,
-				CtChainTension = null,
+				ReelPayloadCapacity = null, 
+				ReelPayloadLength = null, 
+				ReelRemainingLength = null, 
+				InjectorHeadRadius = null, 
+				InjectorHeadMinTubingOd = null, 
+				InjHeadDesignPullCapacity = null, 
+				InjHeadDesignSnubCapacity = null, 
+				InjHeadPullCapacity = null, 
+				InjHeadSnubCapacity = null, 
+				InjHeadMaxSpeed = null, 
+				CtLoad = null, 
+				CtWeightOnBit = null, 
+				CtCoilSpeed = null, 
+				CtCircPressure = null, 
+				CtWellheadPressure = null, 
+				CtEngineSpeed = null, 
+				CtInjHeadDrivePressure = null, 
+				CtInjTubingReelDrivePress = null, 
+				CtChainTension = null, 
 			};
 		}
 		public static ContinuousCirculationDevice ConstructContinuousCirculationDevice()
@@ -737,15 +737,15 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
 				CcdControlClass = (ControlClass)0,
-				WorkingPumpPressure = null,
-				MaxLimitDesignPressure = null,
-				MaxLimitOperatingPressure = null,
-				MaxLimitFlowrate = null,
-				MaxLimitBackflow = null,
-				MaxLimitFluidTemperature = null,
-				MinLimitFluidTemperature = null,
-				MaxLimitMudWeight = null,
-				MaxLimitRotationRate = null,
+				WorkingPumpPressure = null, 
+				MaxLimitDesignPressure = null, 
+				MaxLimitOperatingPressure = null, 
+				MaxLimitFlowrate = null, 
+				MaxLimitBackflow = null, 
+				MaxLimitFluidTemperature = null, 
+				MinLimitFluidTemperature = null, 
+				MaxLimitMudWeight = null, 
+				MaxLimitRotationRate = null, 
 			};
 		}
 		public static CrownBlock ConstructCrownBlock()
@@ -758,13 +758,13 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				Model = "Default Model",
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
-				SheaveDiameter = null,
-				GrooveDiameter = null,
-				NumberOfSheaves = null,
-				MaxLimitDesignLoad = null,
-				MaxLimitOperatingLoad = null,
-				MaxLimitCompensatorStroke = null,
-				Hookload = null,
+				SheaveDiameter = null, 
+				GrooveDiameter = null, 
+				NumberOfSheaves = null, 
+				MaxLimitDesignLoad = null, 
+				MaxLimitOperatingLoad = null, 
+				MaxLimitCompensatorStroke = null, 
+				Hookload = null, 
 			};
 		}
 		public static CuttingsDryer ConstructCuttingsDryer()
@@ -802,11 +802,11 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
 				DerrickClass = (DerrickClass)0,
-				Height = null,
-				MaxLimitJointsPerStand = null,
-				MaxLimitDesignLoad = null,
-				MaxLimitOperatingLoad = null,
-				MaxLimitWindSpeed = null,
+				Height = null, 
+				MaxLimitJointsPerStand = null, 
+				MaxLimitDesignLoad = null, 
+				MaxLimitOperatingLoad = null, 
+				MaxLimitWindSpeed = null, 
 			};
 		}
 		public static Desander ConstructDesander()
@@ -836,10 +836,10 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
 				DrawworksClass = (DrawworksClass)0,
-				MaxLimitDesignLoad = null,
-				MaxLimitOperatingLoad = null,
-				MaxLimitContinuousDrumPower = null,
-				MaxLimitContinuousDrumTorque = null,
+				MaxLimitDesignLoad = null, 
+				MaxLimitOperatingLoad = null, 
+				MaxLimitContinuousDrumPower = null, 
+				MaxLimitContinuousDrumTorque = null, 
 			};
 		}
 		public static DrillLine ConstructDrillLine()
@@ -852,12 +852,12 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				Model = "Default Model",
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
-				Number = null,
-				Diameter = null,
-				LinearWeight = null,
-				MaxLimitDesignBreakingLoad = null,
-				MaxLimitOperatingBreakingLoad = null,
-				Hookload = null,
+				Number = null, 
+				Diameter = null, 
+				LinearWeight = null, 
+				MaxLimitDesignBreakingLoad = null, 
+				MaxLimitOperatingBreakingLoad = null, 
+				Hookload = null, 
 			};
 		}
 		public static DrillingChokeManifold ConstructDrillingChokeManifold()
@@ -871,11 +871,11 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
 				ManifoldType = (ManifoldClass)0,
-				TrimSize = null,
+				TrimSize = null, 
 				FlowMeter = "Default FlowMeter",
-				FlowMeterSize = null,
-				FlowMeterPressureRating = null,
-				JunkBasket = null,
+				FlowMeterSize = null, 
+				FlowMeterPressureRating = null, 
+				JunkBasket = null, 
 				ChokeCount = "Default ChokeCount",
 				FlowMeterCount = "Default FlowMeterCount",
 				PressureSensorVotingNumber = "Default PressureSensorVotingNumber",
@@ -885,29 +885,29 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 					{
 						ConstructChokeCvCurvePoint(),
 					},
-				MaxLimitDesignPressure = null,
-				MaxLimitOperatingPressure = null,
-				MaxLimitOperatingTemperature = null,
-				MinLimitOperatingTemperature = null,
-				MaxLimitOpeningSpeed = null,
-				MaxLimitBackPressure = null,
-				MinLimitFlowrate = null,
-				MaxLimitFlowrate = null,
-				PressureBeforeChoke = null,
-				PressureAfterChoke = null,
-				CvValue = null,
-				CloggingOccuring = null,
-				TemperatureBeforeChoke = null,
-				TemperatureAfterChoke = null,
-				FlowThroughChoke = null,
-				MudDensityOut = null,
-				MudDensityIn = null,
-				ReliefValvePressure = null,
-				PressureBeforeFlowMeter = null,
-				PressureAfterFlowMeter = null,
-				InletPressure = null,
-				OutletPressure = null,
-				VotingSensorsFailed = null,
+				MaxLimitDesignPressure = null, 
+				MaxLimitOperatingPressure = null, 
+				MaxLimitOperatingTemperature = null, 
+				MinLimitOperatingTemperature = null, 
+				MaxLimitOpeningSpeed = null, 
+				MaxLimitBackPressure = null, 
+				MinLimitFlowrate = null, 
+				MaxLimitFlowrate = null, 
+				PressureBeforeChoke = null, 
+				PressureAfterChoke = null, 
+				CvValue = null, 
+				CloggingOccuring = null, 
+				TemperatureBeforeChoke = null, 
+				TemperatureAfterChoke = null, 
+				FlowThroughChoke = null, 
+				MudDensityOut = null, 
+				MudDensityIn = null, 
+				ReliefValvePressure = null, 
+				PressureBeforeFlowMeter = null, 
+				PressureAfterFlowMeter = null, 
+				InletPressure = null, 
+				OutletPressure = null, 
+				VotingSensorsFailed = null, 
 			};
 		}
 		public static DrillingFluidTypeDescriptor ConstructDrillingFluidTypeDescriptor()
@@ -931,20 +931,20 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
 				RiserClass = (RiserClass)0,
-				JointWeight = null,
-				RiserInsideDiameter = null,
-				RiserOuterDiameter = null,
-				RiserJointLength = null,
-				RiserTotalLength = null,
-				MaxLimitTensionLoad = null,
-				MaxLimitOpTensionLoad = null,
-				MaxLimitDesignKillPressure = null,
-				MaxLimitOpKillPressure = null,
-				MaxLimitDesignBoosterPressure = null,
-				MaxLimitBoosterPressure = null,
-				MaxLimitOpTemperature = null,
-				MinLimitOpTemperature = null,
-				MaxLimitAngleRiser = null,
+				JointWeight = null, 
+				RiserInsideDiameter = null, 
+				RiserOuterDiameter = null, 
+				RiserJointLength = null, 
+				RiserTotalLength = null, 
+				MaxLimitTensionLoad = null, 
+				MaxLimitOpTensionLoad = null, 
+				MaxLimitDesignKillPressure = null, 
+				MaxLimitOpKillPressure = null, 
+				MaxLimitDesignBoosterPressure = null, 
+				MaxLimitBoosterPressure = null, 
+				MaxLimitOpTemperature = null, 
+				MinLimitOpTemperature = null, 
+				MaxLimitAngleRiser = null, 
 			};
 		}
 		public static DrillstringHeaveCompensator ConstructDrillstringHeaveCompensator()
@@ -958,9 +958,9 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
 				HeaveCompClass = (HeaveCompensatorClass)0,
-				CompensatorCapacity = null,
+				CompensatorCapacity = null, 
 				CompensatorStatus = (CompensatorStatus)0,
-				MaxLimitCompensatorStroke = null,
+				MaxLimitCompensatorStroke = null, 
 			};
 		}
 		public static DriveMode ConstructDriveMode()
@@ -987,10 +987,10 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
 				FloatValveClass = (FloatValveClass)0,
-				Diameter = null,
-				Length = null,
-				MaxLimitDesignPressure = null,
-				MaxLimitOperatingPressure = null,
+				Diameter = null, 
+				Length = null, 
+				MaxLimitDesignPressure = null, 
+				MaxLimitOperatingPressure = null, 
 			};
 		}
 		public static FlowRoutingManifold ConstructFlowRoutingManifold()
@@ -1004,26 +1004,26 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
 				ManifoldType = (ManifoldClass)0,
-				FlangeSize = null,
-				ReliefLineDiameter = null,
-				EqualizationLineDiameter = null,
-				PressureReliefValveTrim = null,
+				FlangeSize = null, 
+				ReliefLineDiameter = null, 
+				EqualizationLineDiameter = null, 
+				PressureReliefValveTrim = null, 
 				ManifoldFlowPath = (ManifoldFlowPath)0,
 				ManifoldFlowcurves = new List<RoutingManifoldCurvePoint>
 					{
 						ConstructRoutingManifoldCurvePoint(),
 					},
-				MaxLimitDesignPressure = null,
-				MaxLimitOperatingPressure = null,
-				MaxLimitOperatingTemperature = null,
-				MinLimitOperatingTemperature = null,
-				MaxLimitFlowrate = null,
-				InletPressure = null,
-				OutletPressure = null,
-				ReliefValvePressure = null,
-				CloggingOccuring = null,
-				TemperatureInlet = null,
-				TemperatureOutlet = null,
+				MaxLimitDesignPressure = null, 
+				MaxLimitOperatingPressure = null, 
+				MaxLimitOperatingTemperature = null, 
+				MinLimitOperatingTemperature = null, 
+				MaxLimitFlowrate = null, 
+				InletPressure = null, 
+				OutletPressure = null, 
+				ReliefValvePressure = null, 
+				CloggingOccuring = null, 
+				TemperatureInlet = null, 
+				TemperatureOutlet = null, 
 			};
 		}
 		public static FlowSensor ConstructFlowSensor()
@@ -1037,9 +1037,9 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
 				FlowTransducer = (FlowSensorType)0,
-				FlowOutOfBorehole = null,
-				MudFlowrateOut = null,
-				MudFlowrateIn = null,
+				FlowOutOfBorehole = null, 
+				MudFlowrateOut = null, 
+				MudFlowrateIn = null, 
 			};
 		}
 		public static Generator ConstructGenerator()
@@ -1053,37 +1053,37 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
 				GeneratorClass = (GeneratorClass)0,
-				Speed = null,
-				Power = null,
-				Voltage = null,
-				PowerFactor = null,
+				Speed = null, 
+				Power = null, 
+				Voltage = null, 
+				PowerFactor = null, 
 				SpeedMode = (SpeedMode)0,
 				EngineModel = (EngineModelType)0,
-				PowerplantGeneratorNumber = null,
-				PowerplantTotalPower = null,
-				StartupTimeCold = null,
-				StartupTimeWarm = null,
+				PowerplantGeneratorNumber = null, 
+				PowerplantTotalPower = null, 
+				StartupTimeCold = null, 
+				StartupTimeWarm = null, 
 				CoolingMedium = (GeneratorCooling)0,
 				Phases = (GeneratorPhases)0,
-				MaxLimitPower = null,
-				MaxLimitPowerIncrease = null,
-				MaxLimitSpeedIncrease = null,
-				MaxLimitSpeed = null,
-				MaxLimitVoltage = null,
-				MinLimitVoltage = null,
-				MaxLimitFrequency = null,
-				MinLimitFrequency = null,
-				EnginePower = null,
-				GeneratorPower = null,
-				EngineFuelConsumption = null,
-				EngineSpecificFuelConsumption = null,
-				RunningHours = null,
-				EngineSpeed = null,
-				GeneratorVoltage = null,
-				GridVoltage = null,
-				GridFrequency = null,
-				GeneratorFrequency = null,
-				EngineTemperature = null,
+				MaxLimitPower = null, 
+				MaxLimitPowerIncrease = null, 
+				MaxLimitSpeedIncrease = null, 
+				MaxLimitSpeed = null, 
+				MaxLimitVoltage = null, 
+				MinLimitVoltage = null, 
+				MaxLimitFrequency = null, 
+				MinLimitFrequency = null, 
+				EnginePower = null, 
+				GeneratorPower = null, 
+				EngineFuelConsumption = null, 
+				EngineSpecificFuelConsumption = null, 
+				RunningHours = null, 
+				EngineSpeed = null, 
+				GeneratorVoltage = null, 
+				GridVoltage = null, 
+				GridFrequency = null, 
+				GeneratorFrequency = null, 
+				EngineTemperature = null, 
 			};
 		}
 		public static HoistingSystem ConstructHoistingSystem()
@@ -1118,15 +1118,15 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
 				KellyClass = (KellyClass)0,
-				KellyJointLength = null,
-				MaxLimitDesignRotationSpeed = null,
-				MaxLimitDesignTorque = null,
-				MaxLimitIbopPressure = null,
-				MaxLimitRotationSpeed = null,
-				MaxLimitTorque = null,
-				SurfaceRotation = null,
-				SurfaceTorque = null,
-				KellyHeight = null,
+				KellyJointLength = null, 
+				MaxLimitDesignRotationSpeed = null, 
+				MaxLimitDesignTorque = null, 
+				MaxLimitIbopPressure = null, 
+				MaxLimitRotationSpeed = null, 
+				MaxLimitTorque = null, 
+				SurfaceRotation = null, 
+				SurfaceTorque = null, 
+				KellyHeight = null, 
 			};
 		}
 		public static MarineMpdEquipment ConstructMarineMpdEquipment()
@@ -1140,16 +1140,16 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
 				MarineMpdClass = (MarineMpdClass)0,
-				Length = null,
-				Weight = null,
-				ThroughBoreDiameter = null,
+				Length = null, 
+				Weight = null, 
+				ThroughBoreDiameter = null, 
 				ControlMeans = (ControllerType)0,
-				ContainsFlowSpool = null,
-				ContainsNonRotatingDevice = null,
-				ContainsDrillstringIsolation = null,
-				MaxLimitDesignPressure = null,
-				MaxLimitDynamicPressure = null,
-				MaxLimitRotatingSpeed = null,
+				ContainsFlowSpool = null, 
+				ContainsNonRotatingDevice = null, 
+				ContainsDrillstringIsolation = null, 
+				MaxLimitDesignPressure = null, 
+				MaxLimitDynamicPressure = null, 
+				MaxLimitRotatingSpeed = null, 
 			};
 		}
 		public static MeasurementAfm ConstructMeasurementAfm()
@@ -1162,18 +1162,18 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				Model = "Default Model",
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
-				UpdateRate = null,
-				Active = null,
-				AfmMudDensity = null,
-				AfmMudTemperature = null,
-				AfmPv = null,
-				AfmYp = null,
+				UpdateRate = null, 
+				Active = null, 
+				AfmMudDensity = null, 
+				AfmMudTemperature = null, 
+				AfmPv = null, 
+				AfmYp = null, 
 				AfmRheometerMeasurements = new List<RheometerAfmMeasurement>
 					{
 						ConstructRheometerAfmMeasurement(),
 					},
-				RtViscConsistencyIndex = null,
-				RtViscFlowBehaviorIndex = null,
+				RtViscConsistencyIndex = null, 
+				RtViscFlowBehaviorIndex = null, 
 			};
 		}
 		public static MpdControlDevice ConstructMpdControlDevice()
@@ -1187,14 +1187,14 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
 				MpdControlDeviceClass = (MpdControlDeviceClass)0,
-				NominalSize = null,
-				ThroughBoreDiameter = null,
+				NominalSize = null, 
+				ThroughBoreDiameter = null, 
 				SealingElementMaterial = "Default SealingElementMaterial",
-				ControlDeviceHeight = null,
-				MaxLimitStaticPressure = null,
-				MaxLimitDynamicPressure = null,
-				MaxLimitRotatingSpeed = null,
-				MaxLimitActivationPressure = null,
+				ControlDeviceHeight = null, 
+				MaxLimitStaticPressure = null, 
+				MaxLimitDynamicPressure = null, 
+				MaxLimitRotatingSpeed = null, 
+				MaxLimitActivationPressure = null, 
 			};
 		}
 		public static MpdController ConstructMpdController()
@@ -1208,15 +1208,15 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
 				MpdGradientMode = (MpdGradientMode)0,
-				PrimaryChokeTrim = null,
-				SecondaryChokeTrim = null,
-				MaxLimitPressure = null,
-				MinLimitMudPumpFlowrate = null,
-				ManipulatedMpdChoke = null,
-				ManipulatedLiftPumpRate = null,
-				ControlledDownholePressure = null,
-				BackpressureFlowrate = null,
-				AnnulusRefillFlowrate = null,
+				PrimaryChokeTrim = null, 
+				SecondaryChokeTrim = null, 
+				MaxLimitPressure = null, 
+				MinLimitMudPumpFlowrate = null, 
+				ManipulatedMpdChoke = null, 
+				ManipulatedLiftPumpRate = null, 
+				ControlledDownholePressure = null, 
+				BackpressureFlowrate = null, 
+				AnnulusRefillFlowrate = null, 
 			};
 		}
 		public static MudGasSeparator ConstructMudGasSeparator()
@@ -1239,20 +1239,20 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				SerialNumber = "Default SerialNumber",
 				Type = (MudPumpType)0,
 				PumpClass = (PumpClass)0,
-				PumpAction = null,
-				PumpEfficiency = null,
-				PumpDisplacement = null,
-				LinerId = null,
-				Stroke = null,
-				PulsationDamperPressure = null,
-				PulsationDamperVolume = null,
-				MaxLimitDesignPressure = null,
-				MaxLimitOperatingPressure = null,
-				MaxLimitOperatingPower = null,
-				MaxLimitOperatingFlowRate = null,
-				MaxLimitOperatingSpeed = null,
-				MudPumpStrokeRate = null,
-				MudPumpFlowRate = null,
+				PumpAction = null, 
+				PumpEfficiency = null, 
+				PumpDisplacement = null, 
+				LinerId = null, 
+				Stroke = null, 
+				PulsationDamperPressure = null, 
+				PulsationDamperVolume = null, 
+				MaxLimitDesignPressure = null, 
+				MaxLimitOperatingPressure = null, 
+				MaxLimitOperatingPower = null, 
+				MaxLimitOperatingFlowRate = null, 
+				MaxLimitOperatingSpeed = null, 
+				MudPumpStrokeRate = null, 
+				MudPumpFlowRate = null, 
 			};
 		}
 		public static MudTank ConstructMudTank()
@@ -1267,7 +1267,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				SerialNumber = "Default SerialNumber",
 				TankClass = (TankClass)0,
 				TankFluidType = (TankFluidType)0,
-				MaxLimitOperatingVolume = null,
+				MaxLimitOperatingVolume = null, 
 			};
 		}
 		public static MultiPhaseSeparator ConstructMultiPhaseSeparator()
@@ -1281,17 +1281,17 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
 				SeparatorClass = (SeparatorPhaseClass)0,
-				MaximumOperatingPressure = null,
-				MaximumOperatingFlowrate = null,
-				SeparationEfficiency = null,
+				MaximumOperatingPressure = null, 
+				MaximumOperatingFlowrate = null, 
+				SeparationEfficiency = null, 
 				SeparatorMedium = (SeparatorMedium)0,
-				MaxLimitDesignPressure = null,
-				MaxLimitOperatingPressure = null,
-				MaxLimitFlowrate = null,
-				MaxLimitOperatingTemperature = null,
-				MinLimitOperatingTemperature = null,
-				PressureSeparator = null,
-				TemperatureSeparator = null,
+				MaxLimitDesignPressure = null, 
+				MaxLimitOperatingPressure = null, 
+				MaxLimitFlowrate = null, 
+				MaxLimitOperatingTemperature = null, 
+				MinLimitOperatingTemperature = null, 
+				PressureSeparator = null, 
+				TemperatureSeparator = null, 
 			};
 		}
 		public static PipeDeck ConstructPipeDeck()
@@ -1322,8 +1322,8 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 		{
 			return new RheometerAfmMeasurement
 			{
-				AfmViscShearRate = null,
-				AfmViscShearStress = null,
+				AfmViscShearRate = null, 
+				AfmViscShearStress = null, 
 			};
 		}
 		public static Rig ConstructRig()
@@ -1405,9 +1405,9 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				DrillstringHeaveCompensator = ConstructDrillstringHeaveCompensator(),
 				DrillingMarineRiser = ConstructDrillingMarineRiser(),
 				RiserHeaveCompensator = ConstructRiserHeaveCompensator(),
-				DrillFloorElevation = null,
-				IsFixedPlatform = false,
-				ClusterID = null,
+				DrillFloorElevation = null, 
+				IsFixedPlatform = false, 
+				ClusterID = null, 
 			};
 		}
 		public static RigChoke ConstructRigChoke()
@@ -1459,9 +1459,9 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
 				RiserCompensatorClass = (RiserCompensatorClass)0,
-				CompensatorCapacity = null,
+				CompensatorCapacity = null, 
 				CompensatorStatus = (CompensatorStatus)0,
-				MaxLimitCompensatorStroke = null,
+				MaxLimitCompensatorStroke = null, 
 			};
 		}
 		public static RotaryHose ConstructRotaryHose()
@@ -1483,34 +1483,34 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
 				RotaryTableType = (RotaryTableType)0,
-				TableOpeningDiameter = null,
+				TableOpeningDiameter = null, 
 				BushingType = (RotaryTableBushingType)0,
-				BushingSize = null,
-				Height = null,
-				Mass = null,
-				MaxLimitOperatingSpeed = null,
-				MaxLimitDesignSpeed = null,
-				MaxLimitOperatingTorque = null,
-				MaxLimitDesignTorque = null,
-				MaxLimitOperatingStringWeight = null,
-				MaxLimitDesignStringWeight = null,
-				MaxLimitPower = null,
-				MaxLimitTemperature = null,
+				BushingSize = null, 
+				Height = null, 
+				Mass = null, 
+				MaxLimitOperatingSpeed = null, 
+				MaxLimitDesignSpeed = null, 
+				MaxLimitOperatingTorque = null, 
+				MaxLimitDesignTorque = null, 
+				MaxLimitOperatingStringWeight = null, 
+				MaxLimitDesignStringWeight = null, 
+				MaxLimitPower = null, 
+				MaxLimitTemperature = null, 
 			};
 		}
 		public static RoutingManifoldCurvePoint ConstructRoutingManifoldCurvePoint()
 		{
 			return new RoutingManifoldCurvePoint
 			{
-				Pressure = null,
-				Flow = null,
+				Pressure = null, 
+				Flow = null, 
 			};
 		}
 		public static ShakerScreenDefinition ConstructShakerScreenDefinition()
 		{
 			return new ShakerScreenDefinition
 			{
-				ScreenDeck = null,
+				ScreenDeck = null, 
 				MeshSize = "Default MeshSize",
 			};
 		}
@@ -1530,7 +1530,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 					{
 						ConstructShakerScreenDefinition(),
 					},
-				MaxLimitOperatingCapacity = null,
+				MaxLimitOperatingCapacity = null, 
 			};
 		}
 		public static Slips ConstructSlips()
@@ -1547,8 +1547,8 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 			{
 				Name = "Default Name",
 				Description = "Default Description",
-				PressureMeasurementElevation = null,
-				MudHoseHangingPointElevation = null,
+				PressureMeasurementElevation = null, 
+				MudHoseHangingPointElevation = null, 
 			};
 		}
 		public static StandPipeManifold ConstructStandPipeManifold()
@@ -1561,12 +1561,12 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				Model = "Default Model",
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
-				PipeDiameter = null,
+				PipeDiameter = null, 
 				StandpipeSpecLevel = (StandpipeSpecLevel)0,
-				MaxLimitDesignPressure = null,
-				MaxLimitOperatingPressure = null,
-				MaxLimitOperatingTemperature = null,
-				MinLimitOperatingTemperature = null,
+				MaxLimitDesignPressure = null, 
+				MaxLimitOperatingPressure = null, 
+				MaxLimitOperatingTemperature = null, 
+				MinLimitOperatingTemperature = null, 
 			};
 		}
 		public static SurfaceMpdEquipment ConstructSurfaceMpdEquipment()
@@ -1580,21 +1580,21 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
 				SurfaceMpdClass = (SurfaceMpdClass)0,
-				MinimumBoreholeSize = null,
-				MaximumBoreholeSize = null,
-				PressureAccuracy = null,
-				MaxLimitDesignPressure = null,
-				MaxLimitOperatingPressure = null,
-				MinLimitOperatingPressure = null,
-				MaxLimitFlowrate = null,
-				MaxLimitMudWeight = null,
-				MaxLimitPressure = null,
-				MinLimitMudPumpFlowrate = null,
-				StrokeRate = null,
-				FlowRate = null,
-				PressureAtDischarge = null,
-				Power = null,
-				PressureAtInlet = null,
+				MinimumBoreholeSize = null, 
+				MaximumBoreholeSize = null, 
+				PressureAccuracy = null, 
+				MaxLimitDesignPressure = null, 
+				MaxLimitOperatingPressure = null, 
+				MinLimitOperatingPressure = null, 
+				MaxLimitFlowrate = null, 
+				MaxLimitMudWeight = null, 
+				MaxLimitPressure = null, 
+				MinLimitMudPumpFlowrate = null, 
+				StrokeRate = null, 
+				FlowRate = null, 
+				PressureAtDischarge = null, 
+				Power = null, 
+				PressureAtInlet = null, 
 			};
 		}
 		public static TopDrive ConstructTopDrive()
@@ -1609,27 +1609,27 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				SerialNumber = "Default SerialNumber",
 				TopDriveClass = (TopDriveClass)0,
 				TopDriveControllerType = (TopDriveControllerType)0,
-				Orientable = null,
-				Weight = null,
-				MaxLimitIbopPressure = null,
-				MaxLimitRotationSpeed = null,
-				MaxLimitDesignLoad = null,
-				MaxLimitDesignTorque = null,
-				MaxLimitOperatingLoad = null,
-				MaxLimitOperatingTorque = null,
-				MaxLimitMakeupTorque = null,
-				MaxLimitBreakoutTorque = null,
-				TopDriveHeight = null,
-				ProportionalGain = null,
-				IntegralGain = null,
-				TuningFrequency = null,
-				VFDFilterTimeConstant = null,
-				EncoderTimeConstant = null,
-				AccelerationFilterTimeConstant = null,
-				TorqueHighPassFilterTimeConstant = null,
-				TorqueLowPassFilterTimeConstant = null,
-				TuningFactor = null,
-				InertiaCorrectionFactor = null,
+				Orientable = null, 
+				Weight = null, 
+				MaxLimitIbopPressure = null, 
+				MaxLimitRotationSpeed = null, 
+				MaxLimitDesignLoad = null, 
+				MaxLimitDesignTorque = null, 
+				MaxLimitOperatingLoad = null, 
+				MaxLimitOperatingTorque = null, 
+				MaxLimitMakeupTorque = null, 
+				MaxLimitBreakoutTorque = null, 
+				TopDriveHeight = null, 
+				ProportionalGain = null, 
+				IntegralGain = null, 
+				TuningFrequency = null, 
+				VFDFilterTimeConstant = null, 
+				EncoderTimeConstant = null, 
+				AccelerationFilterTimeConstant = null, 
+				TorqueHighPassFilterTimeConstant = null, 
+				TorqueLowPassFilterTimeConstant = null, 
+				TuningFactor = null, 
+				InertiaCorrectionFactor = null, 
 			};
 		}
 		public static TorqueTurnSub ConstructTorqueTurnSub()
@@ -1642,28 +1642,28 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				Model = "Default Model",
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
-				Length = null,
-				OutsideDiameter = null,
-				InsideDiameter = null,
-				Weight = null,
-				BatteryLife = null,
-				MaxLimitDesignLoad = null,
-				MaxLimitDesignTorque = null,
-				MaxLimitDesignPressure = null,
-				MaxLimitLoad = null,
-				MaxLimitTorque = null,
-				MaxLimitPressure = null,
-				MaxLimitTemperature = null,
-				MinLimitTemperature = null,
-				SurfaceTorque = null,
-				Hookload = null,
-				SurfaceTurnCount = null,
-				SurfaceAcceleration = null,
-				SurfaceRotationRate = null,
-				SurfaceBorePressure = null,
-				SurfaceAxialVibration = null,
-				SurfaceTorsionalVibration = null,
-				SurfaceLateralVibration = null,
+				Length = null, 
+				OutsideDiameter = null, 
+				InsideDiameter = null, 
+				Weight = null, 
+				BatteryLife = null, 
+				MaxLimitDesignLoad = null, 
+				MaxLimitDesignTorque = null, 
+				MaxLimitDesignPressure = null, 
+				MaxLimitLoad = null, 
+				MaxLimitTorque = null, 
+				MaxLimitPressure = null, 
+				MaxLimitTemperature = null, 
+				MinLimitTemperature = null, 
+				SurfaceTorque = null, 
+				Hookload = null, 
+				SurfaceTurnCount = null, 
+				SurfaceAcceleration = null, 
+				SurfaceRotationRate = null, 
+				SurfaceBorePressure = null, 
+				SurfaceAxialVibration = null, 
+				SurfaceTorsionalVibration = null, 
+				SurfaceLateralVibration = null, 
 			};
 		}
 		public static TravellingBlock ConstructTravellingBlock()
@@ -1676,14 +1676,14 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				Model = "Default Model",
 				ProductCode = "Default ProductCode",
 				SerialNumber = "Default SerialNumber",
-				Weight = null,
-				NumberOfSheaves = null,
-				GrooveDiameter = null,
-				MaxLimitBlockTravel = null,
-				MaxLimitDesignLoad = null,
-				MaxLimitOperatingLoad = null,
-				HookVelocity = null,
-				HookPosition = null,
+				Weight = null, 
+				NumberOfSheaves = null, 
+				GrooveDiameter = null, 
+				MaxLimitBlockTravel = null, 
+				MaxLimitDesignLoad = null, 
+				MaxLimitOperatingLoad = null, 
+				HookVelocity = null, 
+				HookPosition = null, 
 			};
 		}
 		public static UsageStatisticsRig ConstructUsageStatisticsRig()
@@ -1735,10 +1735,10 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 		{
 			return new VerticalDatumSet
 			{
-				Latitude = 0.0,
-				Longitude = 0.0,
-				VerticalDatumWGS64 = null,
-				GenericVerticalDatum = 0.0,
+				Latitude = 0.0, 
+				Longitude = 0.0, 
+				VerticalDatumWGS64 = null, 
+				GenericVerticalDatum = 0.0, 
 			};
 		}
 		public static UsageStatisticsWell ConstructUsageStatisticsWell()
@@ -1765,9 +1765,9 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				Description = "Default Description",
 				CreationDate = DateTimeOffset.UtcNow,
 				LastModificationDate = DateTimeOffset.UtcNow,
-				SlotID = null,
-				ClusterID = null,
-				IsSingleWell = false,
+				SlotID = null, 
+				ClusterID = null, 
+				IsSingleWell = false, 
 			};
 		}
 		public static UsageStatisticsWellBore ConstructUsageStatisticsWellBore()
@@ -1794,10 +1794,10 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				Description = "Default Description",
 				CreationDate = DateTimeOffset.UtcNow,
 				LastModificationDate = DateTimeOffset.UtcNow,
-				WellID = null,
-				RigID = null,
-				IsSidetrack = false,
-				ParentWellBoreID = null,
+				WellID = null, 
+				RigID = null, 
+				IsSidetrack = false, 
+				ParentWellBoreID = null, 
 				TieInPointAlongHoleDepth = ConstructGaussianDrillingProperty(),
 				SidetrackType = (SidetrackType)0,
 			};
@@ -1943,7 +1943,15 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 				Description = "Default Description",
 				CreationDate = DateTimeOffset.UtcNow,
 				LastModificationDate = DateTimeOffset.UtcNow,
-				WellBoreID = null,
+				WellBoreArchitectureIdentityAssignments = new List<WellBoreArchitectureIdentityAssignment>
+					{
+						ConstructWellBoreArchitectureIdentityAssignment(),
+					},
+				WellBoreArchitectureFeatureAssignments = new List<WellBoreArchitectureFeatureAssignment>
+					{
+						ConstructWellBoreArchitectureFeatureAssignment(),
+					},
+				WellBoreID = null, 
 				WellHead = ConstructWellHead(),
 				FluidsAboveGroundLevel = new List<WellBoreArchitectureFluid>
 					{
@@ -1959,12 +1967,66 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 					},
 			};
 		}
+		public static WellBoreArchitectureFeatureAssignment ConstructWellBoreArchitectureFeatureAssignment()
+		{
+			return new WellBoreArchitectureFeatureAssignment
+			{
+				ID = new Guid(),
+				FeatureCategoryID = null, 
+				FeatureOptionID = null, 
+				FromDate = DateTimeOffset.UtcNow,
+				ToDate = DateTimeOffset.UtcNow,
+			};
+		}
+		public static WellBoreArchitectureFeatureCategory ConstructWellBoreArchitectureFeatureCategory()
+		{
+			return new WellBoreArchitectureFeatureCategory
+			{
+				MetaInfo = ConstructMetaInfo(),
+				Name = "Default Name",
+				IsExclusive = false, 
+				HasValidityPeriod = false, 
+				Options = new List<WellBoreArchitectureFeatureOption>
+					{
+						ConstructWellBoreArchitectureFeatureOption(),
+					},
+				CreationDate = DateTimeOffset.UtcNow,
+				LastModificationDate = DateTimeOffset.UtcNow,
+			};
+		}
+		public static WellBoreArchitectureFeatureOption ConstructWellBoreArchitectureFeatureOption()
+		{
+			return new WellBoreArchitectureFeatureOption
+			{
+				ID = new Guid(),
+				Name = "Default Name",
+			};
+		}
 		public static WellBoreArchitectureFluid ConstructWellBoreArchitectureFluid()
 		{
 			return new WellBoreArchitectureFluid
 			{
 				Fluid = (FluidType)0,
 				Depth = ConstructGaussianDrillingProperty(),
+			};
+		}
+		public static WellBoreArchitectureIdentity ConstructWellBoreArchitectureIdentity()
+		{
+			return new WellBoreArchitectureIdentity
+			{
+				MetaInfo = ConstructMetaInfo(),
+				Name = "Default Name",
+				CreationDate = DateTimeOffset.UtcNow,
+				LastModificationDate = DateTimeOffset.UtcNow,
+			};
+		}
+		public static WellBoreArchitectureIdentityAssignment ConstructWellBoreArchitectureIdentityAssignment()
+		{
+			return new WellBoreArchitectureIdentityAssignment
+			{
+				ID = new Guid(),
+				IdentityID = null, 
+				Value = "Default Value",
 			};
 		}
 		public static WellHead ConstructWellHead()

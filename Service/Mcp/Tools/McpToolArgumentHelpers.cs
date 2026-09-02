@@ -52,12 +52,30 @@ internal static class McpToolArgumentHelpers
                 ["Description"] = NullableString("Human-readable description of the well construction design or revision."),
                 ["CreationDate"] = NullableDateTime("Creation timestamp in ISO 8601 format. Use a UTC offset where possible."),
                 ["LastModificationDate"] = NullableDateTime("Last-modification timestamp in ISO 8601 format. Update this when replacing the architecture."),
+                ["WellBoreArchitectureIdentityAssignments"] = Array("WellBoreArchitectureIdentityAssignment", "Identity values assigned to the architecture.", nullable: true),
+                ["WellBoreArchitectureFeatureAssignments"] = Array("WellBoreArchitectureFeatureAssignment", "Feature options assigned to the architecture.", nullable: true),
                 ["WellBoreID"] = NullableUuid("UUID of the WellBore to which this architecture belongs. This is an external reference to the WellBore microservice, not an embedded WellBore."),
                 ["WellHead"] = Ref("WellHead", "Wellhead dimensions and depth/hanger locations."),
                 ["FluidsAboveGroundLevel"] = Array("WellBoreArchitectureFluid", "Ordered fluid layers above ground or mudline. The last listed fluid extends to ground level."),
                 ["SurfaceSections"] = Array("SurfaceSection", "Surface equipment sections above the wellhead, ordered from top to bottom. At least one item is required because the service calculation rejects an empty list.", minItems: 1),
                 ["CasingSections"] = Array("CasingSection", "Casing sections beginning at the wellhead and ordered from top to bottom.")
             }, "MetaInfo", "SurfaceSections"),
+
+        ["WellBoreArchitectureIdentityAssignment"] = Object("One architecture-specific identity value.", new JsonObject
+        {
+            ["ID"] = String("Caller-generated assignment UUID.", "uuid"),
+            ["IdentityID"] = String("UUID of an existing identity definition.", "uuid"),
+            ["Value"] = NullableString("Architecture-specific identity value.")
+        }, "ID", "IdentityID"),
+
+        ["WellBoreArchitectureFeatureAssignment"] = Object("One architecture feature assignment.", new JsonObject
+        {
+            ["ID"] = String("Caller-generated assignment UUID.", "uuid"),
+            ["FeatureCategoryID"] = String("UUID of an existing feature category.", "uuid"),
+            ["FeatureOptionID"] = String("UUID of an option in that category.", "uuid"),
+            ["FromDate"] = NullableDateTime("Optional validity start; allowed only when the category has a validity period."),
+            ["ToDate"] = NullableDateTime("Optional validity end; must not precede FromDate.")
+        }, "ID", "FeatureCategoryID", "FeatureOptionID"),
 
         ["MetaInfo"] = Object("Shared resource metadata containing the caller-owned UUID and optional HTTP location fields.", new JsonObject
         {
@@ -192,6 +210,37 @@ internal static class McpToolArgumentHelpers
             ["Value"] = NullableNumber("Deterministic value in the containing field's SI unit.")
         })
     };
+
+    public static JsonObject CreateCatalogSchema(string bodyName, bool feature, bool includeId = false, bool includeExpected = false)
+    {
+        JsonObject body = feature ? FeatureCategoryDefinition() : IdentityDefinition();
+        JsonObject properties = new() { [bodyName] = body };
+        JsonArray required = new(bodyName);
+        if (includeId) { properties["id"] = String("Catalog definition UUID.", "uuid"); required.Add("id"); }
+        if (includeExpected) { properties["expectedModifiedUtc"] = String("Exact LastModificationDate returned by the latest read.", "date-time"); required.Add("expectedModifiedUtc"); }
+        return new() { ["type"] = "object", ["properties"] = properties, ["required"] = required, ["additionalProperties"] = false };
+    }
+
+    public static JsonObject CreateCatalogDeleteSchema() => new()
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject { ["id"] = String("Catalog definition UUID.", "uuid"), ["expectedModifiedUtc"] = String("Exact LastModificationDate returned by the latest read.", "date-time") },
+        ["required"] = new JsonArray("id", "expectedModifiedUtc"), ["additionalProperties"] = false
+    };
+
+    private static JsonObject IdentityDefinition() => Object("User-managed identity definition.", new JsonObject
+    {
+        ["MetaInfo"] = new JsonObject { ["type"] = "object", ["properties"] = new JsonObject { ["ID"] = String("Caller-generated definition UUID.", "uuid") }, ["required"] = new JsonArray("ID"), ["additionalProperties"] = true },
+        ["Name"] = NullableString("Identity category name."), ["CreationDate"] = NullableDateTime("Server-owned creation time."), ["LastModificationDate"] = NullableDateTime("Server-owned concurrency token.")
+    }, "MetaInfo");
+
+    private static JsonObject FeatureCategoryDefinition() => Object("User-managed feature category and options.", new JsonObject
+    {
+        ["MetaInfo"] = new JsonObject { ["type"] = "object", ["properties"] = new JsonObject { ["ID"] = String("Caller-generated definition UUID.", "uuid") }, ["required"] = new JsonArray("ID"), ["additionalProperties"] = true },
+        ["Name"] = NullableString("Feature category name."), ["IsExclusive"] = new JsonObject { ["type"] = "boolean" }, ["HasValidityPeriod"] = new JsonObject { ["type"] = "boolean" },
+        ["Options"] = new JsonObject { ["type"] = "array", ["items"] = Object("Feature option.", new JsonObject { ["ID"] = String("Stable option UUID.", "uuid"), ["Name"] = NullableString("Option name.") }, "ID") },
+        ["CreationDate"] = NullableDateTime("Server-owned creation time."), ["LastModificationDate"] = NullableDateTime("Server-owned concurrency token.")
+    }, "MetaInfo", "IsExclusive", "HasValidityPeriod", "Options");
 
     private static JsonObject Object(string description, JsonObject properties, params string[] required)
     {

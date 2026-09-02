@@ -37,6 +37,32 @@
         </MudGrid>
     </MudPaper>
 
+    <MudPaper Class="@Class">
+        <MudToolBar Class="ml-n6 my-n4"><MudText Typo="Typo.h6">Identities</MudText><MudSpacer /><MudButton StartIcon="@Icons.Material.Filled.Add" OnClick="AddIdentityAssignment">Add</MudButton></MudToolBar>
+        <MudTable Items="WellBoreArchitectureInstance.WellBoreArchitectureIdentityAssignments" Dense="true">
+            <HeaderContent><MudTh>Identity</MudTh><MudTh>Value</MudTh><MudTh></MudTh></HeaderContent>
+            <RowTemplate>
+                <MudTd><MudSelect T="Guid?" @bind-Value="context.IdentityID">@foreach (var identity in identityCatalog) { <MudSelectItem T="Guid?" Value="identity.MetaInfo.ID">@identity.Name</MudSelectItem> }</MudSelect></MudTd>
+                <MudTd><MudTextField @bind-Value="context.Value" /></MudTd>
+                <MudTd><MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="@(() => RemoveIdentityAssignment(context))" /></MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudPaper>
+
+    <MudPaper Class="@Class">
+        <MudToolBar Class="ml-n6 my-n4"><MudText Typo="Typo.h6">Features</MudText><MudSpacer /><MudButton StartIcon="@Icons.Material.Filled.Add" OnClick="AddFeatureAssignment">Add</MudButton></MudToolBar>
+        <MudTable Items="WellBoreArchitectureInstance.WellBoreArchitectureFeatureAssignments" Dense="true">
+            <HeaderContent><MudTh>Category</MudTh><MudTh>Option</MudTh><MudTh>From</MudTh><MudTh>To</MudTh><MudTh></MudTh></HeaderContent>
+            <RowTemplate>
+                <MudTd><MudSelect T="Guid?" Value="context.FeatureCategoryID" ValueChanged="@(value => SetFeatureCategory(context, value))">@foreach (var category in featureCatalog) { <MudSelectItem T="Guid?" Value="category.MetaInfo.ID">@category.Name</MudSelectItem> }</MudSelect></MudTd>
+                <MudTd><MudSelect T="Guid?" @bind-Value="context.FeatureOptionID">@foreach (var option in OptionsFor(context)) { <MudSelectItem T="Guid?" Value="option.ID">@option.Name</MudSelectItem> }</MudSelect></MudTd>
+                <MudTd><MudDatePicker Date="ToDateTime(context.FromDate)" DateChanged="@(value => context.FromDate = ToDateTimeOffset(value))" Disabled="@(!HasValidity(context))" /></MudTd>
+                <MudTd><MudDatePicker Date="ToDateTime(context.ToDate)" DateChanged="@(value => context.ToDate = ToDateTimeOffset(value))" Disabled="@(!HasValidity(context))" /></MudTd>
+                <MudTd><MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="@(() => RemoveFeatureAssignment(context))" /></MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudPaper>
+
     @*Well head*@
     @if (WellBoreArchitectureInstance.WellHead != null)
     {
@@ -221,6 +247,8 @@
 }
 
 @code{
+    private List<WellBoreArchitectureIdentity> identityCatalog = [];
+    private List<WellBoreArchitectureFeatureCategory> featureCatalog = [];
     [CascadingParameter]
     private MudUnitAndReferenceChoiceTag? Parent { get; set; }
     [Parameter]
@@ -229,6 +257,24 @@
     public string Class {get; set;} = "mx-2 px-2";
     [Parameter]
     public EventCallback<WellBoreArchitecture> ValueChanged { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        WellBoreArchitectureInstance.WellBoreArchitectureIdentityAssignments ??= [];
+        WellBoreArchitectureInstance.WellBoreArchitectureFeatureAssignments ??= [];
+        if (identityCatalog.Count == 0) identityCatalog = await Api.ClientWellBoreArchitecture.GetAllWellBoreArchitectureIdentityAsync();
+        if (featureCatalog.Count == 0) featureCatalog = await Api.ClientWellBoreArchitecture.GetAllWellBoreArchitectureFeatureCategoryAsync();
+    }
+
+    private void AddIdentityAssignment() => WellBoreArchitectureInstance.WellBoreArchitectureIdentityAssignments.Add(new() { ID = Guid.NewGuid() });
+    private void RemoveIdentityAssignment(WellBoreArchitectureIdentityAssignment value) => WellBoreArchitectureInstance.WellBoreArchitectureIdentityAssignments.Remove(value);
+    private void AddFeatureAssignment() => WellBoreArchitectureInstance.WellBoreArchitectureFeatureAssignments.Add(new() { ID = Guid.NewGuid() });
+    private void RemoveFeatureAssignment(WellBoreArchitectureFeatureAssignment value) => WellBoreArchitectureInstance.WellBoreArchitectureFeatureAssignments.Remove(value);
+    private IEnumerable<WellBoreArchitectureFeatureOption> OptionsFor(WellBoreArchitectureFeatureAssignment value) => featureCatalog.FirstOrDefault(category => category.MetaInfo.ID == value.FeatureCategoryID)?.Options ?? [];
+    private bool HasValidity(WellBoreArchitectureFeatureAssignment value) => featureCatalog.FirstOrDefault(category => category.MetaInfo.ID == value.FeatureCategoryID)?.HasValidityPeriod == true;
+    private void SetFeatureCategory(WellBoreArchitectureFeatureAssignment value, Guid? id) { value.FeatureCategoryID = id; value.FeatureOptionID = null; if (!HasValidity(value)) { value.FromDate = null; value.ToDate = null; } }
+    private static DateTime? ToDateTime(DateTimeOffset? value) => value?.UtcDateTime;
+    private static DateTimeOffset? ToDateTimeOffset(DateTime? value) => value == null ? null : new DateTimeOffset(DateTime.SpecifyKind(value.Value, DateTimeKind.Utc));
     
     private async Task UpdateCasingSectionTopDepth(CasingSection section, double? val)
     {

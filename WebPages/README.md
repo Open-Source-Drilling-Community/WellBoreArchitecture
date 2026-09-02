@@ -6,7 +6,8 @@ It contains the `WellBoreArchitectureMain` page, the architecture editor panels,
 
 ## Package contents
 
-- Wellbore architecture list and editor pages
+- Wellbore architecture list and editor pages, including identity and feature assignments
+- User-managed identity and feature-category catalog pages
 - Surface, casing, fluid, side connector, and well head editor components
 - Shared API/configuration and conversion helpers
 - Plotly-based visualization components
@@ -38,8 +39,8 @@ The consuming app should:
 - `WellBoreHostURL`
 - `WellBoreArchitectureHostURL`
 - `UnitConversionHostURL`
-- `VerticalDatumHostURL`
+- `EarthVerticalDatumHostURL` for the current stateless Earth Vertical Datum API
 
 ## Mean-sea-level depth references
 
-The architecture pages retrieve Vertical Datum data through `WellBoreArchitectureAPIUtils` and use `MslDepthReferenceUtils` and the shared reference-source helpers to display mean-sea-level depth references consistently. This package uses `OSDC.DotnetLibraries.Drilling.WebAppUtils` 1.1.3.
+The architecture pages call the stateless Earth Vertical Datum conversion API through `WellBoreArchitectureAPIUtils` and use `MslDepthReferenceUtils` and the shared reference-source helpers to display mean-sea-level depth references consistently. If that downstream service is temporarily unavailable, the editor remains usable and omits only the mean-sea-level reference. This package uses `OSDC.DotnetLibraries.Drilling.WebAppUtils` 1.1.3.

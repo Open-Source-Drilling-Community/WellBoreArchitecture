@@ -20,7 +20,17 @@ public sealed class McpToolRegistrationTests
         ["GetAllWellBoreArchitecture"] = "well_bore_architecture_get_all",
         ["PostWellBoreArchitecture"] = "well_bore_architecture_create",
         ["PutWellBoreArchitectureById"] = "well_bore_architecture_update_by_id",
-        ["DeleteWellBoreArchitectureById"] = "well_bore_architecture_delete_by_id"
+        ["DeleteWellBoreArchitectureById"] = "well_bore_architecture_delete_by_id",
+        ["IdentityGetAll"] = "well_bore_architecture_identity_get_all",
+        ["IdentityGetById"] = "well_bore_architecture_identity_get_by_id",
+        ["IdentityCreate"] = "well_bore_architecture_identity_create",
+        ["IdentityUpdate"] = "well_bore_architecture_identity_update_by_id",
+        ["IdentityDelete"] = "well_bore_architecture_identity_delete_by_id",
+        ["FeatureGetAll"] = "well_bore_architecture_feature_category_get_all",
+        ["FeatureGetById"] = "well_bore_architecture_feature_category_get_by_id",
+        ["FeatureCreate"] = "well_bore_architecture_feature_category_create",
+        ["FeatureUpdate"] = "well_bore_architecture_feature_category_update_by_id",
+        ["FeatureDelete"] = "well_bore_architecture_feature_category_delete_by_id"
     };
 
     private ServiceProvider _provider = null!;
@@ -46,7 +56,7 @@ public sealed class McpToolRegistrationTests
         var endpoints = typeof(WellBoreArchitectureController).GetMethods()
             .Where(method => method.GetCustomAttributes(typeof(HttpMethodAttribute), true).Length > 0)
             .Select(method => method.Name);
-        Assert.That(endpoints, Is.EquivalentTo(EndpointToolMap.Keys));
+        Assert.That(endpoints, Is.EquivalentTo(EndpointToolMap.Keys.Take(8)));
         Assert.That(_tools.Keys, Is.EquivalentTo(EndpointToolMap.Values.Append("ping")));
     }
 

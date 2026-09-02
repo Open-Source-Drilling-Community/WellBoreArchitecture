@@ -21,12 +21,12 @@ The WebApp project is a Blazor Server UI that lets engineers browse, create, and
 ## Service dependencies
 - `ModelSharedOut` – generated client aligned with the REST contract from the `Service` project. Regenerate the shared client whenever the microservice API changes.
 - `Service` – expected to be reachable at `/WellBoreArchitecture/api`; host name is set via configuration (`WellBoreArchitectureHostURL`).
-- Optional external microservices (Field, Cluster, Well, WellBore, UnitConversion) provide complementary data and are also configured through the static `Configuration` class.
+- External Field, Cluster, Rig, Well, WellBore, Unit Conversion, and Earth-service microservices provide contextual data and the calculator operations.
 
 ## Configuration
 - `appsettings.json` – baseline configuration used in all environments.
 - `appsettings.Development.json`, `appsettings.Production.json` – environment-specific overrides for API hosts, logging, and tracing.
-- Environment variables (`FieldHostURL`, `ClusterHostURL`, `WellHostURL`, `WellBoreHostURL`, `WellBoreArchitectureHostURL`, `UnitConversionHostURL`) can override JSON settings. Helm templates populate these when deploying to Kubernetes.
+- Environment variables can override the host settings, including `FieldHostURL`, `ClusterHostURL`, `RigHostURL`, `WellHostURL`, `WellBoreHostURL`, `WellBoreArchitectureHostURL`, `UnitConversionHostURL`, and the `Earth*HostURL` settings.
 - `Program.cs` applies `UsePathBase("/WellBoreArchitecture/webapp")`; keep ingress rules in sync with this base path.
 
 ## Build and run locally
@@ -62,6 +62,6 @@ The current work has been funded by the [Research Council of Norway](https://www
 
 ## Current integrations
 
-The host supplies the Vertical Datum service and WebApp URLs required by the reusable architecture pages. Its embedded page packages are aligned to Field 1.0.19, Cluster 1.0.12, Cartographic Projection 1.0.8, Geodetic Datum 1.0.7, Well 1.0.11, and WellBore 1.0.12.
+The host uses the OSDC Field, Cluster, Rig, Well, and WellBore page packages for contextual data. Cartographic conversion, Earth Vertical Datum, Earth Gravity, and Earth Magnetic Field calculators use the corresponding OSDC Earth-service page packages. Calculator routes are wrapped by local pages so the Earth packages' own home routes do not conflict with the application home page.
 
 Keep development and production settings aligned with their respective deployments.

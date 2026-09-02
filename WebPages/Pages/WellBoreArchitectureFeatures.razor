@@ -1,0 +1,46 @@
+@page "/WellBoreArchitecture/webapp/WellBoreArchitectureFeatures"
+@inject IWellBoreArchitectureAPIUtils Api
+@inject ISnackbar Snackbar
+
+<MudText Typo="Typo.h4" Class="mb-4">WellBore Architecture Features</MudText>
+<MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="AddCategory">Add category</MudButton>
+<MudButton Color="Color.Primary" Variant="Variant.Filled" Class="ml-2" OnClick="SaveAsync">Save</MudButton>
+<MudExpansionPanels MultiExpansion="true" Class="mt-4">
+@foreach (var category in items)
+{
+    <MudExpansionPanel Text="@(category.Name ?? "New category")">
+        <MudGrid>
+            <MudItem xs="5"><MudTextField Label="Category" @bind-Value="category.Name" /></MudItem>
+            <MudItem xs="3"><MudCheckBox T="bool" Label="Exclusive" @bind-Value="category.IsExclusive" /></MudItem>
+            <MudItem xs="3"><MudCheckBox T="bool" Label="Validity period" @bind-Value="category.HasValidityPeriod" /></MudItem>
+            <MudItem xs="1"><MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => DeleteCategoryAsync(category))" /></MudItem>
+        </MudGrid>
+        @foreach (var option in category.Options)
+        {
+            <div class="d-flex align-center"><MudTextField Label="Option" @bind-Value="option.Name" /><MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="@(() => category.Options.Remove(option))" /></div>
+        }
+        <MudButton StartIcon="@Icons.Material.Filled.Add" OnClick="@(() => category.Options.Add(new() { ID = Guid.NewGuid() }))">Add option</MudButton>
+    </MudExpansionPanel>
+}
+</MudExpansionPanels>
+
+@code {
+    private List<WellBoreArchitectureFeatureCategory> items = [];
+    protected override async Task OnInitializedAsync() => items = await Api.ClientWellBoreArchitecture.GetAllWellBoreArchitectureFeatureCategoryAsync();
+    private void AddCategory() => items.Add(new() { MetaInfo = new() { ID = Guid.NewGuid() }, Options = [] });
+    private async Task SaveAsync()
+    {
+        var existing = (await Api.ClientWellBoreArchitecture.GetAllWellBoreArchitectureFeatureCategoryIdAsync()).ToHashSet();
+        foreach (var item in items)
+            if (existing.Contains(item.MetaInfo.ID)) await Api.ClientWellBoreArchitecture.PutWellBoreArchitectureFeatureCategoryByIdAsync(item.MetaInfo.ID, item.LastModificationDate, item);
+            else await Api.ClientWellBoreArchitecture.PostWellBoreArchitectureFeatureCategoryAsync(item);
+        items = await Api.ClientWellBoreArchitecture.GetAllWellBoreArchitectureFeatureCategoryAsync();
+        Snackbar.Add("Feature categories saved", Severity.Success);
+    }
+    private async Task DeleteCategoryAsync(WellBoreArchitectureFeatureCategory item)
+    {
+        if (item.LastModificationDate == null) { items.Remove(item); return; }
+        try { await Api.ClientWellBoreArchitecture.DeleteWellBoreArchitectureFeatureCategoryByIdAsync(item.MetaInfo.ID, item.LastModificationDate); items.Remove(item); }
+        catch (ApiException ex) when (ex.StatusCode == 409) { Snackbar.Add("This category or one of its options is in use.", Severity.Warning); }
+    }
+}

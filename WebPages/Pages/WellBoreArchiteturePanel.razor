@@ -1193,12 +1193,23 @@
 
     private async Task SyncDepthReferenceSourcesAsync(bool forceRefresh = false)
     {
+        double? meanSeaLevel = null;
+        try
+        {
+            meanSeaLevel = await MslDepthReferenceUtils.ResolveMeanSeaLevelDepthReferenceAsync(
+                Api, _selectedWellBore, _selectedWell, _resolvedCluster, WellBores, Wells, Clusters);
+        }
+        catch (Exception exception) when (exception is HttpRequestException or JsonException)
+        {
+            logger.LogWarning(exception, "Unable to calculate the mean-sea-level depth reference; the editor will continue without it");
+        }
+
         var snapshot = (
             GroundMudLine: GetGroundOrMudLineDepth(),
             SeaWaterLevel: GetSeaWaterLevelReferenceDepth(),
             WellHead: GetWellHeadReferenceDepth(),
             RotaryTable: GetRotaryTableReferenceDepth(),
-            MeanSeaLevel: await MslDepthReferenceUtils.ResolveMeanSeaLevelDepthReferenceAsync(Api, _selectedWellBore, _selectedWell, _resolvedCluster, WellBores, Wells, Clusters));
+            MeanSeaLevel: meanSeaLevel);
 
         DataUtils.UnitAndReferenceParameters.GroundMudLineDepthReferenceSource.GroundMudLineDepthReference = -snapshot.GroundMudLine;
         DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource.MeanSeaLevelDepthReference = snapshot.MeanSeaLevel;

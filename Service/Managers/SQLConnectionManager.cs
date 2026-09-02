@@ -31,7 +31,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
         public static readonly string HOME_DIRECTORY = ".." + Path.DirectorySeparatorChar + "home" + Path.DirectorySeparatorChar;
         public static readonly string DATABASE_FILENAME = "WellBoreArchitecture.db";
         public static readonly string DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
-        public const int CURRENT_SCHEMA_VERSION = 1;
+        public const int CURRENT_SCHEMA_VERSION = 2;
 
         // dictionary describing tables format
         // Light weight data fields are enumerated explicitly in the data table implementing the light weight data concept
@@ -52,6 +52,15 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
                     "CreationDate text",
                     "LastModificationDate text",
                     "WellBoreArchitecture text" }
+                },
+                { "WellBoreArchitectureIdentityTable", new string[] {
+                    "ID text primary key", "MetaInfo text", "Name text", "CreationDate text",
+                    "LastModificationDate text", "WellBoreArchitectureIdentity text" }
+                },
+                { "WellBoreArchitectureFeatureCategoryTable", new string[] {
+                    "ID text primary key", "MetaInfo text", "Name text", "IsExclusive integer",
+                    "HasValidityPeriod integer", "CreationDate text", "LastModificationDate text",
+                    "WellBoreArchitectureFeatureCategory text" }
                 }
             };
 
@@ -180,16 +189,38 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
                 return;
             }
 
-            ValidateExpectedSchema(connection, tableNames);
-            if (schemaVersion == 0)
+            IEnumerable<string> permittedTables = _tableStructureDict.Keys;
+            List<string> unexpected = tableNames.Except(permittedTables, StringComparer.Ordinal).ToList();
+            if (unexpected.Count > 0)
+                throw new InvalidOperationException($"Unexpected WellBoreArchitecture database tables. No data was changed: [{string.Join(',', unexpected)}].");
+            if (!tableNames.Contains("WellBoreArchitectureTable", StringComparer.Ordinal) ||
+                !CheckDatabaseStructure(connection, new("WellBoreArchitectureTable", _tableStructureDict["WellBoreArchitectureTable"])))
+                throw new InvalidOperationException("The existing WellBoreArchitectureTable is missing or malformed. No data was changed.");
+            List<string> malformedExistingCatalogs = _tableStructureDict
+                .Where(table => table.Key != "WellBoreArchitectureTable" && tableNames.Contains(table.Key, StringComparer.Ordinal) && !CheckDatabaseStructure(connection, table))
+                .Select(table => table.Key).ToList();
+            if (malformedExistingCatalogs.Count > 0)
+                throw new InvalidOperationException($"Existing WellBoreArchitecture catalog tables are malformed. No data was changed: [{string.Join(',', malformedExistingCatalogs)}].");
+
+            if (schemaVersion < CURRENT_SCHEMA_VERSION)
             {
                 using SqliteTransaction transaction = connection.BeginTransaction();
                 try
                 {
-                    using SqliteCommand index = connection.CreateCommand();
-                    index.Transaction = transaction;
-                    index.CommandText = "CREATE UNIQUE INDEX IF NOT EXISTS WellBoreArchitectureTableIndex ON WellBoreArchitectureTable (ID)";
-                    index.ExecuteNonQuery();
+                    foreach (KeyValuePair<string, string[]> table in _tableStructureDict)
+                    {
+                        if (!tableNames.Contains(table.Key, StringComparer.Ordinal))
+                        {
+                            using SqliteCommand create = connection.CreateCommand();
+                            create.Transaction = transaction;
+                            create.CommandText = $"CREATE TABLE {table.Key} ({string.Join(',', table.Value)})";
+                            create.ExecuteNonQuery();
+                        }
+                        using SqliteCommand index = connection.CreateCommand();
+                        index.Transaction = transaction;
+                        index.CommandText = $"CREATE UNIQUE INDEX IF NOT EXISTS {table.Key}Index ON {table.Key} (ID)";
+                        index.ExecuteNonQuery();
+                    }
                     SetSchemaVersion(connection, transaction);
                     transaction.Commit();
                 }
@@ -198,7 +229,10 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
                     transaction.Rollback();
                     throw;
                 }
+                tableNames = _tableStructureDict.Keys.ToList();
             }
+
+            ValidateExpectedSchema(connection, tableNames);
         }
 
         private static void SetSchemaVersion(SqliteConnection connection, SqliteTransaction transaction)

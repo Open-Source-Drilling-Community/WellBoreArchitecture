@@ -31,6 +31,10 @@ namespace OSDC.Drilling.WellBoreArchitecture.Model
         /// the date when the data was last modified
         /// </summary>
         public DateTimeOffset? LastModificationDate { get; set; }
+        /// <summary>Identity values assigned to this architecture.</summary>
+        public List<WellBoreArchitectureIdentityAssignment>? WellBoreArchitectureIdentityAssignments { get; set; }
+        /// <summary>Feature options assigned to this architecture.</summary>
+        public List<WellBoreArchitectureFeatureAssignment>? WellBoreArchitectureFeatureAssignments { get; set; }
         /// <summary>
         ///  the ID of the wellbore in which this architecture belongs to
         /// </summary>

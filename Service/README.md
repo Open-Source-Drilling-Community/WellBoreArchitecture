@@ -12,7 +12,7 @@ The `Service` project exposes the WellBoreArchitecture domain as a REST API back
 - `JsonSettings.cs` – centralizes the `System.Text.Json` options so models keep their C# casing and enums are rendered as strings.
 
 ## Runtime data
-By default the service stores data in `..\home\WellBoreArchitecture.db` (relative to the service project). The `SqlConnectionManager` ensures the folder exists and validates the database before use. A valid unversioned legacy database is adopted without rewriting rows; only the missing index and schema-version marker may be added transactionally. Unexpected, malformed, or newer schemas stop startup without changing data. No background retention process deletes old architectures. Most operations open short-lived SQLite connections for thread safety.
+By default the service stores data in `..\home\WellBoreArchitecture.db` (relative to the service project). Schema version 2 adds identity and feature-category catalog tables in one transaction. Version 0/1 databases retain the existing architecture table and every row unchanged; the migration only creates missing catalog tables/indexes and advances `PRAGMA user_version`. Unexpected, malformed, or newer schemas stop startup without changing data. No background retention process deletes old architectures.
 
 ## Interaction with other solution projects
 - Depends on `Model` (domain types) and uses their `Realize()` logic before persistence when needed.
@@ -29,6 +29,8 @@ All endpoints are relative to `/WellBoreArchitecture/api/WellBoreArchitecture` a
 - `POST /` – add a new architecture after running `Calculate()`.
 - `PUT /{id}` – update an existing architecture with recalculated fields.
 - `DELETE /{id}` – remove an architecture.
+
+The parallel `/WellBoreArchitectureIdentity` and `/WellBoreArchitectureFeatureCategory` resources provide list/get/create/update/delete operations. Updates and deletes require `expectedModifiedUtc`; referenced definitions and referenced feature options cannot be removed. Architecture writes validate assignment IDs, catalog references, options, validity periods, and exclusivity.
 
 Swagger UI is served at `/WellBoreArchitecture/api/swagger` with a merged schema defined in `wwwroot/json-schema/WellBoreArchitectureMergedModel.json`.
 
@@ -61,7 +63,7 @@ dotnet test ServiceTest/ServiceTest.csproj
 
 ## MCP server
 
-The service publishes all eight non-statistics WellBoreArchitecture REST operations as MCP tools. Tool names are normalized for protocol compatibility, and access-statistics operations are deliberately omitted.
+The service publishes the architecture operations and user-manageable identity/feature catalogs as MCP tools. Catalog mutations use optimistic concurrency and enforce reference integrity; access-statistics operations are deliberately omitted.
 
 Descriptions distinguish compact discovery (`get_all_ids`, `get_all_meta_info`, and `get_all_light`) from complete construction-model retrieval. Create and update publish explicit nested schemas for the wellhead, fluid layers, surface equipment, side-circuit connectivity, casing elements, open-hole size tables, enums, and uncertainty wrappers. `MetaInfo.ID` is caller-owned, update path/body IDs must match, and `WellBoreID` is an external WellBore reference rather than the architecture's own identifier.
 
