@@ -32,6 +32,9 @@ public class WellBoreArchitectureAPIUtils : APIUtils, IWellBoreArchitectureAPIUt
         HttpClientWellBore = SetHttpClient(HostNameWellBore, HostBasePathWellBore);
         ClientWellBore = new Client(HttpClientWellBore.BaseAddress!.ToString(), HttpClientWellBore);
 
+        HostNameVerticalDatum = Require(configuration.VerticalDatumHostURL, nameof(configuration.VerticalDatumHostURL));
+        HttpClientVerticalDatum = SetHttpClient(HostNameVerticalDatum, HostBasePathVerticalDatum);
+
         HostNameUnitConversion = Require(configuration.UnitConversionHostURL, nameof(configuration.UnitConversionHostURL));
     }
 
@@ -74,6 +77,10 @@ public class WellBoreArchitectureAPIUtils : APIUtils, IWellBoreArchitectureAPIUt
     public string HostBasePathWellBore { get; } = "WellBore/api/";
     public HttpClient HttpClientWellBore { get; }
     public Client ClientWellBore { get; }
+
+    public string HostNameVerticalDatum { get; }
+    public string HostBasePathVerticalDatum { get; } = "VerticalDatum/api/";
+    public HttpClient HttpClientVerticalDatum { get; }
 
     public string HostNameUnitConversion { get; }
     public string HostBasePathUnitConversion { get; } = "UnitConversion/api/";

@@ -7,6 +7,11 @@ public class GroundMudLineDepthReferenceSource : IGroundMudLineDepthReferenceSou
     public double? GroundMudLineDepthReference { get; set; }
 }
 
+public class MeanSeaLevelDepthReferenceSource : IMeanSeaLevelDepthReferenceSource
+{
+    public double? MeanSeaLevelDepthReference { get; set; }
+}
+
 public class RotaryTableDepthReferenceSource : IRotaryTableDepthReferenceSource
 {
     public double? RotaryTableDepthReference { get; set; }

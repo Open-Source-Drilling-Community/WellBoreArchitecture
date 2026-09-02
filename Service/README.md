@@ -57,3 +57,16 @@ The service itself does not include unit tests, but the `ServiceTest` project va
 - Ensure file-system write access to `..\home` for SQLite database creation and backups.
 - Regenerate the shared client (`ModelSharedOut`) after modifying controllers or DTOs to keep the generated schema in sync.
 - Keep swagger contract up to date by running a Debug build (or invoke the `CreateSwaggerJson` MSBuild target manually) whenever the API changes.
+
+## MCP server
+
+The service publishes all eight non-statistics WellBoreArchitecture REST operations as MCP tools. Tool names are normalized for protocol compatibility, and access-statistics operations are deliberately omitted.
+
+Descriptions distinguish compact discovery (`get_all_ids`, `get_all_meta_info`, and `get_all_light`) from complete construction-model retrieval. Create and update publish explicit nested schemas for the wellhead, fluid layers, surface equipment, side-circuit connectivity, casing elements, open-hole size tables, enums, and uncertainty wrappers. `MetaInfo.ID` is caller-owned, update path/body IDs must match, and `WellBoreID` is an external WellBore reference rather than the architecture's own identifier.
+
+Physical values use SI units. Deterministic properties use `DiracDistributionValue.Value`; uncertain properties use `GaussianValue.Mean` and optionally `GaussianValue.StandardDeviation`, with the deviation expressed in the same unit as the mean. Casing `TopDepth` and `TopCementDepth` are metres referenced to the wellhead. Other depth fields must consistently use the caller's configured depth reference because the persisted payload has no field identifying a display reference. Surface and casing collections are ordered top-to-bottom, and at least one `SurfaceSection` is required by the service calculation.
+
+- Streamable HTTP: `/wellborearchitecture/api/mcp`
+- WebSocket: `/wellborearchitecture/api/mcp/ws`
+- Utility tool: `ping`
+- Optional external MCP-hub registration: configured in `appsettings.json`, disabled by default

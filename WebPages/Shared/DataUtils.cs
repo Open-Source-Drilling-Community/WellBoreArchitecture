@@ -15,6 +15,7 @@ public static class DataUtils
         public static string? PressureReferenceName { get; set; }
         public static string? DateReferenceName { get; set; }
         public static GroundMudLineDepthReferenceSource GroundMudLineDepthReferenceSource { get; set; } = new();
+        public static MeanSeaLevelDepthReferenceSource MeanSeaLevelDepthReferenceSource { get; set; } = new();
         public static RotaryTableDepthReferenceSource RotaryTableDepthReferenceSource { get; set; } = new();
         public static SeaWaterLevelDepthReferenceSource SeaWaterLevelDepthReferenceSource { get; set; } = new();
         public static WellHeadDepthReferenceSource WellHeadDepthReferenceSource { get; set; } = new();

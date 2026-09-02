@@ -59,3 +59,9 @@ The current work has been funded by the [Research Council of Norway](https://www
 - Eric Cayeux, NORCE Energy Modelling and Automation
 - Gilles Pelfrene, NORCE Energy Modelling and Automation
 - Lucas Volpi, NORCE Energy Modelling and Automation
+
+## Current integrations
+
+The host supplies the Vertical Datum service and WebApp URLs required by the reusable architecture pages. Its embedded page packages are aligned to Field 1.0.19, Cluster 1.0.12, Cartographic Projection 1.0.8, Geodetic Datum 1.0.7, Well 1.0.11, and WellBore 1.0.12.
+
+Keep development and production settings aligned with their respective deployments.

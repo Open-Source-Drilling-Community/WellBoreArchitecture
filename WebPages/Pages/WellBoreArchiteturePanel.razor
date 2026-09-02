@@ -770,7 +770,7 @@
     private Well? _selectedWell;
     private WellBore? _selectedWellBore;
     private Guid? _initializedArchitectureId;
-    private (double? GroundMudLine, double? SeaWaterLevel, double? WellHead, double? RotaryTable) _lastDepthReferenceSnapshot;
+    private (double? GroundMudLine, double? SeaWaterLevel, double? WellHead, double? RotaryTable, double? MeanSeaLevel) _lastDepthReferenceSnapshot;
     private bool _hasDepthReferenceSnapshot;
     private List<SimplifiedCasingRow> _simplifiedCasingRows = new();
     private bool _includeBop = true;
@@ -1186,9 +1186,11 @@
             GroundMudLine: GetGroundOrMudLineDepth(),
             SeaWaterLevel: GetSeaWaterLevelReferenceDepth(),
             WellHead: GetWellHeadReferenceDepth(),
-            RotaryTable: GetRotaryTableReferenceDepth());
+            RotaryTable: GetRotaryTableReferenceDepth(),
+            MeanSeaLevel: await MslDepthReferenceUtils.ResolveMeanSeaLevelDepthReferenceAsync(Api, _selectedWellBore, _selectedWell, _resolvedCluster, WellBores, Wells, Clusters));
 
         DataUtils.UnitAndReferenceParameters.GroundMudLineDepthReferenceSource.GroundMudLineDepthReference = -snapshot.GroundMudLine;
+        DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource.MeanSeaLevelDepthReference = snapshot.MeanSeaLevel;
         DataUtils.UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource.SeaWaterLevelDepthReference = -snapshot.SeaWaterLevel;
         DataUtils.UnitAndReferenceParameters.WellHeadDepthReferenceSource.WellHeadDepthReference = -snapshot.WellHead;
         DataUtils.UnitAndReferenceParameters.RotaryTableDepthReferenceSource.RotaryTableDepthReference = -snapshot.RotaryTable;
@@ -1198,7 +1200,8 @@
             || !Nullable.Equals(_lastDepthReferenceSnapshot.GroundMudLine, snapshot.GroundMudLine)
             || !Nullable.Equals(_lastDepthReferenceSnapshot.SeaWaterLevel, snapshot.SeaWaterLevel)
             || !Nullable.Equals(_lastDepthReferenceSnapshot.WellHead, snapshot.WellHead)
-            || !Nullable.Equals(_lastDepthReferenceSnapshot.RotaryTable, snapshot.RotaryTable);
+            || !Nullable.Equals(_lastDepthReferenceSnapshot.RotaryTable, snapshot.RotaryTable)
+            || !Nullable.Equals(_lastDepthReferenceSnapshot.MeanSeaLevel, snapshot.MeanSeaLevel);
 
         _lastDepthReferenceSnapshot = snapshot;
         _hasDepthReferenceSnapshot = true;

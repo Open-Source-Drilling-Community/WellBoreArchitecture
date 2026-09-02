@@ -35,6 +35,10 @@ builder.Services.AddSwaggerGen(config =>
     config.CustomSchemaIds(type => type.FullName);
 });
 
+builder.Services.Configure<McpHubOptions>(builder.Configuration.GetSection(McpHubOptions.SectionName));
+builder.Services.AddHttpClient(nameof(McpHubRegistrationService));
+builder.Services.AddHostedService<McpHubRegistrationService>();
+
 // MCP server registrations
 var serverVersion = typeof(SqlConnectionManager).Assembly.GetName().Version?.ToString() ?? "1.0.0";
 
@@ -52,6 +56,7 @@ builder.Services.AddMcpServer(options =>
 }).WithHttpTransport();
 
 builder.Services.AddLegacyMcpTool<PingMcpTool>();
+builder.Services.AddWellBoreArchitectureRestMcpTools();
 
 // end MCP server
 

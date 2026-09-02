@@ -38,3 +38,8 @@ The consuming app should:
 - `WellBoreHostURL`
 - `WellBoreArchitectureHostURL`
 - `UnitConversionHostURL`
+- `VerticalDatumHostURL`
+
+## Mean-sea-level depth references
+
+The architecture pages retrieve Vertical Datum data through `WellBoreArchitectureAPIUtils` and use `MslDepthReferenceUtils` and the shared reference-source helpers to display mean-sea-level depth references consistently. This package uses `OSDC.DotnetLibraries.Drilling.WebAppUtils` 1.1.3.
