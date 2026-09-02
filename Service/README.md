@@ -3,6 +3,7 @@
 The `Service` project exposes the WellBoreArchitecture domain as a REST API backed by a SQLite database. It is an ASP.NET Core web service targeting `net8.0` and reuses the domain types from the `Model` project.
 
 ## Structure
+
 - `Service.csproj` – web SDK project referencing `Model`. NuGet dependencies cover SQLite (`Microsoft.Data.Sqlite`) and Swagger tooling (`Swashbuckle.AspNetCore.*`, `Microsoft.OpenApi`).
 - `Program.cs` – bootstraps the web host, sets the base path (`/WellBoreArchitecture/api`), wires dependency injection, configures Swagger UI, and maps controllers.
 - `Controllers/WellBoreArchitectureController.cs` – the public API surface; each action delegates to the manager layer and returns domain models (`Model.WellBoreArchitecture`, `WellBoreArchitectureLight`, etc.).
@@ -12,15 +13,18 @@ The `Service` project exposes the WellBoreArchitecture domain as a REST API back
 - `JsonSettings.cs` – centralizes the `System.Text.Json` options so models keep their C# casing and enums are rendered as strings.
 
 ## Runtime data
-By default the service stores data in `..\home\WellBoreArchitecture.db` (relative to the service project). Schema version 2 adds identity and feature-category catalog tables in one transaction. Version 0/1 databases retain the existing architecture table and every row unchanged; the migration only creates missing catalog tables/indexes and advances `PRAGMA user_version`. Unexpected, malformed, or newer schemas stop startup without changing data. No background retention process deletes old architectures.
+
+By default the service stores data in `..\home\WellBoreArchitecture.db`, resolved from the process working directory. In the container, `/app/../home` resolves to the persistent `/home` volume. Schema version 2 adds identity and feature-category catalogue tables in one transaction. Version 0/1 databases retain the existing architecture table and every row unchanged; the migration only creates missing catalogue tables/indexes and advances `PRAGMA user_version`. Unexpected, malformed, or newer schemas stop startup without changing data. No background retention process deletes old architectures.
 
 ## Interaction with other solution projects
+
 - Depends on `Model` (domain types) and uses their `Realize()` logic before persistence when needed.
 - `ModelSharedOut` consumes this service's Swagger output. A post-build target (`CreateSwaggerJson`) runs `dotnet swagger tofile` to export the API descriptor into `../ModelSharedOut/json-schemas/WellBoreArchitectureFullName.json`, which eventually feeds NSwag code generation.
 - `ServiceTest` references `ModelSharedOut` to validate the externally generated contract against service behavior.
 - `WebApp` (Blazor frontend) uses the `ModelSharedOut` client to call this API and therefore relies on the service being available at `/WellBoreArchitecture/api`.
 
 ## Endpoints
+
 All endpoints are relative to `/WellBoreArchitecture/api/WellBoreArchitecture` and are implemented in `Controllers/WellBoreArchitectureController.cs`. Highlights:
 - `GET /` – list all architecture IDs.
 - `GET /MetaInfo` – metadata for all architectures.
@@ -29,8 +33,15 @@ All endpoints are relative to `/WellBoreArchitecture/api/WellBoreArchitecture` a
 - `POST /` – add a new architecture after running `Calculate()`.
 - `PUT /{id}` – update an existing architecture with recalculated fields.
 - `DELETE /{id}` – remove an architecture.
+- `GET /{id}/ExternalReferences` – validate one optional external `WellBoreID`.
+- `POST /ExternalReferenceAudit` – validate a bounded page of all or selected records.
+- `POST /BatchExport` / `POST /BatchRestore` – export and transactionally restore version-1 backups.
+
+Usage statistics are exposed separately at `/WellBoreArchitectureUsageStatistics`.
 
 The parallel `/WellBoreArchitectureIdentity` and `/WellBoreArchitectureFeatureCategory` resources provide list/get/create/update/delete operations. Updates and deletes require `expectedModifiedUtc`; referenced definitions and referenced feature options cannot be removed. Architecture writes validate assignment IDs, catalog references, options, validity periods, and exclusivity.
+
+New databases are seeded idempotently with the identities `NameForPlanning`, `NameForCompanyReporting`, `NameForRegulatoryReporting`, `Nickname`, and `NameForOperationReporting`, plus the feature categories `Lifecycle`, `ApprovalStatus`, `SectionRole`, and `DrillingMethod`. These are ordinary persisted definitions: users may add custom entries and may update or remove definitions when referential-integrity rules permit it. Existing databases are never reseeded by deleting or replacing user data.
 
 `POST /BatchExport` exports all architectures or an ordered selection as a dependency-closed, versioned JSON document. `POST /BatchRestore` validates and atomically restores one of those documents with explicit UUID-conflict and catalogue-mapping policies. Exact catalogue UUID matching is the default. Missing definitions created by `MapOrCreateMissing` preserve their source UUIDs; normalized-name mapping across different UUIDs requires the explicit `AllowNormalizedNameMapping` opt-in.
 
@@ -39,6 +50,7 @@ Batch restore does not require or perform a database-schema migration. Catalogue
 Swagger UI is served at `/WellBoreArchitecture/api/swagger` with a merged schema defined in `wwwroot/json-schema/WellBoreArchitectureMergedModel.json`.
 
 ## Build and run
+
 ```powershell
 # Restore dependencies
 dotnet restore Service/Service.csproj
@@ -53,12 +65,14 @@ dotnet run --project Service/Service.csproj
 The service listens on the standard ASP.NET Core ports. Reverse proxies should forward the `X-Forwarded-Host` header so the custom Swagger middleware emits correct server URLs.
 
 ## Testing
+
 ```powershell
 dotnet test ServiceTest/ServiceTest.csproj
 ```
 `ServiceTest` contains both self-contained database safety tests and live API/MCP tests using the generated shared client.
 
 ## Operational tips
+
 - Ensure file-system write access to `..\home` and independently back up `WellBoreArchitecture.db` before an upgrade.
 - Never run two service replicas against the same SQLite file. The Helm chart uses `Recreate`; during the NORCE-to-OSDC cutover, scale the old deployment to zero before starting the new identity.
 - Preserve and reuse `wellborearchitecture-claim`. When a new Helm release adopts it, set `persistence.existingClaim=wellborearchitecture-claim` so Helm does not attempt to create or replace the claim.
@@ -67,7 +81,7 @@ dotnet test ServiceTest/ServiceTest.csproj
 
 ## MCP server
 
-The service publishes the architecture operations and user-manageable identity/feature catalogs as MCP tools. Architecture and catalog mutations use `expectedModifiedUtc` optimistic concurrency; stale calls return conflict without changing stored data. Access-statistics operations are deliberately omitted.
+The service publishes 44 tools: architecture reads/search/mutations, ordered section mutations, user-manageable identity and feature catalogues, backup/restore, external-reference diagnostics, and `ping`. Architecture and catalogue mutations use `expectedModifiedUtc` optimistic concurrency; stale calls return conflict without changing stored data. Access-statistics operations are deliberately omitted.
 
 The MCP contract also publishes `well_bore_architecture_batch_export` and `well_bore_architecture_batch_restore`. They use the same strict version-1 document and transactional implementation as the REST endpoints.
 

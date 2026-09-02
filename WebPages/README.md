@@ -2,16 +2,33 @@
 
 Reusable Razor class library for the WellBoreArchitecture web UI.
 
-It contains the `WellBoreArchitectureMain` page, the architecture editor panels, dependent section editors/components, helper utilities, and the feature JavaScript asset.
+It contains the `WellBoreArchitectureMain` page, simplified and detailed architecture editors, dependent section editors/components, helper utilities, and static JavaScript assets.
 
 ## Package contents
 
-- Wellbore architecture list and editor pages, including identity and feature assignments
+- Wellbore architecture list and simplified/detailed editors, including identity and feature assignments
 - User-managed identity and feature-category catalog pages
 - Backup/restore page for all architectures or a selected set, including safe conflict and catalogue-mapping policies
+- Usage-statistics dashboard with endpoint totals, current-day counts, last-use timestamps, sorting, and refresh
 - Surface, casing, fluid, side connector, and well head editor components
 - Shared API/configuration and conversion helpers
 - Plotly-based visualization components
+
+## Routes
+
+- `/WellBoreArchitecture`
+- `/WellBoreArchitectureIdentities`
+- `/WellBoreArchitectureFeatures`
+- `/WellBoreArchitectureBackupRestore`
+- `/StatisticsWellBoreArchitecture`
+
+The consuming host's `PathBase` is not included in these Razor route templates.
+
+## Identity and feature catalogues
+
+Identity definitions and feature categories are persisted, user-manageable catalogues. New databases are seeded with the default identities `NameForPlanning`, `NameForCompanyReporting`, `NameForRegulatoryReporting`, `Nickname`, and `NameForOperationReporting`. Default feature categories are `Lifecycle`, `ApprovalStatus`, `SectionRole`, and `DrillingMethod`; their exclusivity, validity-period behavior, and suggested options are defined by the service seed manager. Users may add, edit, and remove unused definitions through the catalogue pages.
+
+Both editor modes expose assignments. The simplified downhole table includes cemented state and Top of cement; the depth entry is enabled only for cemented sections.
 
 ## Dependencies
 
@@ -44,6 +61,8 @@ The backup page dynamically loads `_content/OSDC.Drilling.WellBoreArchitecture.W
 - `UnitConversionHostURL`
 - `EarthVerticalDatumHostURL` for the current stateless Earth Vertical Datum API
 
-## Mean-sea-level depth references
+## Units and depth references
 
-The architecture pages call the stateless Earth Vertical Datum conversion API through `WellBoreArchitectureAPIUtils` and use `MslDepthReferenceUtils` and the shared reference-source helpers to display mean-sea-level depth references consistently. If that downstream service is temporarily unavailable, the editor remains usable and omits only the mean-sea-level reference. This package uses `OSDC.DotnetLibraries.Drilling.WebAppUtils` 1.1.3.
+The architecture pages call the stateless Earth Vertical Datum conversion API through `WellBoreArchitectureAPIUtils` and use `MslDepthReferenceUtils` plus shared reference-source helpers to offer mean-sea-level references. All simplified and detailed depth inputs react to the shared unit/depth-reference selection.
+
+The service contract always stores SI metres relative to WGS84. Alternative references such as MSL, RKB, wellhead, ground level, and mud line are UI-only transformations and are converted back to WGS84 before save. If Earth Vertical Datum is temporarily unavailable, the editor remains usable and omits only the mean-sea-level reference. The exact shared-utility version is declared in `WebPages.csproj`.
