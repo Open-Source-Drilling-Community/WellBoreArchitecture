@@ -1,17 +1,236 @@
-﻿
 @page "/"
-<MudContainer Class="mx-6 px-n4">
-    <MudText Typo="Typo.h3" Class="my-4 px-n4">Home</MudText>
-    <MudText Typo="Typo.body1" Align="Align.Justify">
-        <p>
-           In this webapp, <b> Well Bore Architectures </b> are handled and stored. Each well bore architecture is associated with independent microservices: <b>Field</b>, <b>Cluster</b>,  <b>Well</b> and <b>Wellbore</b>.
-The architecture is made to be able to handle <b> well heads </b>, <b>fluid properties </b> above ground, <b>surface sections</b> with a network of <b>side connectors</b>. Each <b>casing section</b> can be defined separately through its properties and their <b>casing section elements</b>. 
-        </p>
 
+<PageTitle>WellBore Architecture</PageTitle>
 
-    </MudText>        
-</MudContainer>
-@code {
+<MudText Class="mx-4 px-4 mt-4" Typo="Typo.h2">OSDC WellBore Architecture</MudText>
+<MudDivider Class="mb-4" />
+<MudText Class="mx-6 px-6" Typo="Typo.body1">
+    This microservice manages WellBore Architecture records: the structural description of a drilled path from the
+    fluids above ground down through the well head, the surface sections, and the casing programme, together with
+    identity assignments, feature assignments, and portable versioned backups. It persists to SQLite, enforces
+    optimistic concurrency on every mutation, and exposes the same operations through a REST API, an MCP server, and
+    a Blazor web application, so an architecture created or edited in one interface is immediately visible through
+    the others.
+</MudText>
 
+<MudGrid Class="mx-4 px-4 mt-2">
+    <MudItem xs="12" md="6">
+        <MudPaper Class="pa-6 mt-4" Elevation="2">
+            <MudText Typo="Typo.h5" Class="mb-3">What is a WellBore Architecture</MudText>
+            <MudText Typo="Typo.body1" Class="mb-2">
+                A <b>WellBore Architecture</b> is the structural record for one drilled path: a name, a description,
+                server-owned creation and modification timestamps, an optional <code>WellBoreID</code> linking it to
+                the wellbore it describes, its identity and feature assignments, and the physical structure itself —
+                a <b>well head</b>, any fluids sitting above ground level, an ordered list of <b>surface
+                sections</b>, and an ordered list of <b>casing sections</b> with their elements and open-hole
+                intervals. Most engineering quantities are stored as probabilistic (Gaussian or scalar) drilling
+                properties rather than single numbers, and each construction object exposes a <code>Realize()</code>
+                method that samples them down to a deterministic snapshot when a single realistic value is needed.
+            </MudText>
+            <MudText Typo="Typo.body1">
+                All persisted values use SI units, and every depth is stored in metres referenced to the WGS84
+                vertical datum; MSL, RKB, well-head, and ground-level depth references are presentation concerns
+                handled by the web pages and converted back to WGS84 before anything is saved.
+            </MudText>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" md="6">
+        <MudPaper Class="pa-6 mt-4" Elevation="2">
+            <MudText Typo="Typo.h5" Class="mb-3">How an architecture links to a WellBore</MudText>
+            <MudText Typo="Typo.body1" Class="mb-2">
+                A WellBore Architecture is not the same thing as a <b>WellBore</b>. The <b>WellBore</b> microservice
+                owns the drilled-path record itself — its well and rig associations, sidetrack topology, trajectory,
+                and survey stations — while this service owns the structural description of what was built along
+                that path: the casing programme, the surface facilities, and the well head that separates them.
+            </MudText>
+            <MudText Typo="Typo.body1">
+                The link runs one way, through the optional <code>WellBoreID</code> on the architecture: an external
+                reference this service validates but never blocks a write on, so an architecture can be planned and
+                stored before, or independently of, the wellbore record it will eventually be attached to. The
+                <b>Contextual Data</b> menu resolves that reference — and the Well, Cluster, Field, and Rig records
+                reachable from it — for display, described further below.
+            </MudText>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" md="6">
+        <MudPaper Class="pa-6 mt-4" Elevation="2">
+            <MudText Typo="Typo.h5" Class="mb-3">Top and downhole architecture, split at the well head</MudText>
+            <MudText Typo="Typo.body1" Class="mb-2">
+                Every architecture is organized around its <b>well head</b>, the fixed point that separates what sits
+                above it from what hangs below it. The well head itself carries a depth, minimum and maximum outside
+                diameter, and the casing- and tubing-hanger depths at which downhole strings are landed.
+            </MudText>
+            <MudText Typo="Typo.body1" Class="mb-2">
+                Above the well head is the <b>top architecture</b>: any fluids sitting above ground level, and the
+                ordered <code>SurfaceSections</code> list — riser joints, diverters, and other above-ground or
+                near-surface elements, each built from a network of side connectors and side elements — sorted top
+                to bottom down to the well head.
+            </MudText>
+            <MudText Typo="Typo.body1">
+                Below the well head is the <b>downhole architecture</b>: the ordered <code>CasingSections</code>
+                list, sorted top to bottom starting at the well head, each with a top depth, length, and
+                top-of-cement depth, its casing section elements, a size table of length and diameter pairs, and the
+                open-hole interval that continues from where the previous casing section — or the ground level for
+                the first one — left off.
+            </MudText>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" md="6">
+        <MudPaper Class="pa-6 mt-4" Elevation="2">
+            <MudText Typo="Typo.h5" Class="mb-3">Identities and features</MudText>
+            <MudText Typo="Typo.body1" Class="mb-2">
+                Every architecture can carry any number of user-defined <b>identities</b> — symbolic references such
+                as an operator architecture name or an external design reference — each with an architecture-specific
+                value, and any number of <b>feature</b> assignments drawn from user-defined categories and options,
+                optionally exclusive within a category and optionally bounded by a from/to date.
+            </MudText>
+            <MudText Typo="Typo.body1">
+                The identity and feature <i>catalogs</i> are managed on the
+                <MudLink Href="/WellBoreArchitecture/webapp/WellBoreArchitectureIdentities">Identities</MudLink> and
+                <MudLink Href="/WellBoreArchitecture/webapp/WellBoreArchitectureFeatures">Features</MudLink> pages,
+                while a specific architecture's assignments are added, replaced, or removed one at a time from the
+                <MudLink Href="/WellBoreArchitecture/webapp/WellBoreArchitecture">WellBore Architecture</MudLink>
+                page — a definition or option cannot be deleted while an architecture still references it.
+            </MudText>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
 
-}
+<MudPaper Class="mx-4 px-4 pa-6 mt-4" Elevation="2">
+    <MudText Typo="Typo.h5" Class="mb-3">Contextual data and calculators</MudText>
+    <MudText Typo="Typo.body1" Class="mb-2">
+        The web application's <b>Contextual Data</b> menu gives read access to the records an architecture's
+        <code>WellBoreID</code> chains up to: <MudLink Href="/WellBoreArchitecture/webapp/WellBore">WellBore</MudLink>,
+        <MudLink Href="/WellBoreArchitecture/webapp/Well">Well</MudLink>,
+        <MudLink Href="/WellBoreArchitecture/webapp/Cluster">Cluster</MudLink>,
+        <MudLink Href="/WellBoreArchitecture/webapp/Field">Field</MudLink>, and
+        <MudLink Href="/WellBoreArchitecture/webapp/Rig">Rig</MudLink> — each backed by its own microservice and
+        shown here through reusable Razor components, so an architecture can be understood in its wellbore, well,
+        field, and drilling-program context without leaving this application.
+    </MudText>
+    <MudText Typo="Typo.body1">
+        The <b>Calculators</b> menu exposes the same synchronous, stateless evaluations used elsewhere in OSDC —
+        <MudLink Href="/WellBoreArchitecture/webapp/FieldCartographicConverter">Cartographic Conversion</MudLink>,
+        <MudLink Href="/WellBoreArchitecture/webapp/EarthVerticalDatumCalculation">Vertical Datum Conversion</MudLink>,
+        <MudLink Href="/WellBoreArchitecture/webapp/EarthGravityCalculation">Earth Gravity Evaluation</MudLink>, and
+        <MudLink Href="/WellBoreArchitecture/webapp/EarthMagneticFieldCalculation">Earth Magnetic Field
+        Evaluation</MudLink> — for one-off conversions and lookups while working an architecture, without switching
+        to another site.
+    </MudText>
+</MudPaper>
+
+<MudPaper Class="mx-4 px-4 pa-6 mt-4" Elevation="2">
+    <MudText Typo="Typo.h5" Class="mb-3">Backup and restore</MudText>
+    <MudText Typo="Typo.body1" Class="mb-2">
+        Backups are logical, portable JSON, not a raw database copy. From the
+        <MudLink Href="/WellBoreArchitecture/webapp/WellBoreArchitectureBackupRestore">Backup and Restore</MudLink>
+        page, export <b>all</b> architectures or an ordered <b>selection</b> into one schema-versioned document that
+        carries the complete architectures together with only the identity definitions and feature categories/options
+        they actually reference — enough to reproduce the architectures on another installation without pulling in
+        unrelated catalog clutter. The <code>WellBoreID</code> travels as an external reference and is not resolved
+        during export.
+    </MudText>
+    <MudText Typo="Typo.body1">
+        Restoring the same document back offers a <b>conflict policy</b> — fail if any architecture UUID already
+        exists, or replace matching architectures while creating the rest — and a <b>catalog policy</b> — map onto
+        existing local identity/feature definitions, or create the missing ones locally, with normalized-name
+        mapping across different UUIDs available only when explicitly allowed. Validation, catalog mapping, and
+        every architecture write happen inside one SQLite transaction, so a restore of many architectures either
+        commits completely or leaves the database untouched.
+    </MudText>
+</MudPaper>
+
+<MudPaper Class="mx-4 px-4 pa-6 mt-4" Elevation="2">
+    <MudText Typo="Typo.h5" Class="mb-3">Data integrity and monitoring</MudText>
+    <MudText Typo="Typo.body1" Class="mb-2">
+        Architecture updates, deletes, and individual identity/feature assignment, surface-section, and
+        casing-section changes use <b>optimistic concurrency</b>: every mutation must echo back the
+        <code>LastModificationDate</code> from the caller's latest read, and a stale request is rejected rather than
+        silently overwriting a concurrent change. Deleting a catalog definition or option still in use by an
+        architecture is likewise rejected. Surface sections and casing sections can each be reordered independently
+        of the rest of the architecture, addressed by a stable <code>ComponentID</code> rather than by array
+        position.
+    </MudText>
+    <MudText Typo="Typo.body1">
+        Because <code>WellBoreID</code> points at another service, WellBore Architecture also offers read-only
+        <b>external-reference validation</b> for one architecture and a bounded <b>audit</b> across all or selected
+        architectures, each reference reported as <code>Valid</code>, <code>Invalid</code>, or
+        <code>Unavailable</code> so a dependency outage is never confused with a genuinely broken reference. The
+        <MudLink Href="/WellBoreArchitecture/webapp/StatisticsWellBoreArchitecture">Usage Statistics</MudLink> page
+        reports per-endpoint request counts for this service replica.
+    </MudText>
+</MudPaper>
+
+<MudPaper Class="mx-4 px-4 pa-6 mt-4" Elevation="2">
+    <MudText Typo="Typo.h5" Class="mb-3">Using this web application</MudText>
+    <MudText Typo="Typo.body1" Class="mb-2">
+        Open <MudLink Href="/WellBoreArchitecture/webapp/WellBoreArchitecture">WellBore Architecture</MudLink> to
+        browse, search, create, edit, and remove architectures, edit the well head, above-ground fluids, surface
+        sections, and casing sections, and manage identity and feature assignments. Manage the shared catalogs on
+        <MudLink Href="/WellBoreArchitecture/webapp/WellBoreArchitectureIdentities">Identities</MudLink> and
+        <MudLink Href="/WellBoreArchitecture/webapp/WellBoreArchitectureFeatures">Features</MudLink>, and move data
+        between installations on
+        <MudLink Href="/WellBoreArchitecture/webapp/WellBoreArchitectureBackupRestore">Backup and Restore</MudLink>.
+    </MudText>
+    <MudText Typo="Typo.body1">
+        The <b>Contextual Data</b> and <b>Calculators</b> menus give access to the related records and evaluations
+        described above, and the <b>Monitoring</b> menu links to the usage statistics page. All numeric fields
+        follow the unit system selected for the page through the OSDC unit-reference system.
+    </MudText>
+</MudPaper>
+
+<MudPaper Class="mx-4 px-4 pa-6 mt-4 mb-6" Elevation="2">
+    <MudText Typo="Typo.h5" Class="mb-3">Access methods</MudText>
+    <MudText Typo="Typo.body1" Class="mb-3">
+        The same architecture data is reachable through several interfaces built on the same underlying store, so it
+        can be managed interactively, scripted, embedded in other Blazor applications, or wired into AI agents.
+    </MudText>
+    <MudSimpleTable>
+        <thead>
+            <tr><th>Method</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><b>Web page</b></td>
+                <td>
+                    This site — a server-side Blazor application (this page) for browsing, editing, backing up, and
+                    restoring architectures, inspecting contextual data, running calculators, and reviewing usage
+                    statistics.
+                </td>
+            </tr>
+            <tr>
+                <td><b>REST API</b></td>
+                <td>
+                    JSON endpoints under <code>/WellBoreArchitecture/api</code> for architecture CRUD, details,
+                    well-head/topology updates, surface- and casing-section add/update/delete/reorder, identity and
+                    feature catalog management, targeted assignment mutations, external-reference validation and
+                    audit, and batch export/restore, documented and explorable through the Swagger UI at
+                    <code>/WellBoreArchitecture/api/swagger</code>. Suited to scripts, backend integration, and any
+                    HTTP client.
+                </td>
+            </tr>
+            <tr>
+                <td><b>MCP</b></td>
+                <td>
+                    A Model Context Protocol server exposed as Streamable HTTP at
+                    <code>/WellBoreArchitecture/api/mcp</code> (and WebSocket at
+                    <code>/WellBoreArchitecture/api/mcp/ws</code>), publishing every non-statistics REST operation —
+                    architecture CRUD, section and topology mutations, catalog management, external-reference
+                    validation and audit, and batch export/restore — plus connectivity <code>ping</code>, with
+                    strict, closed input/output JSON Schemas, so AI agents and MCP-aware tooling can query, create,
+                    update, and back up architectures directly.
+                </td>
+            </tr>
+            <tr>
+                <td><b>Reusable web pages</b></td>
+                <td>
+                    The Razor components behind the WellBore Architecture, catalog, backup/restore, and section-edit
+                    pages are published as the <code>OSDC.Drilling.WellBoreArchitecture.WebPages</code> NuGet
+                    package, so other Blazor applications can embed the same unit-aware controls instead of
+                    re-implementing this UI — the same way this application embeds the WellBore, Well, Cluster,
+                    Field, and Rig web pages for its own Contextual Data menu.
+                </td>
+            </tr>
+        </tbody>
+    </MudSimpleTable>
+</MudPaper>
