@@ -193,7 +193,9 @@
             _conflictPolicy == WellBoreArchitectureBatchRestoreConflictPolicy.ReplaceExisting
                 ? $"Restore {_document.WellBoreArchitectures.Count} architecture(s) and replace matching UUIDs?"
                 : $"Restore {_document.WellBoreArchitectures.Count} architecture(s)? The operation stops if a UUID exists.",
-            yesText: _conflictPolicy == WellBoreArchitectureBatchRestoreConflictPolicy.ReplaceExisting ? "Restore and replace" : "Restore", cancelText: "Cancel");
+            yesText: _conflictPolicy == WellBoreArchitectureBatchRestoreConflictPolicy.ReplaceExisting ? "Restore and replace" : "Restore",
+            cancelText: "Cancel",
+            options: new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, CloseOnEscapeKey = true });
         if (confirmed != true) return;
         try
         {

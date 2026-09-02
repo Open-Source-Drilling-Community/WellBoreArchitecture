@@ -67,11 +67,13 @@ dotnet test ServiceTest/ServiceTest.csproj
 
 ## MCP server
 
-The service publishes the architecture operations and user-manageable identity/feature catalogs as MCP tools. Catalog mutations use optimistic concurrency and enforce reference integrity; access-statistics operations are deliberately omitted.
+The service publishes the architecture operations and user-manageable identity/feature catalogs as MCP tools. Architecture and catalog mutations use `expectedModifiedUtc` optimistic concurrency; stale calls return conflict without changing stored data. Access-statistics operations are deliberately omitted.
 
 The MCP contract also publishes `well_bore_architecture_batch_export` and `well_bore_architecture_batch_restore`. They use the same strict version-1 document and transactional implementation as the REST endpoints.
 
-Descriptions distinguish compact discovery (`get_all_ids`, `get_all_meta_info`, and `get_all_light`) from complete construction-model retrieval. Create and update publish explicit nested schemas for the wellhead, fluid layers, surface equipment, side-circuit connectivity, casing elements, open-hole size tables, enums, and uncertainty wrappers. `MetaInfo.ID` is caller-owned, update path/body IDs must match, and `WellBoreID` is an external WellBore reference rather than the architecture's own identifier.
+Descriptions distinguish compact discovery (`get_all_ids`, `get_all_meta_info`, and `get_all_light`) from complete construction-model retrieval. `well_bore_architecture_search` provides a deterministic, bounded page with name, WellBore, identity, feature, and modification-date filters. Narrow details, WellBore-link, and identity/feature-assignment mutations avoid full-document replacement for routine changes.
+
+Create and update publish explicit nested schemas for the wellhead, fluid layers, surface equipment, side-circuit connectivity, casing elements, open-hole size tables, enums, and uncertainty wrappers. `MetaInfo.ID` is caller-owned, update path/body IDs must match, and `WellBoreID` is an externally-owned WellBore reference rather than the architecture's own identifier. All tools reject unexpected top-level arguments. The MCP protocol advertises output schemas and read-only, destructive, and idempotent behavior annotations; failed tool calls are returned as MCP errors as well as structured error payloads.
 
 Physical values use SI units. Deterministic properties use `DiracDistributionValue.Value`; uncertain properties use `GaussianValue.Mean` and optionally `GaussianValue.StandardDeviation`, with the deviation expressed in the same unit as the mean. Casing `TopDepth` and `TopCementDepth` are metres referenced to the wellhead. Other depth fields must consistently use the caller's configured depth reference because the persisted payload has no field identifying a display reference. Surface and casing collections are ordered top-to-bottom, and at least one `SurfaceSection` is required by the service calculation.
 

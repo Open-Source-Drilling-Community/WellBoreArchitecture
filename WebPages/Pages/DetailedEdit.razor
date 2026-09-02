@@ -114,9 +114,9 @@
                                 <div class="d-flex align-center gap-3">
                                     <MudText Typo="Typo.subtitle1"><b>Section @capturedIndex</b></MudText>
                                     <MudText Typo="Typo.body2" Class="mud-text-secondary">
-                                        Top Depth: @capturedContext.TopDepth?.GaussianValue?.Mean &nbsp;·&nbsp;
+                                        Top Depth: @FormatDepth(capturedContext.TopDepth?.GaussianValue?.Mean) &nbsp;·&nbsp;
                                         Length: @capturedContext.Length?.GaussianValue?.Mean &nbsp;·&nbsp;
-                                        Top Cement Depth: @capturedContext.TopCementDepth?.GaussianValue?.Mean
+                                        Top Cement Depth: @FormatDepth(capturedContext.TopCementDepth?.GaussianValue?.Mean)
                                     </MudText>
                                 </div>
                             </TitleContent>
@@ -127,6 +127,7 @@
                                         <MudText Typo="Typo.caption" Class="mud-text-secondary">Top Depth [@(Parent?.GetUnitLabel("DepthDrilling"))]</MudText>
                                         <MudInputWithUnit VariantType="Variant.Text"
                                                    QuantityName="DepthDrilling"
+                                                   DrillingSignalReference="@DrillingSignalReferenceType.Depth"
                                                    SIValueNullable="capturedContext.TopDepth?.GaussianValue?.Mean"
                                                    SIValueNullableChanged="@(val => UpdateCasingSectionTopDepth(capturedContext, val))" />
                                     </MudItem>
@@ -141,6 +142,7 @@
                                         <MudText Typo="Typo.caption" Class="mud-text-secondary">Top Cement Depth [@(Parent?.GetUnitLabel("DepthDrilling"))]</MudText>
                                         <MudInputWithUnit VariantType="Variant.Text"
                                                    QuantityName="DepthDrilling"
+                                                   DrillingSignalReference="@DrillingSignalReferenceType.Depth"
                                                    SIValueNullable="capturedContext.TopCementDepth?.GaussianValue?.Mean"
                                                    SIValueNullableChanged="@(val => UpdateCasingSectionTopCementDepth(capturedContext, val))" />
                                     </MudItem>
@@ -251,6 +253,12 @@
     private List<WellBoreArchitectureFeatureCategory> featureCatalog = [];
     [CascadingParameter]
     private MudUnitAndReferenceChoiceTag? Parent { get; set; }
+
+    private string FormatDepth(double? value)
+    {
+        return Parent?.FromWGS84DepthSI(value, "DepthDrilling", false) ?? string.Empty;
+    }
+
     [Parameter]
     public WellBoreArchitecture WellBoreArchitectureInstance {get; set;} 
     [Parameter]

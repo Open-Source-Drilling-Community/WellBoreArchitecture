@@ -33,13 +33,19 @@ internal sealed class LegacyMcpServerToolAdapter : McpServerTool
         _protocolTool = new Tool
         {
             Name = tool.Name,
-            Description = tool.Description
+            Title = tool.Behavior.Title,
+            Description = tool.Description,
+            InputSchema = JsonSerializer.SerializeToElement(tool.InputSchema, SerializerOptions),
+            OutputSchema = JsonSerializer.SerializeToElement(tool.OutputSchema, SerializerOptions),
+            Annotations = new()
+            {
+                Title = tool.Behavior.Title,
+                ReadOnlyHint = tool.Behavior.ReadOnlyHint,
+                DestructiveHint = tool.Behavior.DestructiveHint,
+                IdempotentHint = tool.Behavior.IdempotentHint,
+                OpenWorldHint = tool.Behavior.OpenWorldHint
+            }
         };
-
-        if (tool.InputSchema is JsonNode schemaNode)
-        {
-            _protocolTool.InputSchema = JsonSerializer.SerializeToElement(schemaNode, SerializerOptions);
-        }
     }
 
     public override Tool ProtocolTool => _protocolTool;
@@ -58,9 +64,16 @@ internal sealed class LegacyMcpServerToolAdapter : McpServerTool
         {
             var result = await _tool.InvokeAsync(arguments, cancellationToken).ConfigureAwait(false);
 
+            if (TryGetFailure(result, out JsonNode failure))
+            {
+                return Error(failure);
+            }
+
+            string? fallback = result?.ToJsonString(SerializerOptions);
             return new CallToolResult
             {
-                StructuredContent = result
+                StructuredContent = result?.DeepClone(),
+                Content = fallback is null ? [] : [new TextContentBlock { Text = fallback }]
             };
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -71,19 +84,39 @@ internal sealed class LegacyMcpServerToolAdapter : McpServerTool
         {
             _logger.LogError(ex, "MCP tool {ToolName} failed while handling request.", _tool.Name);
 
-            return new CallToolResult
+            return Error(new JsonObject
             {
-                IsError = true,
-                Content =
-                {
-                    new TextContentBlock
-                    {
-                        Text = $"Tool '{_tool.Name}' failed: {ex.Message}"
-                    }
-                }
-            };
+                ["error"] = "internal_error",
+                ["message"] = "An unexpected server error occurred while executing the tool.",
+                ["errors"] = new JsonArray()
+            });
         }
     }
+
+    private static bool TryGetFailure(JsonNode? result, out JsonNode failure)
+    {
+        failure = null!;
+        if (result is not JsonObject response || response["status"]?.GetValue<int>() is not int status || status < 400)
+            return false;
+        failure = new JsonObject
+        {
+            ["error"] = response["error"]?.DeepClone() ?? JsonValue.Create(ErrorCodeForStatus(status)),
+            ["message"] = response["message"]?.DeepClone() ?? response["error"]?.DeepClone() ?? JsonValue.Create("The tool request failed."),
+            ["errors"] = new JsonArray()
+        };
+        return true;
+    }
+
+    private static string ErrorCodeForStatus(int status) => status switch
+    {
+        400 => "validation_failed", 404 => "not_found", 409 => "conflict", _ => "request_failed"
+    };
+
+    private static CallToolResult Error(JsonNode problem) => new()
+    {
+        IsError = true,
+        Content = { new TextContentBlock { Text = problem.ToJsonString(SerializerOptions) } }
+    };
 
     private JsonObject? ConvertArguments(IReadOnlyDictionary<string, JsonElement>? arguments)
     {

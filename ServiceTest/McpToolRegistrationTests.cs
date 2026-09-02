@@ -35,6 +35,23 @@ public sealed class McpToolRegistrationTests
         ["FeatureDelete"] = "well_bore_architecture_feature_category_delete_by_id"
     };
 
+    private static readonly string[] AdditionalToolNames =
+    [
+        "well_bore_architecture_search",
+        "well_bore_architecture_details_update",
+        "well_bore_architecture_well_bore_link_update",
+        "well_bore_architecture_identity_assignment_add",
+        "well_bore_architecture_identity_assignment_update_by_id",
+        "well_bore_architecture_identity_assignment_delete_by_id",
+        "well_bore_architecture_feature_assignment_add",
+        "well_bore_architecture_feature_assignment_update_by_id",
+        "well_bore_architecture_feature_assignment_delete_by_id",
+        "well_bore_architecture_identity_get_all_ids",
+        "well_bore_architecture_identity_get_all_meta_info",
+        "well_bore_architecture_feature_category_get_all_ids",
+        "well_bore_architecture_feature_category_get_all_meta_info"
+    ];
+
     private ServiceProvider _provider = null!;
     private IReadOnlyDictionary<string, IMcpTool> _tools = null!;
 
@@ -59,7 +76,7 @@ public sealed class McpToolRegistrationTests
             .Where(method => method.GetCustomAttributes(typeof(HttpMethodAttribute), true).Length > 0)
             .Select(method => method.Name);
         Assert.That(endpoints, Is.EquivalentTo(EndpointToolMap.Keys.Take(10)));
-        Assert.That(_tools.Keys, Is.EquivalentTo(EndpointToolMap.Values.Append("ping")));
+        Assert.That(_tools.Keys, Is.EquivalentTo(EndpointToolMap.Values.Concat(AdditionalToolNames).Append("ping")));
     }
 
     [Test]
@@ -73,6 +90,8 @@ public sealed class McpToolRegistrationTests
         Assert.That(domainTools.All(tool => tool.Description.Length >= 150), Is.True);
         Assert.That(domainTools.All(tool => tool.InputSchema is JsonObject), Is.True);
         Assert.That(domainTools.All(tool => tool.InputSchema?["type"]?.GetValue<string>() == "object"), Is.True);
+        Assert.That(domainTools.All(tool => tool.OutputSchema is JsonObject), Is.True);
+        Assert.That(domainTools.All(tool => tool.OutputSchema["type"]?.GetValue<string>() == "object"), Is.True);
     }
 
     [Test]
@@ -129,6 +148,77 @@ public sealed class McpToolRegistrationTests
     public async Task Create_requires_a_request_body()
     {
         JsonObject? response = await _tools["well_bore_architecture_create"].InvokeAsync(new JsonObject(), CancellationToken.None) as JsonObject;
+        Assert.That(response?["status"]?.GetValue<int>(), Is.EqualTo(400));
+    }
+
+    [Test]
+    public void Architecture_mutations_require_optimistic_concurrency_tokens()
+    {
+        foreach (string name in new[]
+                 {
+                     "well_bore_architecture_update_by_id", "well_bore_architecture_delete_by_id",
+                     "well_bore_architecture_details_update", "well_bore_architecture_well_bore_link_update",
+                     "well_bore_architecture_identity_assignment_add", "well_bore_architecture_identity_assignment_update_by_id",
+                     "well_bore_architecture_identity_assignment_delete_by_id", "well_bore_architecture_feature_assignment_add",
+                     "well_bore_architecture_feature_assignment_update_by_id", "well_bore_architecture_feature_assignment_delete_by_id"
+                 })
+        {
+            JsonObject schema = (JsonObject)_tools[name].InputSchema!;
+            Assert.That(schema["required"]!.AsArray().Select(node => node!.GetValue<string>()),
+                Does.Contain("expectedModifiedUtc"), name);
+            Assert.That(schema["additionalProperties"]!.GetValue<bool>(), Is.False, name);
+        }
+    }
+
+    [Test]
+    public void Search_is_bounded_and_supports_domain_filters()
+    {
+        string schema = _tools["well_bore_architecture_search"].InputSchema!.ToJsonString();
+        Assert.That(schema, Does.Contain("\"maximum\":200"));
+        Assert.That(schema, Does.Contain("wellBoreId"));
+        Assert.That(schema, Does.Contain("identityValue"));
+        Assert.That(schema, Does.Contain("featureCategoryId"));
+        Assert.That(schema, Does.Contain("modifiedFromUtc"));
+    }
+
+    [Test]
+    public void Catalog_metadata_rejects_unknown_properties()
+    {
+        foreach (string name in new[]
+                 {
+                     "well_bore_architecture_identity_create",
+                     "well_bore_architecture_feature_category_create"
+                 })
+        {
+            string schema = _tools[name].InputSchema!.ToJsonString();
+            Assert.That(schema, Does.Not.Contain("\"additionalProperties\":true"), name);
+        }
+    }
+
+    [Test]
+    public void Protocol_contract_publishes_output_schemas_and_safety_annotations()
+    {
+        McpServerTool[] tools = _provider.GetServices<McpServerTool>().ToArray();
+        Assert.That(tools.All(tool => tool.ProtocolTool.OutputSchema.HasValue), Is.True);
+        Assert.That(tools.All(tool => tool.ProtocolTool.Annotations != null), Is.True);
+
+        IMcpTool search = _tools["well_bore_architecture_search"];
+        IMcpTool delete = _tools["well_bore_architecture_delete_by_id"];
+        Assert.Multiple(() =>
+        {
+            Assert.That(search.Behavior.ReadOnlyHint, Is.True);
+            Assert.That(search.Behavior.DestructiveHint, Is.False);
+            Assert.That(delete.Behavior.ReadOnlyHint, Is.False);
+            Assert.That(delete.Behavior.DestructiveHint, Is.True);
+            Assert.That(delete.Behavior.IdempotentHint, Is.True);
+        });
+    }
+
+    [Test]
+    public async Task Unexpected_arguments_are_rejected_before_invocation()
+    {
+        JsonObject? response = await _tools["well_bore_architecture_get_all_ids"]
+            .InvokeAsync(new JsonObject { ["typo"] = true }, CancellationToken.None) as JsonObject;
         Assert.That(response?["status"]?.GetValue<int>(), Is.EqualTo(400));
     }
 }

@@ -28,7 +28,9 @@ internal static class McpToolArgumentHelpers
         if (includeId)
         {
             properties["id"] = String("UUID of the persisted architecture. It must exactly equal wellBoreArchitecture.MetaInfo.ID.", "uuid");
+            properties["expectedModifiedUtc"] = String("Exact LastModificationDate returned by the latest read. Stale writes are rejected without changing data.", "date-time");
             required.Add("id");
+            required.Add("expectedModifiedUtc");
         }
 
         return new JsonObject
@@ -38,6 +40,157 @@ internal static class McpToolArgumentHelpers
             ["required"] = required,
             ["additionalProperties"] = false,
             ["$defs"] = Definitions()
+        };
+    }
+
+    public static JsonObject CreateWellBoreArchitectureDeleteSchema() => new()
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["id"] = String("UUID from WellBoreArchitecture.MetaInfo.ID.", "uuid"),
+            ["expectedModifiedUtc"] = String("Exact LastModificationDate returned by the latest read.", "date-time")
+        },
+        ["required"] = new JsonArray("id", "expectedModifiedUtc"),
+        ["additionalProperties"] = false
+    };
+
+    public static JsonObject CreateDetailsMutationSchema() => CreateSubresourceMutationSchema("details", Object(
+        "Only the human-readable architecture details to change.", new JsonObject
+        {
+            ["Name"] = NullableString("New architecture name."),
+            ["Description"] = NullableString("New architecture description.")
+        }, "Name", "Description"));
+
+    public static JsonObject CreateWellBoreLinkMutationSchema() => CreateSubresourceMutationSchema("link", Object(
+        "The externally-owned WellBore relationship to change.", new JsonObject
+        {
+            ["WellBoreID"] = NullableUuid("External WellBore UUID, or null to remove the relationship. The WellBore service is not synchronously validated.")
+        }, "WellBoreID"));
+
+    public static JsonObject CreateIdentityAssignmentMutationSchema(bool includeAssignmentId, bool includeBody) =>
+        CreateAssignmentMutationSchema("WellBoreArchitectureIdentityAssignment", includeAssignmentId, includeBody);
+
+    public static JsonObject CreateFeatureAssignmentMutationSchema(bool includeAssignmentId, bool includeBody) =>
+        CreateAssignmentMutationSchema("WellBoreArchitectureFeatureAssignment", includeAssignmentId, includeBody);
+
+    public static JsonObject CreateSearchSchema() => new()
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["offset"] = new JsonObject { ["type"] = "integer", ["minimum"] = 0, ["default"] = 0 },
+            ["limit"] = new JsonObject { ["type"] = "integer", ["minimum"] = 1, ["maximum"] = 200, ["default"] = 50 },
+            ["name"] = NullableString("Case-insensitive substring matched against Name."),
+            ["wellBoreId"] = NullableUuid("Exact externally-owned WellBore UUID."),
+            ["identityId"] = NullableUuid("Identity definition UUID assigned to the architecture."),
+            ["identityValue"] = NullableString("Case-insensitive substring matched against assigned identity values."),
+            ["featureCategoryId"] = NullableUuid("Feature category UUID assigned to the architecture."),
+            ["featureOptionId"] = NullableUuid("Feature option UUID assigned to the architecture."),
+            ["modifiedFromUtc"] = NullableDateTime("Inclusive lower LastModificationDate bound."),
+            ["modifiedToUtc"] = NullableDateTime("Inclusive upper LastModificationDate bound.")
+        },
+        ["additionalProperties"] = false
+    };
+
+    public static JsonObject CreateIdsOutputSchema() => SuccessEnvelope(new JsonObject
+    {
+        ["type"] = "array", ["items"] = String("Resource UUID.", "uuid")
+    });
+
+    public static JsonObject CreateMetaInfoListOutputSchema() => SuccessEnvelope(new JsonObject
+    {
+        ["type"] = "array", ["items"] = new JsonObject { ["$ref"] = "#/$defs/MetaInfo" }
+    }, Definitions());
+
+    public static JsonObject CreateArchitectureOutputSchema() => SuccessEnvelope(
+        new JsonObject { ["$ref"] = "#/$defs/WellBoreArchitecture" }, Definitions());
+
+    public static JsonObject CreateArchitectureListOutputSchema() => SuccessEnvelope(new JsonObject
+    {
+        ["type"] = "array", ["items"] = new JsonObject { ["$ref"] = "#/$defs/WellBoreArchitecture" }
+    }, Definitions());
+
+    public static JsonObject CreateArchitectureLightListOutputSchema() => SuccessEnvelope(new JsonObject
+    {
+        ["type"] = "array",
+        ["items"] = Object("Lightweight architecture discovery record.", new JsonObject
+        {
+            ["MetaInfo"] = new JsonObject { ["$ref"] = "#/$defs/MetaInfo" },
+            ["Name"] = NullableString("Architecture name."),
+            ["Description"] = NullableString("Architecture description."),
+            ["CreationDate"] = NullableDateTime("Server-owned creation timestamp."),
+            ["LastModificationDate"] = NullableDateTime("Latest optimistic-concurrency token.")
+        }, "MetaInfo")
+    }, Definitions());
+
+    public static JsonObject CreateIdentityOutputSchema() => SuccessEnvelope(IdentityDefinition());
+    public static JsonObject CreateIdentityListOutputSchema() => SuccessEnvelope(new JsonObject
+    {
+        ["type"] = "array", ["items"] = IdentityDefinition()
+    });
+    public static JsonObject CreateFeatureCategoryOutputSchema() => SuccessEnvelope(FeatureCategoryDefinition());
+    public static JsonObject CreateFeatureCategoryListOutputSchema() => SuccessEnvelope(new JsonObject
+    {
+        ["type"] = "array", ["items"] = FeatureCategoryDefinition()
+    });
+
+    public static JsonObject CreateSearchOutputSchema() => SuccessEnvelope(Object("Deterministic search page.", new JsonObject
+    {
+        ["Offset"] = new JsonObject { ["type"] = "integer", ["minimum"] = 0 },
+        ["Limit"] = new JsonObject { ["type"] = "integer", ["minimum"] = 1, ["maximum"] = 200 },
+        ["TotalCount"] = new JsonObject { ["type"] = "integer", ["minimum"] = 0 },
+        ["Items"] = new JsonObject { ["type"] = "array", ["items"] = new JsonObject { ["$ref"] = "#/$defs/WellBoreArchitecture" } }
+    }, "Offset", "Limit", "TotalCount", "Items"), Definitions());
+
+    public static JsonObject CreateGenericOutputSchema() => SuccessEnvelope(new JsonObject());
+
+    private static JsonObject SuccessEnvelope(JsonObject data, JsonObject? definitions = null)
+    {
+        var result = Object("Successful MCP tool response envelope.", new JsonObject
+        {
+            ["status"] = new JsonObject { ["type"] = "integer", ["minimum"] = 200, ["maximum"] = 299 },
+            ["data"] = data
+        }, "status");
+        if (definitions != null) result["$defs"] = definitions;
+        return result;
+    }
+
+    private static JsonObject CreateSubresourceMutationSchema(string bodyName, JsonObject body) => new()
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["wellBoreArchitectureId"] = String("UUID from WellBoreArchitecture.MetaInfo.ID.", "uuid"),
+            ["expectedModifiedUtc"] = String("Exact LastModificationDate returned by the latest read.", "date-time"),
+            [bodyName] = body
+        },
+        ["required"] = new JsonArray("wellBoreArchitectureId", "expectedModifiedUtc", bodyName),
+        ["additionalProperties"] = false
+    };
+
+    private static JsonObject CreateAssignmentMutationSchema(string definitionName, bool includeAssignmentId, bool includeBody)
+    {
+        var properties = new JsonObject
+        {
+            ["wellBoreArchitectureId"] = String("UUID from WellBoreArchitecture.MetaInfo.ID.", "uuid"),
+            ["expectedModifiedUtc"] = String("Exact LastModificationDate returned by the latest read.", "date-time")
+        };
+        var required = new JsonArray("wellBoreArchitectureId", "expectedModifiedUtc");
+        if (includeAssignmentId)
+        {
+            properties["assignmentId"] = String("Caller-generated assignment UUID.", "uuid");
+            required.Add("assignmentId");
+        }
+        if (includeBody)
+        {
+            properties["assignment"] = Ref(definitionName, "Complete assignment payload.");
+            required.Add("assignment");
+        }
+        return new JsonObject
+        {
+            ["type"] = "object", ["properties"] = properties, ["required"] = required,
+            ["additionalProperties"] = false, ["$defs"] = Definitions()
         };
     }
 
@@ -294,13 +447,25 @@ internal static class McpToolArgumentHelpers
 
     private static JsonObject IdentityDefinition() => Object("User-managed identity definition.", new JsonObject
     {
-        ["MetaInfo"] = new JsonObject { ["type"] = "object", ["properties"] = new JsonObject { ["ID"] = String("Caller-generated definition UUID.", "uuid") }, ["required"] = new JsonArray("ID"), ["additionalProperties"] = true },
+        ["MetaInfo"] = Object("Identity-definition metadata.", new JsonObject
+        {
+            ["ID"] = String("Caller-generated definition UUID.", "uuid"),
+            ["HttpHostName"] = NullableString("Optional source host metadata."),
+            ["HttpHostBasePath"] = NullableString("Optional source base-path metadata."),
+            ["HttpEndPoint"] = NullableString("Optional source endpoint metadata.")
+        }, "ID"),
         ["Name"] = NullableString("Identity category name."), ["CreationDate"] = NullableDateTime("Server-owned creation time."), ["LastModificationDate"] = NullableDateTime("Server-owned concurrency token.")
     }, "MetaInfo");
 
     private static JsonObject FeatureCategoryDefinition() => Object("User-managed feature category and options.", new JsonObject
     {
-        ["MetaInfo"] = new JsonObject { ["type"] = "object", ["properties"] = new JsonObject { ["ID"] = String("Caller-generated definition UUID.", "uuid") }, ["required"] = new JsonArray("ID"), ["additionalProperties"] = true },
+        ["MetaInfo"] = Object("Feature-category metadata.", new JsonObject
+        {
+            ["ID"] = String("Caller-generated definition UUID.", "uuid"),
+            ["HttpHostName"] = NullableString("Optional source host metadata."),
+            ["HttpHostBasePath"] = NullableString("Optional source base-path metadata."),
+            ["HttpEndPoint"] = NullableString("Optional source endpoint metadata.")
+        }, "ID"),
         ["Name"] = NullableString("Feature category name."), ["IsExclusive"] = new JsonObject { ["type"] = "boolean" }, ["HasValidityPeriod"] = new JsonObject { ["type"] = "boolean" },
         ["Options"] = new JsonObject { ["type"] = "array", ["items"] = Object("Feature option.", new JsonObject { ["ID"] = String("Stable option UUID.", "uuid"), ["Name"] = NullableString("Option name.") }, "ID") },
         ["CreationDate"] = NullableDateTime("Server-owned creation time."), ["LastModificationDate"] = NullableDateTime("Server-owned concurrency token.")

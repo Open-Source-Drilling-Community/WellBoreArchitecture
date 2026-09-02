@@ -10,8 +10,8 @@ This project validates the WellBoreArchitecture service API and its MCP surface.
 
 ## MCP coverage
 
-- `McpToolRegistrationTests.cs` verifies the ten architecture REST tools, identity/feature catalogue tools, and `ping`, including exclusion of usage-statistics operations.
-- The registration tests also guard detailed descriptions, the complete nested write schema, external WellBore references, ordered/required sections, exact enums, uncertainty-wrapper shapes, SI units, depth-reference guidance, and update ID matching.
+- `McpToolRegistrationTests.cs` verifies the architecture REST tools, bounded search, granular details/link/assignment mutations, identity/feature catalogue tools, and `ping`, including exclusion of usage-statistics operations.
+- The registration tests also guard detailed descriptions, strict input and output schemas, safety annotations, optimistic-concurrency tokens, external WellBore references, ordered/required sections, uncertainty-wrapper shapes, SI units, depth-reference guidance, and rejection of unexpected arguments.
 - `McpServerHttpTests.cs` exercises MCP initialization, tool listing, and representative calls against a running service.
 
 The live HTTP tests require the service at the configured test base URL. Run the suite with `dotnet test ServiceTest/ServiceTest.csproj`.

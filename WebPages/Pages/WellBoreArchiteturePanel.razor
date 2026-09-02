@@ -322,20 +322,21 @@
                         
                     </MudToolBar>
                     <MudDivider Class="mb-2" />
-                    <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:0.75rem;align-items:center;" class="my-2">
+                    <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr)) minmax(3.5rem,0.4fr) minmax(0,1fr) minmax(10rem,1.4fr);gap:0.75rem;align-items:center;" class="my-2">
                         <MudText Typo="Typo.caption"><b>Suspension depth</b></MudText>
                         <MudText Typo="Typo.caption"><b>Final depth</b></MudText>
                         <MudText Typo="Typo.caption"><b>OD</b></MudText>
                         <MudText Typo="Typo.caption"><b>ID</b></MudText>
                         <MudText Typo="Typo.caption"><b>Borehole OD</b></MudText>
                         <MudText Typo="Typo.caption"><b>Cement</b></MudText>
+                        <MudText Typo="Typo.caption"><b>Top cement depth</b></MudText>
                         <MudText Typo="Typo.caption"><b>Actions</b></MudText>
                     </div>
                     @for (var i = 0; i < SimplifiedCasingRows.Count; i++)
                     {
                         var index = i;
                         var row = SimplifiedCasingRows[i];
-                        <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:0.75rem;align-items:center;" class="my-2">
+                        <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr)) minmax(3.5rem,0.4fr) minmax(0,1fr) minmax(10rem,1.4fr);gap:0.75rem;align-items:center;" class="my-2">
                             <div>
                                 <MudInputWithUnitAdornment VariantType="Variant.Text"
                                                            QuantityName="DepthDrilling"
@@ -373,6 +374,14 @@
                                              Value="@row.HasCement"
                                              ValueChanged="value => UpdateCasingCement(index, value)"
                                              Color="Color.Primary" />
+                            </div>
+                            <div>
+                                <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                                           QuantityName="DepthDrilling"
+                                                           DrillingSignalReference="@DrillingSignalReferenceType.Depth"
+                                                           Disabled="@(!row.HasCement)"
+                                                           SIValueNullable="@row.TopCementDepth"
+                                                           SIValueNullableChanged="value => UpdateTopCementDepth(index, value)" />
                             </div>
                             <div>
                                 <MudIconButton Icon="@Icons.Material.Filled.ArrowUpward" Disabled="@(index == 0)" OnClick="@(() => MoveCasingSection(index, -1))" />
@@ -1344,11 +1353,14 @@
             RotaryTable: GetRotaryTableReferenceDepth(),
             MeanSeaLevel: meanSeaLevel);
 
-        DataUtils.UnitAndReferenceParameters.GroundMudLineDepthReferenceSource.GroundMudLineDepthReference = -snapshot.GroundMudLine;
+        // Keep the non-MSL reference sources usable even for legacy architectures that do not
+        // contain their own surface-reference values. This matches the Well editor: a missing
+        // offset is neutral (zero), while resolved Cluster/Rig values replace that neutral value.
+        DataUtils.UnitAndReferenceParameters.GroundMudLineDepthReferenceSource.GroundMudLineDepthReference = -(snapshot.GroundMudLine ?? 0.0);
         DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource.MeanSeaLevelDepthReference = snapshot.MeanSeaLevel;
-        DataUtils.UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource.SeaWaterLevelDepthReference = -snapshot.SeaWaterLevel;
-        DataUtils.UnitAndReferenceParameters.WellHeadDepthReferenceSource.WellHeadDepthReference = -snapshot.WellHead;
-        DataUtils.UnitAndReferenceParameters.RotaryTableDepthReferenceSource.RotaryTableDepthReference = -snapshot.RotaryTable;
+        DataUtils.UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource.SeaWaterLevelDepthReference = -(snapshot.SeaWaterLevel ?? 0.0);
+        DataUtils.UnitAndReferenceParameters.WellHeadDepthReferenceSource.WellHeadDepthReference = -(snapshot.WellHead ?? 0.0);
+        DataUtils.UnitAndReferenceParameters.RotaryTableDepthReferenceSource.RotaryTableDepthReference = -(snapshot.RotaryTable ?? 0.0);
 
         var hasChanged = forceRefresh
             || !_hasDepthReferenceSnapshot
@@ -1367,7 +1379,11 @@
         }
     }
 
-    private double? GetSeaWaterLevelReferenceDepth() => ShouldShowWaterAboveMudLine ? GetTopWaterDepth() : null;
+    private double? GetSeaWaterLevelReferenceDepth()
+    {
+        var architectureDepth = ShouldShowWaterAboveMudLine ? GetTopWaterDepth() : null;
+        return architectureDepth ?? _resolvedCluster?.TopWaterDepth?.GaussianValue?.Mean;
+    }
 
     private double? GetWellHeadReferenceDepth()
     {
@@ -1585,12 +1601,19 @@
     private double? GetGroundOrMudLineDepth()
     {
         var fluids = EnsureFluidsList();
+        double? architectureDepth;
         if (ShouldShowWaterAboveMudLine)
         {
-            return ConversionsFromOSDC.GaussianToDouble(fluids.FirstOrDefault(fluid => fluid.Fluid == FluidType.Water)?.Depth);
+            architectureDepth = ConversionsFromOSDC.GaussianToDouble(
+                fluids.FirstOrDefault(fluid => fluid.Fluid == FluidType.Water)?.Depth);
+        }
+        else
+        {
+            architectureDepth = ConversionsFromOSDC.GaussianToDouble(
+                fluids.FirstOrDefault(fluid => fluid.Fluid == FluidType.Air)?.Depth);
         }
 
-        return ConversionsFromOSDC.GaussianToDouble(fluids.FirstOrDefault(fluid => fluid.Fluid == FluidType.Air)?.Depth);
+        return architectureDepth ?? _resolvedCluster?.GroundMudLineDepth?.GaussianValue?.Mean;
     }
 
     private Task OnGroundOrMudLineDepthChanged(double? value)
@@ -1705,6 +1728,11 @@
         _resolvedRig = null;
 
         var rigId = _selectedWellBore?.RigID;
+        if ((!rigId.HasValue || rigId == Guid.Empty) && _resolvedCluster?.RigID is Guid clusterRigId && clusterRigId != Guid.Empty)
+        {
+            rigId = clusterRigId;
+        }
+
         if ((!rigId.HasValue || rigId == Guid.Empty) && _resolvedCluster?.MetaInfo?.ID is Guid clusterId && clusterId != Guid.Empty)
         {
             rigId = Rigs?
@@ -2317,7 +2345,8 @@
                 {
                     SuspensionDepth = sectionTop,
                     FinalDepth = sectionTop + sectionLength,
-                    HasCement = GetGaussianValue(section.TopCementDepth) is double topCementDepthFallback && topCementDepthFallback <= sectionTop + CasingGroupingTolerance
+                    HasCement = GetGaussianValue(section.TopCementDepth).HasValue,
+                    TopCementDepth = GetGaussianValue(section.TopCementDepth)
                 });
                 continue;
             }
@@ -2348,7 +2377,8 @@
                     OD = GetGaussianValue(elements.FirstOrDefault()?.BodyOD),
                     ID = GetGaussianValue(elements.FirstOrDefault()?.BodyID),
                     BoreholeOD = GetGaussianValue(sizeRows.FirstOrDefault()?.HoleSize),
-                    HasCement = GetGaussianValue(section.TopCementDepth) is double topCementDepthFallback && topCementDepthFallback <= sectionTop + CasingGroupingTolerance
+                    HasCement = GetGaussianValue(section.TopCementDepth).HasValue,
+                    TopCementDepth = GetGaussianValue(section.TopCementDepth)
                 });
                 continue;
             }
@@ -2372,7 +2402,10 @@
                     OD = GetGaussianValue(element?.BodyOD),
                     ID = GetGaussianValue(element?.BodyID),
                     BoreholeOD = GetGaussianValue(sizeRow?.HoleSize),
-                    HasCement = topCementDepth.HasValue && intervalTop >= topCementDepth.Value - CasingGroupingTolerance
+                    HasCement = topCementDepth.HasValue && intervalTop >= topCementDepth.Value - CasingGroupingTolerance,
+                    TopCementDepth = topCementDepth.HasValue && intervalTop >= topCementDepth.Value - CasingGroupingTolerance
+                        ? topCementDepth
+                        : null
                 });
             }
         }
@@ -2436,7 +2469,7 @@
             var group = i < groupedRows.Count ? groupedRows[i] : null;
             var topCementDepth = group?.Rows
                 .Where(row => row.HasCement)
-                .Select(row => row.SuspensionDepth)
+                .Select(row => row.TopCementDepth ?? row.SuspensionDepth)
                 .Where(value => value.HasValue)
                 .Select(value => value!.Value)
                 .Cast<double?>()
@@ -2679,7 +2712,17 @@
 
     private void UpdateCasingCement(int index, bool value)
     {
-        SimplifiedCasingRows[index].HasCement = value;
+        var row = SimplifiedCasingRows[index];
+        row.HasCement = value;
+        row.TopCementDepth = value ? row.TopCementDepth ?? row.SuspensionDepth : null;
+    }
+
+    private void UpdateTopCementDepth(int index, double? value)
+    {
+        if (SimplifiedCasingRows[index].HasCement)
+        {
+            SimplifiedCasingRows[index].TopCementDepth = value;
+        }
     }
 
     private void AddOpenHoleRow()
@@ -2874,7 +2917,7 @@
             var maxWidth = stringOuterWidth + markerWidth * 2.0;
             var tocDepth = group.Rows
                 .Where(row => row.HasCement)
-                .Select(row => row.SuspensionDepth)
+                .Select(row => row.TopCementDepth ?? row.SuspensionDepth)
                 .Where(value => value.HasValue)
                 .Select(value => value!.Value)
                 .Cast<double?>()
@@ -3314,6 +3357,7 @@
         public double? ID { get; set; }
         public double? BoreholeOD { get; set; }
         public bool HasCement { get; set; }
+        public double? TopCementDepth { get; set; }
     }
 
     private sealed record SimplifiedCasingGroup(List<SimplifiedCasingRow> Rows);
