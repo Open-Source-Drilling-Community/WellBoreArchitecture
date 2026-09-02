@@ -8,9 +8,11 @@ This project validates the WellBoreArchitecture service API and its MCP surface.
 
 `WellBoreArchitectureBatchBackupRestoreTests.cs` verifies dependency-closed export, UUID-preserving transactional catalogue creation, explicit consent before normalized-name mapping, architecture restore, and complete rollback when an assignment is invalid. `WellBoreArchitectureComponentIdentityTests.cs` verifies deterministic legacy-ID materialization and duplicate component-ID rejection.
 
+`WellBoreArchitectureExternalReferenceValidatorTests.cs` verifies that unlinked drafts require no dependency call and that linked references distinguish found, missing, and unavailable WellBore-service outcomes.
+
 ## MCP coverage
 
-- `McpToolRegistrationTests.cs` verifies the architecture REST tools, bounded search, granular details/link/assignment/surface-section/casing-section mutations, identity/feature catalogue tools, and `ping`, including exclusion of usage-statistics operations.
+- `McpToolRegistrationTests.cs` verifies the architecture REST tools, bounded search, read-only WellBore-reference validation/audit, granular details/link/assignment/surface-section/casing-section mutations, identity/feature catalogue tools, and `ping`, including exclusion of usage-statistics operations.
 - The registration tests also guard detailed descriptions, strict input and output schemas, safety annotations, optimistic-concurrency tokens, external WellBore references, ordered/required sections, uncertainty-wrapper shapes, SI units, depth-reference guidance, and rejection of unexpected arguments.
 - `McpServerHttpTests.cs` exercises MCP initialization, tool listing, and representative calls against a running service.
 

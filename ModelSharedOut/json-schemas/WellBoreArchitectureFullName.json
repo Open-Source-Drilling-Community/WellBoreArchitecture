@@ -222,6 +222,76 @@
         }
       }
     },
+    "/WellBoreArchitecture/{id}/ExternalReferences": {
+      "get": {
+        "tags": [
+          "WellBoreArchitecture"
+        ],
+        "operationId": "ValidateWellBoreArchitectureExternalReferences",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureExternalReferenceValidation"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WellBoreArchitecture/ExternalReferenceAudit": {
+      "post": {
+        "tags": [
+          "WellBoreArchitecture"
+        ],
+        "operationId": "AuditWellBoreArchitectureExternalReferences",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureExternalReferenceAuditRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureExternalReferenceAuditRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureExternalReferenceAuditRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureExternalReferenceAuditResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/WellBoreArchitecture/BatchExport": {
       "post": {
         "tags": [
@@ -1534,6 +1604,141 @@
           }
         },
         "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureExternalReferenceAuditRequest": {
+        "required": [
+          "Scope"
+        ],
+        "type": "object",
+        "properties": {
+          "Scope": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureExternalReferenceAuditScope"
+          },
+          "WellBoreArchitectureIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          },
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureExternalReferenceAuditResult": {
+        "type": "object",
+        "properties": {
+          "CheckedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ValidCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "InvalidCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "UnavailableCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureExternalReferenceValidation"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureExternalReferenceAuditScope": {
+        "enum": [
+          "All",
+          "Selected"
+        ],
+        "type": "string"
+      },
+      "OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureExternalReferenceIssue": {
+        "type": "object",
+        "properties": {
+          "Property": {
+            "type": "string",
+            "nullable": true
+          },
+          "Code": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureExternalReferenceValidation": {
+        "type": "object",
+        "properties": {
+          "WellBoreArchitectureID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "WellBoreID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "WellBoreExists": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "Status": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureExternalReferenceValidationStatus"
+          },
+          "CheckedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Issues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureExternalReferenceIssue"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureExternalReferenceValidationStatus": {
+        "enum": [
+          "Valid",
+          "Invalid",
+          "Unavailable"
+        ],
+        "type": "string"
       },
       "OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureFeatureAssignment": {
         "type": "object",

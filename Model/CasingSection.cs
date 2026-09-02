@@ -10,7 +10,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.Model
         public Guid ComponentID { get; set; }
 
         /// <summary>
-        /// the top depth of the casing section is a Gaussian value that is Depth quantity and that is referred to the Well-head.
+        /// The top depth is a Gaussian depth quantity stored in metres and referenced to the WGS84 datum.
         /// </summary>
         public GaussianDrillingProperty TopDepth { get; set; } = new GaussianDrillingProperty();
         /// <summary>
@@ -18,7 +18,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.Model
         /// </summary>
         public GaussianDrillingProperty Length { get; set; } = new GaussianDrillingProperty();
         /// <summary>
-        /// the top of cement depth is a Gaussian value that is a Depth quantity and is referred to the well-head
+        /// The top-of-cement depth is a Gaussian depth quantity stored in metres and referenced to the WGS84 datum.
         /// </summary>
         public GaussianDrillingProperty TopCementDepth { get; set; } = new GaussianDrillingProperty();
         public List<CasingSectionElement> CasingSectionElements { get; set; }

@@ -23,6 +23,8 @@ public sealed class McpToolRegistrationTests
         ["DeleteWellBoreArchitectureById"] = "well_bore_architecture_delete_by_id",
         ["BatchExportWellBoreArchitectures"] = "well_bore_architecture_batch_export",
         ["BatchRestoreWellBoreArchitectures"] = "well_bore_architecture_batch_restore",
+        ["ValidateExternalReferences"] = "well_bore_architecture_validate_external_references",
+        ["AuditExternalReferences"] = "well_bore_architecture_audit_external_references",
         ["IdentityGetAll"] = "well_bore_architecture_identity_get_all",
         ["IdentityGetById"] = "well_bore_architecture_identity_get_by_id",
         ["IdentityCreate"] = "well_bore_architecture_identity_create",
@@ -83,7 +85,7 @@ public sealed class McpToolRegistrationTests
         var endpoints = typeof(WellBoreArchitectureController).GetMethods()
             .Where(method => method.GetCustomAttributes(typeof(HttpMethodAttribute), true).Length > 0)
             .Select(method => method.Name);
-        Assert.That(endpoints, Is.EquivalentTo(EndpointToolMap.Keys.Take(10)));
+        Assert.That(endpoints, Is.EquivalentTo(EndpointToolMap.Keys.Take(12)));
         Assert.That(_tools.Keys, Is.EquivalentTo(EndpointToolMap.Values.Concat(AdditionalToolNames).Append("ping")));
     }
 
@@ -130,7 +132,8 @@ public sealed class McpToolRegistrationTests
         Assert.That(createSchema, Does.Contain("GaussianValue"));
         Assert.That(createSchema, Does.Contain("StandardDeviation"));
         Assert.That(createSchema, Does.Contain("DiracDistributionValue"));
-        Assert.That(createSchema, Does.Contain("referenced to the wellhead"));
+        Assert.That(createSchema, Does.Contain("referenced to the WGS84 datum"));
+        Assert.That(createSchema, Does.Contain("UI-only display transformations"));
         Assert.That(createSchema, Does.Contain("metres (m)"));
         Assert.That(createSchema, Does.Contain("pascals (Pa)"));
         Assert.That(createSchema, Does.Contain("radians per metre"));
@@ -217,6 +220,24 @@ public sealed class McpToolRegistrationTests
         string schema = _tools["well_bore_architecture_batch_restore"].InputSchema!.ToJsonString();
         Assert.That(schema, Does.Contain("AllowNormalizedNameMapping"));
         Assert.That(schema, Does.Contain("\"default\":false"));
+    }
+
+    [Test]
+    public void External_reference_tools_are_bounded_read_only_and_strict()
+    {
+        IMcpTool validate = _tools["well_bore_architecture_validate_external_references"];
+        IMcpTool audit = _tools["well_bore_architecture_audit_external_references"];
+        string auditInput = audit.InputSchema.ToJsonString();
+        string auditOutput = audit.OutputSchema.ToJsonString();
+        Assert.Multiple(() =>
+        {
+            Assert.That(validate.Behavior.ReadOnlyHint, Is.True);
+            Assert.That(audit.Behavior.ReadOnlyHint, Is.True);
+            Assert.That(auditInput, Does.Contain("\"maximum\":100"));
+            Assert.That(auditInput, Does.Contain("WellBoreArchitectureIDs"));
+            Assert.That(auditOutput, Does.Contain("UnavailableCount"));
+            Assert.That(auditOutput, Does.Contain("WellBoreExists"));
+        });
     }
 
     [Test]

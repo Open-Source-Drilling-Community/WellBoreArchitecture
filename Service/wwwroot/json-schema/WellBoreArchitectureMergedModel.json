@@ -3188,6 +3188,76 @@
         }
       }
     },
+    "/WellBoreArchitecture/{id}/ExternalReferences": {
+      "get": {
+        "tags": [
+          "WellBoreArchitecture"
+        ],
+        "operationId": "ValidateWellBoreArchitectureExternalReferences",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WellBoreArchitectureExternalReferenceValidation"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WellBoreArchitecture/ExternalReferenceAudit": {
+      "post": {
+        "tags": [
+          "WellBoreArchitecture"
+        ],
+        "operationId": "AuditWellBoreArchitectureExternalReferences",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WellBoreArchitectureExternalReferenceAuditRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WellBoreArchitectureExternalReferenceAuditRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/WellBoreArchitectureExternalReferenceAuditRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WellBoreArchitectureExternalReferenceAuditResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/WellBoreArchitecture/BatchExport": {
       "post": {
         "tags": [
@@ -9755,6 +9825,10 @@
       "BoreHoleSize": {
         "type": "object",
         "properties": {
+          "ComponentID": {
+            "type": "string",
+            "format": "uuid"
+          },
           "HoleSize": {
             "$ref": "#/components/schemas/GaussianDrillingProperty"
           },
@@ -9766,6 +9840,10 @@
       "CasingSection": {
         "type": "object",
         "properties": {
+          "ComponentID": {
+            "type": "string",
+            "format": "uuid"
+          },
           "TopDepth": {
             "$ref": "#/components/schemas/GaussianDrillingProperty"
           },
@@ -9797,6 +9875,10 @@
       "CasingSectionElement": {
         "type": "object",
         "properties": {
+          "ComponentID": {
+            "type": "string",
+            "format": "uuid"
+          },
           "BodyOD": {
             "$ref": "#/components/schemas/GaussianDrillingProperty"
           },
@@ -9855,6 +9937,10 @@
       "ElementConnectivity": {
         "type": "object",
         "properties": {
+          "ComponentID": {
+            "type": "string",
+            "format": "uuid"
+          },
           "UpstreamElement": {
             "$ref": "#/components/schemas/SideElement"
           },
@@ -9873,6 +9959,10 @@
       "OpenHoleSection": {
         "type": "object",
         "properties": {
+          "ComponentID": {
+            "type": "string",
+            "format": "uuid"
+          },
           "HoleSizes": {
             "type": "array",
             "items": {
@@ -9885,6 +9975,10 @@
       "SideConnector": {
         "type": "object",
         "properties": {
+          "ComponentID": {
+            "type": "string",
+            "format": "uuid"
+          },
           "Position": {
             "$ref": "#/components/schemas/GaussianDrillingProperty"
           },
@@ -9906,6 +10000,10 @@
       "SideElement": {
         "type": "object",
         "properties": {
+          "ComponentID": {
+            "type": "string",
+            "format": "uuid"
+          },
           "Name": {
             "type": "string",
             "nullable": true
@@ -9941,6 +10039,10 @@
       "SurfaceSection": {
         "type": "object",
         "properties": {
+          "ComponentID": {
+            "type": "string",
+            "format": "uuid"
+          },
           "Type": {
             "$ref": "#/components/schemas/SurfaceSectionType"
           },
@@ -10276,6 +10378,9 @@
           "CatalogPolicy": {
             "$ref": "#/components/schemas/WellBoreArchitectureBatchCatalogRestorePolicy"
           },
+          "AllowNormalizedNameMapping": {
+            "type": "boolean"
+          },
           "Document": {
             "$ref": "#/components/schemas/WellBoreArchitectureBatchExportDocument"
           }
@@ -10320,6 +10425,137 @@
             "nullable": true
           }
         }
+      },
+      "WellBoreArchitectureExternalReferenceAuditRequest": {
+        "required": [
+          "Scope"
+        ],
+        "type": "object",
+        "properties": {
+          "Scope": {
+            "$ref": "#/components/schemas/WellBoreArchitectureExternalReferenceAuditScope"
+          },
+          "WellBoreArchitectureIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          },
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "WellBoreArchitectureExternalReferenceAuditResult": {
+        "type": "object",
+        "properties": {
+          "CheckedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ValidCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "InvalidCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "UnavailableCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WellBoreArchitectureExternalReferenceValidation"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "WellBoreArchitectureExternalReferenceAuditScope": {
+        "enum": [
+          "All",
+          "Selected"
+        ],
+        "type": "string"
+      },
+      "WellBoreArchitectureExternalReferenceIssue": {
+        "type": "object",
+        "properties": {
+          "Property": {
+            "type": "string",
+            "nullable": true
+          },
+          "Code": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "WellBoreArchitectureExternalReferenceValidation": {
+        "type": "object",
+        "properties": {
+          "WellBoreArchitectureID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "WellBoreID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "WellBoreExists": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "Status": {
+            "$ref": "#/components/schemas/WellBoreArchitectureExternalReferenceValidationStatus"
+          },
+          "CheckedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Issues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WellBoreArchitectureExternalReferenceIssue"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "WellBoreArchitectureExternalReferenceValidationStatus": {
+        "enum": [
+          "Valid",
+          "Invalid",
+          "Unavailable"
+        ],
+        "type": "string"
       },
       "WellBoreArchitectureFeatureAssignment": {
         "type": "object",

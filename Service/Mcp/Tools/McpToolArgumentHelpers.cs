@@ -173,6 +173,49 @@ internal static class McpToolArgumentHelpers
         ["Items"] = new JsonObject { ["type"] = "array", ["items"] = new JsonObject { ["$ref"] = "#/$defs/WellBoreArchitecture" } }
     }, "Offset", "Limit", "TotalCount", "Items"), Definitions());
 
+    public static JsonObject CreateExternalReferenceValidationOutputSchema() =>
+        SuccessEnvelope(ExternalReferenceValidationSchema());
+
+    public static JsonObject CreateExternalReferenceAuditSchema() => new()
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["request"] = Object("Bounded external-reference audit request.", new JsonObject
+            {
+                ["Scope"] = Enum("Audit every architecture or an explicit UUID selection.", "All", "Selected"),
+                ["WellBoreArchitectureIDs"] = new JsonObject { ["type"] = new JsonArray("array", "null"), ["uniqueItems"] = true,
+                    ["items"] = String("Architecture UUID.", "uuid") },
+                ["Offset"] = new JsonObject { ["type"] = "integer", ["minimum"] = 0, ["default"] = 0 },
+                ["Limit"] = new JsonObject { ["type"] = "integer", ["minimum"] = 1, ["maximum"] = 100, ["default"] = 100 }
+            }, "Scope")
+        },
+        ["required"] = new JsonArray("request"), ["additionalProperties"] = false
+    };
+
+    public static JsonObject CreateExternalReferenceAuditOutputSchema() => SuccessEnvelope(Object("Bounded external-reference audit result.", new JsonObject
+    {
+        ["CheckedAtUtc"] = String("UTC timestamp shared by this audit page.", "date-time"),
+        ["Total"] = NonNegativeInteger(), ["Offset"] = NonNegativeInteger(),
+        ["Limit"] = new JsonObject { ["type"] = "integer", ["minimum"] = 1, ["maximum"] = 100 },
+        ["ValidCount"] = NonNegativeInteger(), ["InvalidCount"] = NonNegativeInteger(), ["UnavailableCount"] = NonNegativeInteger(),
+        ["Items"] = new JsonObject { ["type"] = "array", ["items"] = ExternalReferenceValidationSchema() }
+    }, "CheckedAtUtc", "Total", "Offset", "Limit", "ValidCount", "InvalidCount", "UnavailableCount", "Items"));
+
+    private static JsonObject ExternalReferenceValidationSchema() => Object("One architecture's WellBore-reference validation result.", new JsonObject
+    {
+        ["WellBoreArchitectureID"] = String("Architecture UUID.", "uuid"),
+        ["WellBoreID"] = NullableUuid("Stored external WellBore UUID, or null for an intentionally unlinked draft."),
+        ["WellBoreExists"] = new JsonObject { ["type"] = new JsonArray("boolean", "null") },
+        ["Status"] = Enum("Validation outcome.", "Valid", "Invalid", "Unavailable"),
+        ["CheckedAtUtc"] = String("UTC validation timestamp.", "date-time"),
+        ["Issues"] = new JsonObject { ["type"] = "array", ["items"] = Object("Reference-validation issue.", new JsonObject
+        {
+            ["Property"] = String("Property containing the reference."), ["Code"] = String("Stable machine-readable issue code."),
+            ["Message"] = String("Human-readable diagnostic message.")
+        }, "Property", "Code", "Message") }
+    }, "WellBoreArchitectureID", "WellBoreID", "WellBoreExists", "Status", "CheckedAtUtc", "Issues");
+
     public static JsonObject CreateGenericOutputSchema() => SuccessEnvelope(new JsonObject());
 
     private static JsonObject SuccessEnvelope(JsonObject data, JsonObject? definitions = null)
@@ -227,7 +270,7 @@ internal static class McpToolArgumentHelpers
     private static JsonObject Definitions() => new()
     {
         ["WellBoreArchitecture"] = Object(
-            "Complete wellbore construction architecture. Physical values are SI. Depth references are field-specific and described below; the payload itself does not store a selected display-unit system.",
+            "Complete wellbore construction architecture. Physical values are SI and every persisted depth is referenced to the WGS84 datum. Alternative depth references are UI-only display transformations and are never persisted in this payload.",
             new JsonObject
             {
                 ["MetaInfo"] = Ref("MetaInfo", "Resource metadata. MetaInfo.ID is supplied by the caller and is the persistent architecture UUID."),
@@ -272,15 +315,15 @@ internal static class McpToolArgumentHelpers
         {
             ["MaxOD"] = NullableRef("ScalarDrillingProperty", "Maximum wellhead outside diameter in metres (m), serialized under DiracDistributionValue.Value."),
             ["MinOD"] = NullableRef("ScalarDrillingProperty", "Minimum wellhead outside diameter in metres (m), serialized under DiracDistributionValue.Value."),
-            ["Depth"] = NullableRef("GaussianDrillingProperty", "Wellhead depth in metres (m), expressed in the caller's consistently selected depth reference. Mean and standard deviation are under GaussianValue."),
-            ["CasingHangerDepth"] = NullableRef("ScalarDrillingProperty", "Casing-hanger depth in metres (m) in the same depth reference used for WellHead.Depth."),
-            ["TubingHangerDepth"] = NullableRef("ScalarDrillingProperty", "Tubing-hanger depth in metres (m) in the same depth reference used for WellHead.Depth.")
+            ["Depth"] = NullableRef("GaussianDrillingProperty", "Wellhead depth in metres (m), referenced to the WGS84 datum. Mean and standard deviation are under GaussianValue."),
+            ["CasingHangerDepth"] = NullableRef("ScalarDrillingProperty", "Casing-hanger depth in metres (m), referenced to the WGS84 datum."),
+            ["TubingHangerDepth"] = NullableRef("ScalarDrillingProperty", "Tubing-hanger depth in metres (m), referenced to the WGS84 datum.")
         }),
 
         ["WellBoreArchitectureFluid"] = Object("A fluid layer above ground or mudline and the depth of its boundary.", new JsonObject
         {
             ["Fluid"] = Enum("Fluid type for the layer.", "Air", "Water"),
-            ["Depth"] = Ref("GaussianDrillingProperty", "Boundary depth in metres (m), using the same configured depth reference as the architecture. Mean and standard deviation are SI values under GaussianValue.")
+            ["Depth"] = Ref("GaussianDrillingProperty", "Boundary depth in metres (m), referenced to the WGS84 datum. Mean and standard deviation are SI values under GaussianValue.")
         }),
 
         ["SurfaceSection"] = Object("Surface well-control or riser section above the wellhead, with uncertain dimensions/material properties and optional side circuitry.", new JsonObject
@@ -307,7 +350,7 @@ internal static class McpToolArgumentHelpers
         {
             ["ComponentID"] = String("Stable UUID used to address this nested connector.", "uuid"),
             ["Position"] = Ref("GaussianDrillingProperty", "Position along the host section in metres (m)."),
-            ["VerticalDepth"] = Ref("GaussianDrillingProperty", "Vertical depth in metres (m), using the architecture's configured depth reference."),
+            ["VerticalDepth"] = Ref("GaussianDrillingProperty", "Vertical depth in metres (m), referenced to the WGS84 datum."),
             ["FirstSideElement"] = NullableRef("SideElement", "Root element of the side-circuit network."),
             ["ElementConnectivities"] = Array("ElementConnectivity", "Connectivity edges between side-circuit elements.", nullable: true)
         }),
@@ -318,7 +361,7 @@ internal static class McpToolArgumentHelpers
             ["Name"] = NullableString("Human-readable side-element name."),
             ["Type"] = Enum("Side-element classification.", "Unknown", "Pipe", "Hose", "GateValve", "Choke", "Pump"),
             ["Length"] = Ref("GaussianDrillingProperty", "Element length in metres (m)."),
-            ["TopVerticalDepth"] = Ref("GaussianDrillingProperty", "Vertical depth of the element top in metres (m), using the architecture's configured depth reference."),
+            ["TopVerticalDepth"] = Ref("GaussianDrillingProperty", "Vertical depth of the element top in metres (m), referenced to the WGS84 datum."),
             ["OD"] = Ref("GaussianDrillingProperty", "Typical outside diameter in metres (m)."),
             ["ID"] = Ref("GaussianDrillingProperty", "Typical inside diameter in metres (m); this is a dimension, not a UUID.")
         }),
@@ -330,12 +373,12 @@ internal static class McpToolArgumentHelpers
             ["DownstreamElement"] = NullableRef("SideElement", "Downstream side-circuit element.")
         }),
 
-        ["CasingSection"] = Object("Casing interval beginning at the wellhead. Depth properties are referenced to the wellhead and all lists describe the interval's construction.", new JsonObject
+        ["CasingSection"] = Object("Casing interval beginning at the wellhead. Depth properties are stored in metres relative to the WGS84 datum; all lists describe the interval's construction.", new JsonObject
         {
             ["ComponentID"] = String("Stable UUID used by granular nested-component mutations.", "uuid"),
-            ["TopDepth"] = Ref("GaussianDrillingProperty", "Top depth in metres (m), explicitly referenced to the wellhead."),
+            ["TopDepth"] = Ref("GaussianDrillingProperty", "Top depth in metres (m), referenced to the WGS84 datum."),
             ["Length"] = Ref("GaussianDrillingProperty", "Casing-section length in metres (m)."),
-            ["TopCementDepth"] = Ref("GaussianDrillingProperty", "Top-of-cement depth in metres (m), explicitly referenced to the wellhead."),
+            ["TopCementDepth"] = Ref("GaussianDrillingProperty", "Top-of-cement depth in metres (m), referenced to the WGS84 datum."),
             ["CasingSectionElements"] = Array("CasingSectionElement", "Ordered casing-element specifications used through this interval."),
             ["CasingSectionSizeTable"] = Array("BoreHoleSize", "Borehole diameter/length rows applicable to this casing section."),
             ["OpenHoleSection"] = NullableRef("OpenHoleSection", "Optional open-hole interval following this casing section; it begins where the previous casing interval ends, or at ground level for the first section.")
@@ -560,6 +603,7 @@ internal static class McpToolArgumentHelpers
     private static JsonObject NullableDateTime(string description) => new() { ["type"] = new JsonArray("string", "null"), ["format"] = "date-time", ["description"] = description };
     private static JsonObject Number(string description) => new() { ["type"] = "number", ["description"] = description };
     private static JsonObject NullableNumber(string description) => new() { ["type"] = new JsonArray("number", "null"), ["description"] = description };
+    private static JsonObject NonNegativeInteger() => new() { ["type"] = "integer", ["minimum"] = 0 };
 
     public static bool TryParseGuid(JsonObject? arguments, string key, out Guid value, out JsonNode? error)
     {

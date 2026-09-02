@@ -69,7 +69,8 @@ public static class McpServiceCollectionExtensions
     private static McpToolBehavior InferBehavior(string name)
     {
         bool readOnly = name.Contains("_get_", StringComparison.Ordinal) || name.EndsWith("_get_all", StringComparison.Ordinal) ||
-                        name.EndsWith("_search", StringComparison.Ordinal) || name.EndsWith("_batch_export", StringComparison.Ordinal);
+                        name.EndsWith("_search", StringComparison.Ordinal) || name.EndsWith("_batch_export", StringComparison.Ordinal) ||
+                        name.Contains("_external_references", StringComparison.Ordinal);
         bool destructive = name.Contains("_delete_", StringComparison.Ordinal) || name.EndsWith("_batch_restore", StringComparison.Ordinal);
         bool idempotent = readOnly || name.Contains("_update", StringComparison.Ordinal) || name.Contains("_delete_", StringComparison.Ordinal) ||
                           name.EndsWith("_reorder", StringComparison.Ordinal);
@@ -82,6 +83,8 @@ public static class McpServiceCollectionExtensions
         if (name.EndsWith("_get_all_ids", StringComparison.Ordinal)) return Tools.McpToolArgumentHelpers.CreateIdsOutputSchema();
         if (name.EndsWith("_get_all_meta_info", StringComparison.Ordinal)) return Tools.McpToolArgumentHelpers.CreateMetaInfoListOutputSchema();
         if (name == "well_bore_architecture_search") return Tools.McpToolArgumentHelpers.CreateSearchOutputSchema();
+        if (name == "well_bore_architecture_validate_external_references") return Tools.McpToolArgumentHelpers.CreateExternalReferenceValidationOutputSchema();
+        if (name == "well_bore_architecture_audit_external_references") return Tools.McpToolArgumentHelpers.CreateExternalReferenceAuditOutputSchema();
         if (name == "well_bore_architecture_get_by_id" || name.Contains("_assignment_", StringComparison.Ordinal) ||
             name.Contains("_surface_section_", StringComparison.Ordinal) || name.Contains("_casing_section_", StringComparison.Ordinal) ||
             name is "well_bore_architecture_update_by_id" or "well_bore_architecture_details_update" or "well_bore_architecture_well_bore_link_update")

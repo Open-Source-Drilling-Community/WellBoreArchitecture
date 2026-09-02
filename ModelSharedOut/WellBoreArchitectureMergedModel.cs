@@ -8495,6 +8495,157 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<WellBoreArchitectureExternalReferenceValidation> ValidateWellBoreArchitectureExternalReferencesAsync(System.Guid id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "WellBoreArchitecture/{id}/ExternalReferences"
+                    urlBuilder_.Append("WellBoreArchitecture/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/ExternalReferences");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<WellBoreArchitectureExternalReferenceValidation>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<WellBoreArchitectureExternalReferenceAuditResult> AuditWellBoreArchitectureExternalReferencesAsync(WellBoreArchitectureExternalReferenceAuditRequest body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "WellBoreArchitecture/ExternalReferenceAudit"
+                    urlBuilder_.Append("WellBoreArchitecture/ExternalReferenceAudit");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<WellBoreArchitectureExternalReferenceAuditResult>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<WellBoreArchitectureBatchExportDocument> BatchExportWellBoreArchitecturesAsync(WellBoreArchitectureBatchExportRequest body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var client_ = _httpClient;
@@ -16218,6 +16369,9 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
     public partial class BoreHoleSize
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ComponentID")]
+        public System.Guid ComponentID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("HoleSize")]
         public GaussianDrillingProperty HoleSize { get; set; }
 
@@ -16238,6 +16392,9 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class CasingSection
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ComponentID")]
+        public System.Guid ComponentID { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("TopDepth")]
         public GaussianDrillingProperty TopDepth { get; set; }
@@ -16271,6 +16428,9 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class CasingSectionElement
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ComponentID")]
+        public System.Guid ComponentID { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("BodyOD")]
         public GaussianDrillingProperty BodyOD { get; set; }
@@ -16338,6 +16498,9 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
     public partial class ElementConnectivity
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ComponentID")]
+        public System.Guid ComponentID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("UpstreamElement")]
         public SideElement UpstreamElement { get; set; }
 
@@ -16371,6 +16534,9 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
     public partial class OpenHoleSection
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ComponentID")]
+        public System.Guid ComponentID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("HoleSizes")]
         public System.Collections.Generic.List<BoreHoleSize> HoleSizes { get; set; }
 
@@ -16388,6 +16554,9 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class SideConnector
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ComponentID")]
+        public System.Guid ComponentID { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Position")]
         public GaussianDrillingProperty Position { get; set; }
@@ -16415,6 +16584,9 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class SideElement
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ComponentID")]
+        public System.Guid ComponentID { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
@@ -16473,6 +16645,9 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class SurfaceSection
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ComponentID")]
+        public System.Guid ComponentID { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Type")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
@@ -16871,6 +17046,9 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
         public WellBoreArchitectureBatchCatalogRestorePolicy CatalogPolicy { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AllowNormalizedNameMapping")]
+        public bool AllowNormalizedNameMapping { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Document")]
         public WellBoreArchitectureBatchExportDocument Document { get; set; }
 
@@ -16918,6 +17096,159 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
             get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
             set { _additionalProperties = value; }
         }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class WellBoreArchitectureExternalReferenceAuditRequest
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("Scope")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public WellBoreArchitectureExternalReferenceAuditScope Scope { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("WellBoreArchitectureIDs")]
+        public System.Collections.Generic.List<System.Guid> WellBoreArchitectureIDs { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Offset")]
+        public int Offset { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Limit")]
+        public int Limit { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class WellBoreArchitectureExternalReferenceAuditResult
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("CheckedAtUtc")]
+        public System.DateTimeOffset CheckedAtUtc { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Total")]
+        public int Total { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Offset")]
+        public int Offset { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Limit")]
+        public int Limit { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("ValidCount")]
+        public int ValidCount { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InvalidCount")]
+        public int InvalidCount { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("UnavailableCount")]
+        public int UnavailableCount { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Items")]
+        public System.Collections.Generic.List<WellBoreArchitectureExternalReferenceValidation> Items { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum WellBoreArchitectureExternalReferenceAuditScope
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"All")]
+        All = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Selected")]
+        Selected = 1,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class WellBoreArchitectureExternalReferenceIssue
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("Property")]
+        public string Property { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Code")]
+        public string Code { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Message")]
+        public string Message { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class WellBoreArchitectureExternalReferenceValidation
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("WellBoreArchitectureID")]
+        public System.Guid WellBoreArchitectureID { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("WellBoreID")]
+        public System.Guid? WellBoreID { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("WellBoreExists")]
+        public bool? WellBoreExists { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Status")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public WellBoreArchitectureExternalReferenceValidationStatus Status { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CheckedAtUtc")]
+        public System.DateTimeOffset CheckedAtUtc { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Issues")]
+        public System.Collections.Generic.List<WellBoreArchitectureExternalReferenceIssue> Issues { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum WellBoreArchitectureExternalReferenceValidationStatus
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Valid")]
+        Valid = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Invalid")]
+        Invalid = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Unavailable")]
+        Unavailable = 2,
 
     }
 

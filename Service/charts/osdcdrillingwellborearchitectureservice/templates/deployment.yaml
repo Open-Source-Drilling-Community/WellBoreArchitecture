@@ -39,6 +39,9 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
+          env:
+            - name: WellBoreHostURL
+              value: {{ .Values.externalServices.wellBoreHostURL | quote }}
           {{- if .Values.probes.enabled}}
           livenessProbe:
             httpGet:

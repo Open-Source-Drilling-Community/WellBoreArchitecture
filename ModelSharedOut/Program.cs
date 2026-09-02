@@ -202,11 +202,14 @@ class Program
                             {
                                 Namespace = NAMESPACE,
                                 TypeNameGenerator = new CustomTypeNameGenerator(), // strip type names to short names
-                                JsonLibrary = CSharpJsonLibrary.SystemTextJson
+                                JsonLibrary = CSharpJsonLibrary.SystemTextJson,
+                                ArrayType = "System.Collections.Generic.List",
+                                ArrayInstanceType = "System.Collections.Generic.List"
                             },
                         GenerateClientClasses = true,
                         GenerateDtoTypes = true,
-                        GenerateOptionalParameters = true
+                        GenerateOptionalParameters = true,
+                        ResponseArrayType = "System.Collections.Generic.List"
                     };
                     var generator = new CSharpClientGenerator(nswDocument, settings);
                     var code = generator.GenerateFile();

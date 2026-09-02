@@ -6,6 +6,9 @@ using Microsoft.Extensions.Logging;
 using OSDC.Drilling.WellBoreArchitecture.Model;
 using OSDC.DotnetLibraries.General.DataManagement;
 using OSDC.Drilling.WellBoreArchitecture.Service.Managers;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace OSDC.Drilling.WellBoreArchitecture.Service.Controllers
 {
@@ -16,11 +19,14 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Controllers
     {
         private readonly ILogger<WellBoreArchitectureManager> _logger;
         private readonly WellBoreArchitectureManager _wellBoreArchitectureManager;
+        private readonly IWellBoreArchitectureExternalReferenceValidator _externalReferenceValidator;
 
-        public WellBoreArchitectureController(ILogger<WellBoreArchitectureManager> logger, SqlConnectionManager connectionManager)
+        public WellBoreArchitectureController(ILogger<WellBoreArchitectureManager> logger, SqlConnectionManager connectionManager,
+            IWellBoreArchitectureExternalReferenceValidator? externalReferenceValidator = null)
         {
             _logger = logger;
             _wellBoreArchitectureManager = WellBoreArchitectureManager.GetInstance(_logger, connectionManager);
+            _externalReferenceValidator = externalReferenceValidator ?? new UnavailableWellBoreArchitectureExternalReferenceValidator();
         }
 
         /// <summary>
@@ -227,6 +233,64 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Controllers
                 _logger.LogWarning("The WellBoreArchitecture of given ID does not exist");
                 return NotFound();
             }
+        }
+
+        /// <summary>Checks one architecture's external WellBore reference without modifying stored data.</summary>
+        [HttpGet("{id}/ExternalReferences", Name = "ValidateWellBoreArchitectureExternalReferences")]
+        [ProducesResponseType<WellBoreArchitectureExternalReferenceValidation>(StatusCodes.Status200OK)]
+        public async Task<ActionResult<WellBoreArchitectureExternalReferenceValidation>> ValidateExternalReferences(
+            Guid id, CancellationToken cancellationToken)
+        {
+            if (id == Guid.Empty) return BadRequest(new { Error = "invalid_id", Message = "A non-empty WellBoreArchitecture UUID is required." });
+            Model.WellBoreArchitecture? architecture = _wellBoreArchitectureManager.GetWellBoreArchitectureById(id);
+            if (architecture == null) return NotFound(new { Error = "not_found", Message = "The WellBoreArchitecture does not exist." });
+            IReadOnlyList<WellBoreArchitectureExternalReferenceValidation> results =
+                await _externalReferenceValidator.ValidateAsync([architecture], cancellationToken);
+            return Ok(results.Single());
+        }
+
+        /// <summary>Checks a deterministic bounded page of architectures for external WellBore consistency.</summary>
+        [HttpPost("ExternalReferenceAudit", Name = "AuditWellBoreArchitectureExternalReferences")]
+        [ProducesResponseType<WellBoreArchitectureExternalReferenceAuditResult>(StatusCodes.Status200OK)]
+        public async Task<ActionResult<WellBoreArchitectureExternalReferenceAuditResult>> AuditExternalReferences(
+            [FromBody] WellBoreArchitectureExternalReferenceAuditRequest? request, CancellationToken cancellationToken)
+        {
+            if (request == null) return BadRequest(new { Error = "required", Message = "An audit request is required." });
+            if (!Enum.IsDefined(request.Scope)) return BadRequest(new { Error = "invalid_scope", Message = "Scope must be All or Selected." });
+            if (request.Offset < 0 || request.Limit is < 1 or > 100)
+                return BadRequest(new { Error = "invalid_pagination", Message = "Offset must be non-negative and Limit must be between 1 and 100." });
+            if (request.Scope == WellBoreArchitectureExternalReferenceAuditScope.Selected &&
+                (request.WellBoreArchitectureIDs == null || request.WellBoreArchitectureIDs.Count == 0))
+                return BadRequest(new { Error = "required_ids", Message = "Selected scope requires at least one architecture UUID." });
+            if (request.WellBoreArchitectureIDs?.Any(value => value == Guid.Empty) == true ||
+                request.WellBoreArchitectureIDs?.Distinct().Count() != request.WellBoreArchitectureIDs?.Count)
+                return BadRequest(new { Error = "invalid_ids", Message = "Selected UUIDs must be non-empty and unique." });
+
+            List<Model.WellBoreArchitecture?>? stored = _wellBoreArchitectureManager.GetAllWellBoreArchitecture();
+            if (stored == null) return StatusCode(StatusCodes.Status500InternalServerError,
+                new { Error = "storage_failure", Message = "Architectures could not be read." });
+            Dictionary<Guid, Model.WellBoreArchitecture> byId = stored.Where(value => value?.MetaInfo != null)
+                .Cast<Model.WellBoreArchitecture>().ToDictionary(value => value.MetaInfo.ID);
+            IEnumerable<Model.WellBoreArchitecture> selected = byId.Values;
+            if (request.Scope == WellBoreArchitectureExternalReferenceAuditScope.Selected)
+            {
+                Guid missing = request.WellBoreArchitectureIDs!.FirstOrDefault(id => !byId.ContainsKey(id));
+                if (missing != Guid.Empty)
+                    return NotFound(new { Error = "not_found", Message = $"Selected architecture UUID '{missing}' does not exist." });
+                selected = request.WellBoreArchitectureIDs!.Select(id => byId[id]);
+            }
+            List<Model.WellBoreArchitecture> matches = selected.OrderBy(value => value.MetaInfo.ID).ToList();
+            IReadOnlyList<WellBoreArchitectureExternalReferenceValidation> items = await _externalReferenceValidator
+                .ValidateAsync(matches.Skip(request.Offset).Take(request.Limit).ToList(), cancellationToken);
+            return Ok(new WellBoreArchitectureExternalReferenceAuditResult
+            {
+                CheckedAtUtc = items.FirstOrDefault()?.CheckedAtUtc ?? DateTimeOffset.UtcNow,
+                Total = matches.Count, Offset = request.Offset, Limit = request.Limit,
+                ValidCount = items.Count(value => value.Status == WellBoreArchitectureExternalReferenceValidationStatus.Valid),
+                InvalidCount = items.Count(value => value.Status == WellBoreArchitectureExternalReferenceValidationStatus.Invalid),
+                UnavailableCount = items.Count(value => value.Status == WellBoreArchitectureExternalReferenceValidationStatus.Unavailable),
+                Items = items.ToList()
+            });
         }
 
         /// <summary>Exports all WellBoreArchitectures or an ordered selection together with every referenced local catalog definition.</summary>

@@ -19,6 +19,8 @@ using SurfaceSectionModel = OSDC.Drilling.WellBoreArchitecture.Model.SurfaceSect
 using CasingSectionModel = OSDC.Drilling.WellBoreArchitecture.Model.CasingSection;
 using BatchExportRequestModel = OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchExportRequest;
 using BatchRestoreRequestModel = OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchRestoreRequest;
+using ExternalAuditRequestModel = OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureExternalReferenceAuditRequest;
+using ExternalAuditResultModel = OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureExternalReferenceAuditResult;
 
 namespace OSDC.Drilling.WellBoreArchitecture.Service.Mcp.Tools;
 
@@ -40,6 +42,13 @@ public static class WellBoreArchitectureRestMcpToolRegistrations
             (sp, _, ct) => Invoke(ct, () => Controller(sp).GetAllWellBoreArchitecture()));
         services.AddLegacyMcpTool("well_bore_architecture_search", "Return one deterministic page of complete WellBoreArchitectures together with the total match count. Filters may target name, external WellBore UUID, identity definition/value, feature category/option, and modification dates; results are ordered by resource UUID.", McpToolArgumentHelpers.CreateSearchSchema(),
             InvokeSearch);
+        services.AddLegacyMcpTool("well_bore_architecture_validate_external_references", "Check one stored architecture's optional WellBoreID against the configured WellBore service without changing data. Valid includes unlinked drafts and confirmed references; Invalid identifies a missing WellBore; Unavailable distinguishes configuration, transport, timeout, and malformed dependency responses.",
+            McpToolArgumentHelpers.CreateGuidSchema("wellBoreArchitectureId", "UUID of the stored architecture whose WellBore reference should be checked."),
+            (sp, args, ct) => InvokeByGuidAsync(args, "wellBoreArchitectureId", ct, (id, token) => Controller(sp).ValidateExternalReferences(id, token)));
+        services.AddLegacyMcpTool("well_bore_architecture_audit_external_references", "Check a deterministic bounded page of all or selected stored architectures against the configured WellBore service without changing architecture data. Page results and counts distinguish valid or unlinked records, invalid references, and dependency checks that were unavailable.",
+            McpToolArgumentHelpers.CreateExternalReferenceAuditSchema(),
+            (sp, args, ct) => InvokeWithBodyResultAsync<ExternalAuditRequestModel, ExternalAuditResultModel>(args, "request", ct,
+                (request, token) => Controller(sp).AuditExternalReferences(request, token)));
         services.AddLegacyMcpTool("well_bore_architecture_batch_export", "Create a read-only, schema-version-1 JSON backup of all stored WellBoreArchitectures or an explicitly ordered selection. The response contains complete construction records and only the identity definitions, feature categories, and options referenced by them. WellBoreID remains an external UUID reference. An invalid or missing selected record rejects the complete export.", McpToolArgumentHelpers.CreateWellBoreArchitectureBatchExportSchema(),
             (sp, args, ct) => InvokeWithBodyResult<BatchExportRequestModel, OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchExportDocument>(args, "request", ct, request => Controller(sp).BatchExportWellBoreArchitectures(request)));
         services.AddLegacyMcpTool("well_bore_architecture_batch_restore", "Validate and atomically restore a schema-version-1 backup. Exact catalogue UUID matching is the safe default; missing definitions preserve source UUIDs. Mapping by normalized name requires explicit AllowNormalizedNameMapping consent and still rejects ambiguity or incompatible semantics. Catalogue mapping and all writes share one transaction, so any failure leaves the database unchanged.", McpToolArgumentHelpers.CreateWellBoreArchitectureBatchRestoreSchema(),
@@ -478,6 +487,13 @@ public static class WellBoreArchitectureRestMcpToolRegistrations
         return McpToolArgumentHelpers.TryParseGuid(args, "id", out Guid id, out JsonNode? error)
             ? Task.FromResult<JsonNode?>(McpActionResultConverter.FromActionResult(action(id))) : Task.FromResult(error);
     }
+    private static async Task<JsonNode?> InvokeByGuidAsync<T>(JsonObject? args, string key, CancellationToken ct,
+        Func<Guid, CancellationToken, Task<ActionResult<T>>> action)
+    {
+        ct.ThrowIfCancellationRequested();
+        if (!McpToolArgumentHelpers.TryParseGuid(args, key, out Guid id, out JsonNode? error)) return error;
+        return McpActionResultConverter.FromActionResult(await action(id, ct));
+    }
     private static Task<JsonNode?> InvokeDelete(JsonObject? args, CancellationToken ct, Func<Guid, ActionResult> action)
     {
         ct.ThrowIfCancellationRequested();
@@ -497,6 +513,13 @@ public static class WellBoreArchitectureRestMcpToolRegistrations
         return TryDeserialize(args, bodyName, out TBody? data, out JsonNode? error)
             ? Task.FromResult<JsonNode?>(McpActionResultConverter.FromActionResult(action(data)))
             : Task.FromResult(error);
+    }
+    private static async Task<JsonNode?> InvokeWithBodyResultAsync<TBody, TResult>(JsonObject? args, string bodyName,
+        CancellationToken ct, Func<TBody?, CancellationToken, Task<ActionResult<TResult>>> action)
+    {
+        ct.ThrowIfCancellationRequested();
+        if (!TryDeserialize(args, bodyName, out TBody? data, out JsonNode? error)) return error;
+        return McpActionResultConverter.FromActionResult(await action(data, ct));
     }
     private static Task<JsonNode?> InvokeWithIdAndBody<T>(JsonObject? args, string bodyName, CancellationToken ct, Func<Guid, T?, ActionResult> action)
     {
@@ -541,7 +564,8 @@ public static class WellBoreArchitectureRestMcpToolRegistrations
         return Task.FromResult<JsonNode?>(McpActionResultConverter.FromActionResult(action(id, expected)));
     }
     private static WellBoreArchitectureController Controller(IServiceProvider sp) => new(
-        sp.GetRequiredService<ILogger<WellBoreArchitectureManager>>(), sp.GetRequiredService<SqlConnectionManager>());
+        sp.GetRequiredService<ILogger<WellBoreArchitectureManager>>(), sp.GetRequiredService<SqlConnectionManager>(),
+        sp.GetService<IWellBoreArchitectureExternalReferenceValidator>());
     private static WellBoreArchitectureManager Manager(IServiceProvider sp) => WellBoreArchitectureManager.GetInstance(
         sp.GetRequiredService<ILogger<WellBoreArchitectureManager>>(), sp.GetRequiredService<SqlConnectionManager>());
     private static WellBoreArchitectureIdentityController IdentityController(IServiceProvider sp) => new(sp.GetRequiredService<SqlConnectionManager>());
