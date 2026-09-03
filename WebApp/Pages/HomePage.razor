@@ -27,10 +27,20 @@
                 properties rather than single numbers, and each construction object exposes a <code>Realize()</code>
                 method that samples them down to a deterministic snapshot when a single realistic value is needed.
             </MudText>
-            <MudText Typo="Typo.body1">
+            <MudText Typo="Typo.body1" Class="mb-2">
                 All persisted values use SI units, and every depth is stored in metres referenced to the WGS84
                 vertical datum; MSL, RKB, well-head, and ground-level depth references are presentation concerns
                 handled by the web pages and converted back to WGS84 before anything is saved.
+            </MudText>
+            <MudText Typo="Typo.body1">
+                The <b>fluids above ground level</b> describe the column of air and water the tubulars are exposed to
+                above the well head, each layer a fluid type — <code>Air</code> or <code>Water</code> — with the
+                depth down to which it extends. On land that column is air only; offshore it is typically water up
+                to sea level and air above it. A fixed-platform well can invert part of that picture: where a
+                conductor pipe runs inside a platform pile, the tubular is exposed to air from the ground line
+                upward even though the installation as a whole sits offshore, so the fluid list is what actually
+                distinguishes an onshore, an offshore, and a through-pile completion rather than any single flag on
+                the architecture.
             </MudText>
         </MudPaper>
     </MudItem>
@@ -43,12 +53,22 @@
                 and survey stations — while this service owns the structural description of what was built along
                 that path: the casing programme, the surface facilities, and the well head that separates them.
             </MudText>
-            <MudText Typo="Typo.body1">
+            <MudText Typo="Typo.body1" Class="mb-2">
                 The link runs one way, through the optional <code>WellBoreID</code> on the architecture: an external
                 reference this service validates but never blocks a write on, so an architecture can be planned and
                 stored before, or independently of, the wellbore record it will eventually be attached to. The
                 <b>Contextual Data</b> menu resolves that reference — and the Well, Cluster, Field, and Rig records
                 reachable from it — for display, described further below.
+            </MudText>
+            <MudText Typo="Typo.body1">
+                Because the link is a reference rather than a one-to-one binding, the same wellbore can legitimately
+                have <b>several</b> architecture records pointing at it at once — one per hole section as it is
+                drilled, a <b>planned</b> architecture describing how the wellbore is expected to look once
+                complete, and a separate <b>as-built</b> (actual) architecture recording what was really run, updated
+                as drilling and completion progress. Nothing in the schema itself tells these apart: it is the
+                <b>feature</b> assignments — for example a category such as "Architecture Status" with options like
+                Planned, Actual, or a per-section tag — that let callers and the web application distinguish which
+                architecture record is which for a given wellbore.
             </MudText>
         </MudPaper>
     </MudItem>
