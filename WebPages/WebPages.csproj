@@ -19,6 +19,7 @@
 		<PackageProjectUrl>https://github.com/Open-Source-Drilling-Community/WellBoreArchitecture</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Version>1.1.0</Version>
 	</PropertyGroup>
 
 	<ItemGroup>

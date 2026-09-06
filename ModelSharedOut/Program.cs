@@ -84,7 +84,6 @@ class Program
             if (doUpdateModel)
             {
                 DynamicCreationOfPseudoConstructors(directory);
-                //NORCE.Drilling.Trajectory.PseudoConstructorsWriter.Writer.CreatePseudoConstructors();      
             }
         }
         else

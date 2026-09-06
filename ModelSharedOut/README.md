@@ -28,4 +28,7 @@ Do not hand-edit generated outputs. Review their diff after generation because e
 
 `json-schemas/WellBoreArchitectureFullName.json` is exported from the service by its Debug build target. `json-schemas/VerticalDatumModel.json` supplies the Vertical Datum types used by WebPages for mean-sea-level display references.
 
+Trajectory is not a ModelSharedOut schema dependency of WellBore Architecture;
+only its host WebApp carries the shared Trajectory service URL for composed pages.
+
 Regenerate the shared output after changing this schema or the service REST contract, then rebuild its consumers to verify compatibility.

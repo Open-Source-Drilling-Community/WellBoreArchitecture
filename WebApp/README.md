@@ -18,13 +18,13 @@ The WebApp project is the .NET 8 Blazor Server host for the reusable `OSDC.Drill
 
 - The local `WebPages` library compiles the generated `ModelSharedOut` client aligned with the service REST contract. Regenerate it whenever the API changes.
 - The service is expected at `/WellBoreArchitecture/api`; its host is configured through `WellBoreArchitectureHostURL`.
-- External Field, Cluster, Rig, Well, WellBore, Unit Conversion, Cartographic Projection, Earth Geodesy, Earth Gravity, Earth Magnetic Field, and Earth Vertical Datum services provide contextual data, conversions, and calculators.
+- External Field, Cluster, Rig, Well, WellBore, Trajectory, Unit Conversion, Cartographic Projection, Earth Geodesy, Earth Gravity, Earth Magnetic Field, and Earth Vertical Datum services provide contextual data, conversions, and calculators.
 
 ## Configuration
 
 - `appsettings.json` – baseline configuration used in all environments.
 - `appsettings.Development.json`, `appsettings.Production.json` – environment-specific overrides for API hosts, logging, and tracing.
-- Environment variables can override the host settings, including `FieldHostURL`, `ClusterHostURL`, `RigHostURL`, `WellHostURL`, `WellBoreHostURL`, `WellBoreArchitectureHostURL`, `UnitConversionHostURL`, and the `Earth*HostURL` settings.
+- Environment variables can override the host settings, including `FieldHostURL`, `ClusterHostURL`, `RigHostURL`, `WellHostURL`, `WellBoreHostURL`, `WellBoreArchitectureHostURL`, `TrajectoryHostURL`, `UnitConversionHostURL`, and the `Earth*HostURL` settings. Kubernetes production resolves Trajectory through `http://osdcdrillingtrajectoryservice/`.
 - `Program.cs` applies `UsePathBase("/wellborearchitecture/webapp")`; keep ingress rules in sync with this base path.
 
 ## Build and run locally
