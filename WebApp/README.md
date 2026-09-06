@@ -24,7 +24,7 @@ The WebApp project is the .NET 8 Blazor Server host for the reusable `OSDC.Drill
 
 - `appsettings.json` – baseline configuration used in all environments.
 - `appsettings.Development.json`, `appsettings.Production.json` – environment-specific overrides for API hosts, logging, and tracing.
-- Environment variables can override the host settings, including `FieldHostURL`, `ClusterHostURL`, `RigHostURL`, `WellHostURL`, `WellBoreHostURL`, `WellBoreArchitectureHostURL`, `TrajectoryHostURL`, `UnitConversionHostURL`, and the `Earth*HostURL` settings. Kubernetes production resolves Trajectory through `http://osdcdrillingtrajectoryservice/`.
+- Environment variables can override the host settings, including `FieldHostURL`, `ClusterHostURL`, `RigHostURL`, `WellHostURL`, `WellBoreHostURL`, `WellBoreArchitectureHostURL`, `TrajectoryHostURL`, `UnitConversionHostURL`, and the `Earth*HostURL` settings. Kubernetes production resolves Trajectory through `http://osdctrajectoryservice/`.
 - `Program.cs` applies `UsePathBase("/wellborearchitecture/webapp")`; keep ingress rules in sync with this base path.
 
 ## Build and run locally
