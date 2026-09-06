@@ -1,5 +1,7 @@
 # OSDC.Drilling.WellBoreArchitecture.WebPages
 
+This release targets MudBlazor 9.9.0 and the matching OSDC shared web component packages.
+
 Reusable Razor class library for the WellBoreArchitecture web UI.
 
 It contains the `WellBoreArchitectureMain` page, simplified and detailed architecture editors, dependent section editors/components, helper utilities, and static JavaScript assets.
