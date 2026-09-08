@@ -101,8 +101,10 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
             if (connection != null)
             {
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT COUNT(*) FROM WellBoreArchitectureTable WHERE ID = $id";
-                command.Parameters.AddWithValue("$id", guid);
+                command.CommandText = "SELECT COUNT(*) FROM WellBoreArchitectureTable " +
+                    "WHERE ID = $idText OR ID = $idValue";
+                command.Parameters.AddWithValue("$idText", guid.ToString());
+                command.Parameters.AddWithValue("$idValue", guid);
                 try
                 {
                     using SqliteDataReader reader = command.ExecuteReader();
@@ -208,8 +210,10 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
                 {
                     Model.WellBoreArchitecture? wellBoreArchitecture;
                     var command = connection.CreateCommand();
-                    command.CommandText = "SELECT WellBoreArchitecture FROM WellBoreArchitectureTable WHERE ID = $id";
-                    command.Parameters.AddWithValue("$id", guid);
+                    command.CommandText = "SELECT WellBoreArchitecture FROM WellBoreArchitectureTable " +
+                        "WHERE ID = $idText OR ID = $idValue";
+                    command.Parameters.AddWithValue("$idText", guid.ToString());
+                    command.Parameters.AddWithValue("$idValue", guid);
                     try
                     {
                         using var reader = command.ExecuteReader();
@@ -392,7 +396,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
                             command.CommandText = "INSERT INTO WellBoreArchitectureTable " +
                                 "(ID, MetaInfo, Name, Description, CreationDate, LastModificationDate, WellBoreArchitecture) " +
                                 "VALUES ($id, $metaInfo, $name, $description, $creationDate, $lastModificationDate, $document)";
-                            command.Parameters.AddWithValue("$id", wellBoreArchitecture.MetaInfo.ID);
+                            command.Parameters.AddWithValue("$id", wellBoreArchitecture.MetaInfo.ID.ToString());
                             command.Parameters.AddWithValue("$metaInfo", metaInfo);
                             command.Parameters.AddWithValue("$name", wellBoreArchitecture.Name ?? string.Empty);
                             command.Parameters.AddWithValue("$description", wellBoreArchitecture.Description ?? string.Empty);
@@ -487,14 +491,15 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
                         command.CommandText = "UPDATE WellBoreArchitectureTable SET " +
                             "MetaInfo = $metaInfo, Name = $name, Description = $description, " +
                             "CreationDate = $creationDate, LastModificationDate = $lastModificationDate, " +
-                            "WellBoreArchitecture = $document WHERE ID = $id";
+                            "WellBoreArchitecture = $document WHERE (ID = $idText OR ID = $idValue)";
                         command.Parameters.AddWithValue("$metaInfo", metaInfo);
                         command.Parameters.AddWithValue("$name", wellBoreArchitecture.Name ?? string.Empty);
                         command.Parameters.AddWithValue("$description", wellBoreArchitecture.Description ?? string.Empty);
                         command.Parameters.AddWithValue("$creationDate", cDate ?? string.Empty);
                         command.Parameters.AddWithValue("$lastModificationDate", lDate);
                         command.Parameters.AddWithValue("$document", data);
-                        command.Parameters.AddWithValue("$id", guid);
+                        command.Parameters.AddWithValue("$idText", guid.ToString());
+                        command.Parameters.AddWithValue("$idValue", guid);
                         int count = command.ExecuteNonQuery();
                         if (count != 1)
                         {
@@ -653,8 +658,10 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
                     try
                     {
                         var command = connection.CreateCommand();
-                        command.CommandText = "DELETE FROM WellBoreArchitectureTable WHERE ID = $id";
-                        command.Parameters.AddWithValue("$id", guid);
+                        command.CommandText = "DELETE FROM WellBoreArchitectureTable " +
+                            "WHERE ID = $idText OR ID = $idValue";
+                        command.Parameters.AddWithValue("$idText", guid.ToString());
+                        command.Parameters.AddWithValue("$idValue", guid);
                         int count = command.ExecuteNonQuery();
                         if (count < 0)
                         {

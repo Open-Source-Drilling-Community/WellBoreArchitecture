@@ -269,7 +269,8 @@
         catch (Exception ex)
         {
             currentWellBoreArchitecture = null;
-            logger.LogError(ex, "Impossible to load WellBore to be edited");
+            logger.LogError(ex, "Impossible to load WellBore Architecture to be edited");
+            Snackbar.Add("Impossible to load WellBore Architecture", Severity.Error);
         }
     }
 
