@@ -28,7 +28,7 @@ The consuming host's `PathBase` is not included in these Razor route templates.
 
 ## Identity and feature catalogues
 
-Identity definitions and feature categories are persisted, user-manageable catalogues. New databases are seeded with the default identities `NameForPlanning`, `NameForCompanyReporting`, `NameForRegulatoryReporting`, `Nickname`, and `NameForOperationReporting`. Default feature categories are `Lifecycle`, `ApprovalStatus`, `SectionRole`, and `DrillingMethod`; their exclusivity, validity-period behavior, and suggested options are defined by the service seed manager. Users may add, edit, and remove unused definitions through the catalogue pages.
+Identity definitions and feature categories are persisted, user-manageable catalogues. New databases are seeded with the default identities `NameForPlanning`, `NameForCompanyReporting`, `NameForRegulatoryReporting`, `Nickname`, and `NameForOperationReporting`. Default feature categories are `Lifecycle`, `ApprovalStatus`, `SectionRole`, and `DrillingMethod`; their exclusivity, validity-period behavior, and suggested options are defined by the service seed manager. Users may add, edit, and remove unused definitions through the catalogue pages. The feature page uses the common resource-service compact grid, bulk category/option selection, validation, deletion confirmation, and add/save/reload actions.
 
 Both editor modes expose assignments. The simplified downhole table includes cemented state and Top of cement; the depth entry is enabled only for cemented sections.
 

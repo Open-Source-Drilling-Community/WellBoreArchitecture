@@ -7,6 +7,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers;
 
 public sealed class WellBoreArchitectureFeatureCategoryManager
 {
+    private static readonly object DefaultSeedLock = new();
     private static readonly (string Name, bool Exclusive, bool Validity, string[] Options)[] Defaults =
     [
         ("Lifecycle", true, true, ["Planned", "UnderConstruction", "Operational", "Suspended", "Completed", "PluggedBack", "Abandoned", "Decommissioned"]),
@@ -41,11 +42,16 @@ public sealed class WellBoreArchitectureFeatureCategoryManager
     }
     private void EnsureDefaults()
     {
-        List<Model.WellBoreArchitectureFeatureCategory> existing = store.All();
-        if (existing.Count > 0) return;
-        foreach (var item in Defaults)
-            Add(new() { MetaInfo = new MetaInfo { ID = Guid.NewGuid() }, Name = item.Name, IsExclusive = item.Exclusive, HasValidityPeriod = item.Validity,
-                Options = item.Options.Select(name => new Model.WellBoreArchitectureFeatureOption { ID = Guid.NewGuid(), Name = name }).ToList() });
+        lock (DefaultSeedLock)
+        {
+            // GetAll can be called concurrently when the WebApp first renders. Recheck inside
+            // the process-wide lock so only one request seeds a fresh catalogue.
+            List<Model.WellBoreArchitectureFeatureCategory> existing = store.All();
+            if (existing.Count > 0) return;
+            foreach (var item in Defaults)
+                Add(new() { MetaInfo = new MetaInfo { ID = Guid.NewGuid() }, Name = item.Name, IsExclusive = item.Exclusive, HasValidityPeriod = item.Validity,
+                    Options = item.Options.Select(name => new Model.WellBoreArchitectureFeatureOption { ID = Guid.NewGuid(), Name = name }).ToList() });
+        }
     }
     private static void Prepare(Model.WellBoreArchitectureFeatureCategory value)
     {

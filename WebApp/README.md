@@ -10,7 +10,7 @@ The WebApp project is the .NET 8 Blazor Server host for the reusable `OSDC.Drill
 - `ExternalWebPagesServiceCollectionExtensions.cs` - registers API helpers required by embedded Field, Cluster, Rig, Well, WellBore, and Earth pages.
 - `ExternalRazorAssemblies.cs` - supplies route-bearing Razor assemblies to the Blazor router.
 - `Pages/` - contains the app home, three local calculator route wrappers, and the server-side host/error pages. Architecture pages and components live in `../WebPages/`.
-- `Shared/NavMenu.razor` - provides Home, WellBore Architecture Management, Contextual Data, Calculators, and Monitoring groups.
+- `Shared/NavMenu.razor` - provides Home, WellBore Architecture Management, Import/Export, Contextual Data, Calculators, and Monitoring groups.
 - `charts/` - Helm chart `osdcdrillingwellborearchitecturewebappclient`.
 - `wwwroot/` - host CSS, Bootstrap, favicon, and third-party Open Iconic assets.
 
@@ -38,7 +38,7 @@ dotnet run --project WebApp/WebApp.csproj
 ```
 The app serves the UI on the standard ASP.NET Core ports. Configure `WellBoreArchitectureHostURL` (and other URLs as required) so the UI can reach the backing services during local development.
 
-The **WellBore Architecture Management** menu includes **Backup / Restore**. It exports all architectures or a selected set and restores a version-1 JSON backup. Restore defaults to stopping on an existing UUID and mapping only compatible existing catalogue definitions; replacement and creation of missing definitions must be selected explicitly. The service commits the complete restore in one transaction.
+The collapsed **Import/Export** menu includes **Backup / Restore**. It exports all architectures or a selected set and restores a version-1 JSON backup. Restore defaults to stopping on an existing UUID and mapping only compatible existing catalogue definitions; replacement and creation of missing definitions must be selected explicitly. The service commits the complete restore in one transaction.
 
 ## Docker and Helm packaging
 

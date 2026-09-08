@@ -120,6 +120,27 @@ public sealed class SqlConnectionManagerSafetyTests
     }
 
     [Test]
+    public void Concurrent_feature_catalog_reads_seed_each_default_once()
+    {
+        WithDatabase(path =>
+        {
+            SqlConnectionManager connections = Manager(path);
+
+            Parallel.For(0, 16, _ =>
+                new WellBoreArchitectureFeatureCategoryManager(connections).GetAll());
+
+            using SqliteConnection verification = Open(path);
+            Assert.Multiple(() =>
+            {
+                Assert.That(ScalarLong(verification,
+                    "SELECT COUNT(*) FROM WellBoreArchitectureFeatureCategoryTable"), Is.EqualTo(4));
+                Assert.That(ScalarLong(verification,
+                    "SELECT COUNT(DISTINCT Name) FROM WellBoreArchitectureFeatureCategoryTable"), Is.EqualTo(4));
+            });
+        });
+    }
+
+    [Test]
     public void Unexpected_schema_aborts_startup_without_dropping_data()
     {
         WithDatabase(path =>
