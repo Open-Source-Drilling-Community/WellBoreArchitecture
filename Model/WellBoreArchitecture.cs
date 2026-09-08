@@ -98,7 +98,9 @@ namespace OSDC.Drilling.WellBoreArchitecture.Model
         }
         public bool Calculate()
         {
-            return (this.SurfaceSections.Count > 0);
+            // A wellhead and its downhole construction form a valid architecture even when
+            // no optional surface equipment has been defined.
+            return true;
         }
     }
 }

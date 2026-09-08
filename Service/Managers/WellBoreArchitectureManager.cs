@@ -20,7 +20,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
         private readonly ILogger<WellBoreArchitectureManager> _logger;
         private readonly SqlConnectionManager _connectionManager;
 
-        private WellBoreArchitectureManager(ILogger<WellBoreArchitectureManager> logger, SqlConnectionManager connectionManager)
+        internal WellBoreArchitectureManager(ILogger<WellBoreArchitectureManager> logger, SqlConnectionManager connectionManager)
         {
             _logger = logger;
             _connectionManager = connectionManager;
@@ -37,7 +37,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
             get
             {
                 int count = 0;
-                var connection = _connectionManager.GetConnection();
+                using var connection = _connectionManager.GetConnection();
                 if (connection != null)
                 {
                     var command = connection.CreateCommand();
@@ -65,7 +65,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
 
         public bool Clear()
         {
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 bool success = false;
@@ -97,11 +97,12 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
         public bool Contains(Guid guid)
         {
             int count = 0;
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
-                command.CommandText = $"SELECT COUNT(*) FROM WellBoreArchitectureTable WHERE ID = '{guid}'";
+                command.CommandText = "SELECT COUNT(*) FROM WellBoreArchitectureTable WHERE ID = $id";
+                command.Parameters.AddWithValue("$id", guid);
                 try
                 {
                     using SqliteDataReader reader = command.ExecuteReader();
@@ -129,7 +130,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
         public List<Guid>? GetAllWellBoreArchitectureId()
         {
             List<Guid> ids = [];
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
@@ -164,7 +165,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
         public List<MetaInfo?>? GetAllWellBoreArchitectureMetaInfo()
         {
             List<MetaInfo?> metaInfos = new();
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
@@ -202,12 +203,13 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
         {
             if (!guid.Equals(Guid.Empty))
             {
-                var connection = _connectionManager.GetConnection();
+                using var connection = _connectionManager.GetConnection();
                 if (connection != null)
                 {
                     Model.WellBoreArchitecture? wellBoreArchitecture;
                     var command = connection.CreateCommand();
-                    command.CommandText = $"SELECT WellBoreArchitecture FROM WellBoreArchitectureTable WHERE ID = '{guid}'";
+                    command.CommandText = "SELECT WellBoreArchitecture FROM WellBoreArchitectureTable WHERE ID = $id";
+                    command.Parameters.AddWithValue("$id", guid);
                     try
                     {
                         using var reader = command.ExecuteReader();
@@ -219,6 +221,8 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
                                 throw new SqliteException("SQLite database corrupted: returned WellBoreArchitecture is null or has been jsonified with the wrong ID.", 1);
                             if (wellBoreArchitecture != null && !WellBoreArchitectureComponentIdentity.Ensure(wellBoreArchitecture))
                                 throw new SqliteException("SQLite database corrupted: nested component IDs are duplicated.", 1);
+                            if (wellBoreArchitecture != null)
+                                EnsureReadableRevision(wellBoreArchitecture);
                         }
                         else
                         {
@@ -253,7 +257,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
         public List<Model.WellBoreArchitecture?>? GetAllWellBoreArchitecture()
         {
             List<Model.WellBoreArchitecture?> vals = [];
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
@@ -267,6 +271,8 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
                         Model.WellBoreArchitecture? wellBoreArchitecture = JsonSerializer.Deserialize<Model.WellBoreArchitecture>(data, JsonSettings.Options);
                         if (wellBoreArchitecture != null && !WellBoreArchitectureComponentIdentity.Ensure(wellBoreArchitecture))
                             throw new SqliteException("SQLite database corrupted: nested component IDs are duplicated.", 1);
+                        if (wellBoreArchitecture != null)
+                            EnsureReadableRevision(wellBoreArchitecture);
                         vals.Add(wellBoreArchitecture);
                     }
                     _logger.LogInformation("Returning the list of existing WellBoreArchitecture from WellBoreArchitectureTable");
@@ -292,7 +298,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
         public List<Model.WellBoreArchitectureLight>? GetAllWellBoreArchitectureLight()
         {
             List<Model.WellBoreArchitectureLight>? wellBoreArchitectureLightList = [];
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
@@ -313,6 +319,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
                         DateTimeOffset? lastModificationDate = null;
                         if (DateTimeOffset.TryParse(reader.GetString(4), out DateTimeOffset lDate))
                             lastModificationDate = lDate;
+                        lastModificationDate ??= creationDate ?? DateTimeOffset.UnixEpoch;
                         wellBoreArchitectureLightList.Add(new Model.WellBoreArchitectureLight(
                                 metaInfo,
                                 string.IsNullOrEmpty(name) ? null : name,
@@ -366,7 +373,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
                 if (newWellBoreArchitecture == null)
                 {
                     //update WellBoreArchitectureTable
-                    var connection = _connectionManager.GetConnection();
+                    using var connection = _connectionManager.GetConnection();
                     if (connection != null)
                     {
                         using SqliteTransaction transaction = connection.BeginTransaction();
@@ -374,32 +381,24 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
                         try
                         {
                             //add the WellBoreArchitecture to the WellBoreArchitectureTable
+                            DateTimeOffset now = DateTimeOffset.UtcNow;
+                            wellBoreArchitecture.CreationDate = now;
+                            wellBoreArchitecture.LastModificationDate = now;
                             string metaInfo = JsonSerializer.Serialize(wellBoreArchitecture.MetaInfo, JsonSettings.Options);
-                            string? cDate = null;
-                            if (wellBoreArchitecture.CreationDate != null)
-                                cDate = ((DateTimeOffset)wellBoreArchitecture.CreationDate).ToString(SqlConnectionManager.DATE_TIME_FORMAT);
-                            string? lDate = null;
-                            if (wellBoreArchitecture.LastModificationDate != null)
-                                lDate = ((DateTimeOffset)wellBoreArchitecture.LastModificationDate).ToString(SqlConnectionManager.DATE_TIME_FORMAT);
+                            string cDate = now.ToString(SqlConnectionManager.DATE_TIME_FORMAT);
+                            string lDate = cDate;
                             string data = JsonSerializer.Serialize(wellBoreArchitecture, JsonSettings.Options);
                             var command = connection.CreateCommand();
-                            command.CommandText = "INSERT INTO WellBoreArchitectureTable (" +
-                                "ID, " +
-                                "MetaInfo, " +
-                                "Name, " +
-                                "Description, " +
-                                "CreationDate, " +
-                                "LastModificationDate, " +
-                                "WellBoreArchitecture" +
-                                ") VALUES (" +
-                                $"'{wellBoreArchitecture.MetaInfo.ID}', " +
-                                $"'{metaInfo}', " +
-                                $"'{wellBoreArchitecture.Name}', " +
-                                $"'{wellBoreArchitecture.Description}', " +
-                                $"'{cDate}', " +
-                                $"'{lDate}', " +
-                                $"'{data}'" +
-                                ")";
+                            command.CommandText = "INSERT INTO WellBoreArchitectureTable " +
+                                "(ID, MetaInfo, Name, Description, CreationDate, LastModificationDate, WellBoreArchitecture) " +
+                                "VALUES ($id, $metaInfo, $name, $description, $creationDate, $lastModificationDate, $document)";
+                            command.Parameters.AddWithValue("$id", wellBoreArchitecture.MetaInfo.ID);
+                            command.Parameters.AddWithValue("$metaInfo", metaInfo);
+                            command.Parameters.AddWithValue("$name", wellBoreArchitecture.Name ?? string.Empty);
+                            command.Parameters.AddWithValue("$description", wellBoreArchitecture.Description ?? string.Empty);
+                            command.Parameters.AddWithValue("$creationDate", cDate);
+                            command.Parameters.AddWithValue("$lastModificationDate", lDate);
+                            command.Parameters.AddWithValue("$document", data);
                             int count = command.ExecuteNonQuery();
                             if (count != 1)
                             {
@@ -470,7 +469,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
                     return false;
                 }
                 //update WellBoreArchitectureTable
-                var connection = _connectionManager.GetConnection();
+                using var connection = _connectionManager.GetConnection();
                 if (connection != null)
                 {
                     using SqliteTransaction transaction = connection.BeginTransaction();
@@ -485,14 +484,17 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
                         string? lDate = ((DateTimeOffset)wellBoreArchitecture.LastModificationDate).ToString(SqlConnectionManager.DATE_TIME_FORMAT);
                         string data = JsonSerializer.Serialize(wellBoreArchitecture, JsonSettings.Options);
                         var command = connection.CreateCommand();
-                        command.CommandText = $"UPDATE WellBoreArchitectureTable SET " +
-                            $"MetaInfo = '{metaInfo}', " +
-                            $"Name = '{wellBoreArchitecture.Name}', " +
-                            $"Description = '{wellBoreArchitecture.Description}', " +
-                            $"CreationDate = '{cDate}', " +
-                            $"LastModificationDate = '{lDate}', " +
-                            $"WellBoreArchitecture = '{data}' " +
-                            $"WHERE ID = '{guid}'";
+                        command.CommandText = "UPDATE WellBoreArchitectureTable SET " +
+                            "MetaInfo = $metaInfo, Name = $name, Description = $description, " +
+                            "CreationDate = $creationDate, LastModificationDate = $lastModificationDate, " +
+                            "WellBoreArchitecture = $document WHERE ID = $id";
+                        command.Parameters.AddWithValue("$metaInfo", metaInfo);
+                        command.Parameters.AddWithValue("$name", wellBoreArchitecture.Name ?? string.Empty);
+                        command.Parameters.AddWithValue("$description", wellBoreArchitecture.Description ?? string.Empty);
+                        command.Parameters.AddWithValue("$creationDate", cDate ?? string.Empty);
+                        command.Parameters.AddWithValue("$lastModificationDate", lDate);
+                        command.Parameters.AddWithValue("$document", data);
+                        command.Parameters.AddWithValue("$id", guid);
                         int count = command.ExecuteNonQuery();
                         if (count != 1)
                         {
@@ -630,6 +632,9 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
             (left.ToDate == null || right.FromDate == null || left.ToDate >= right.FromDate) &&
             (right.ToDate == null || left.FromDate == null || right.ToDate >= left.FromDate);
 
+        private static void EnsureReadableRevision(Model.WellBoreArchitecture architecture) =>
+            architecture.LastModificationDate ??= architecture.CreationDate ?? DateTimeOffset.UnixEpoch;
+
         /// <summary>
         /// Deletes the WellBoreArchitecture of given ID from the microservice database
         /// </summary>
@@ -639,7 +644,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
         {
             if (!guid.Equals(Guid.Empty))
             {
-                var connection = _connectionManager.GetConnection();
+                using var connection = _connectionManager.GetConnection();
                 if (connection != null)
                 {
                     using var transaction = connection.BeginTransaction();
@@ -648,7 +653,8 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
                     try
                     {
                         var command = connection.CreateCommand();
-                        command.CommandText = $"DELETE FROM WellBoreArchitectureTable WHERE ID = '{guid}'";
+                        command.CommandText = "DELETE FROM WellBoreArchitectureTable WHERE ID = $id";
+                        command.Parameters.AddWithValue("$id", guid);
                         int count = command.ExecuteNonQuery();
                         if (count < 0)
                         {

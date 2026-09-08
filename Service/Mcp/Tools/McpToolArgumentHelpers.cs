@@ -276,16 +276,16 @@ internal static class McpToolArgumentHelpers
                 ["MetaInfo"] = Ref("MetaInfo", "Resource metadata. MetaInfo.ID is supplied by the caller and is the persistent architecture UUID."),
                 ["Name"] = NullableString("Human-readable architecture name."),
                 ["Description"] = NullableString("Human-readable description of the well construction design or revision."),
-                ["CreationDate"] = NullableDateTime("Creation timestamp in ISO 8601 format. Use a UTC offset where possible."),
-                ["LastModificationDate"] = NullableDateTime("Last-modification timestamp in ISO 8601 format. Update this when replacing the architecture."),
+                ["CreationDate"] = NullableDateTime("Server-owned creation timestamp. It may be omitted on create."),
+                ["LastModificationDate"] = NullableDateTime("Server-owned optimistic-concurrency token. It may be omitted on create; copy the returned value exactly for updates and deletes."),
                 ["WellBoreArchitectureIdentityAssignments"] = Array("WellBoreArchitectureIdentityAssignment", "Identity values assigned to the architecture.", nullable: true),
                 ["WellBoreArchitectureFeatureAssignments"] = Array("WellBoreArchitectureFeatureAssignment", "Feature options assigned to the architecture.", nullable: true),
                 ["WellBoreID"] = NullableUuid("UUID of the WellBore to which this architecture belongs. This is an external reference to the WellBore microservice, not an embedded WellBore."),
                 ["WellHead"] = Ref("WellHead", "Wellhead dimensions and depth/hanger locations."),
                 ["FluidsAboveGroundLevel"] = Array("WellBoreArchitectureFluid", "Ordered fluid layers above ground or mudline. The last listed fluid extends to ground level."),
-                ["SurfaceSections"] = Array("SurfaceSection", "Surface equipment sections above the wellhead, ordered from top to bottom. At least one item is required because the service calculation rejects an empty list.", minItems: 1),
+                ["SurfaceSections"] = Array("SurfaceSection", "Optional surface equipment sections above the wellhead, ordered from top to bottom. The list may be omitted or empty when the architecture has no surface equipment."),
                 ["CasingSections"] = Array("CasingSection", "Casing sections beginning at the wellhead and ordered from top to bottom.")
-            }, "MetaInfo", "SurfaceSections"),
+            }, "MetaInfo"),
 
         ["WellBoreArchitectureIdentityAssignment"] = Object("One architecture-specific identity value.", new JsonObject
         {

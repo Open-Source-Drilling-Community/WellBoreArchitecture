@@ -21,7 +21,7 @@
                 A <b>WellBore Architecture</b> is the structural record for one drilled path: a name, a description,
                 server-owned creation and modification timestamps, an optional <code>WellBoreID</code> linking it to
                 the wellbore it describes, its identity and feature assignments, and the physical structure itself —
-                a <b>well head</b>, any fluids sitting above ground level, an ordered list of <b>surface
+                a <b>well head</b>, any fluids sitting above ground level, zero or more ordered <b>surface
                 sections</b>, and an ordered list of <b>casing sections</b> with their elements and open-hole
                 intervals. Most engineering quantities are stored as probabilistic (Gaussian or scalar) drilling
                 properties rather than single numbers, and each construction object exposes a <code>Realize()</code>
@@ -76,19 +76,21 @@
         <MudPaper Class="pa-6 mt-4" Elevation="2">
             <MudText Typo="Typo.h5" Class="mb-3">Top and downhole architecture, split at the well head</MudText>
             <MudText Typo="Typo.body1" Class="mb-2">
-                Every architecture is organized around its <b>well head</b>, the fixed point that separates what sits
-                above it from what hangs below it. The well head itself carries a depth, minimum and maximum outside
-                diameter, and the casing- and tubing-hanger depths at which downhole strings are landed.
+                Every architecture is organized around its <b>well head</b>, the upper anchor of the downhole
+                construction and the fixed point that separates what sits above it from what hangs below it. The well
+                head itself carries a depth, minimum and maximum outside diameter, and the casing- and tubing-hanger
+                depths at which downhole strings are landed.
             </MudText>
             <MudText Typo="Typo.body1" Class="mb-2">
                 Above the well head is the <b>top architecture</b>: any fluids sitting above ground level, and the
-                ordered <code>SurfaceSections</code> list — riser joints, diverters, and other above-ground or
+                optional, ordered <code>SurfaceSections</code> list — riser joints, diverters, and other above-ground or
                 near-surface elements, each built from a network of side connectors and side elements — sorted top
-                to bottom down to the well head.
+                to bottom down to the well head. This list may be empty when no surface equipment is part of the
+                architecture.
             </MudText>
             <MudText Typo="Typo.body1">
-                Below the well head is the <b>downhole architecture</b>: the ordered <code>CasingSections</code>
-                list, sorted top to bottom starting at the well head, each with a top depth, length, and
+                The <b>downhole architecture</b> starts at the well head and continues through the ordered
+                <code>CasingSections</code> list, sorted top to bottom, each with a top depth, length, and
                 top-of-cement depth, its casing section elements, a size table of length and diameter pairs, and the
                 open-hole interval that continues from where the previous casing section — or the ground level for
                 the first one — left off.

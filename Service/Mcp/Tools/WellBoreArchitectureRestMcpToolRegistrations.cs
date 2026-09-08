@@ -53,8 +53,8 @@ public static class WellBoreArchitectureRestMcpToolRegistrations
             (sp, args, ct) => InvokeWithBodyResult<BatchExportRequestModel, OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchExportDocument>(args, "request", ct, request => Controller(sp).BatchExportWellBoreArchitectures(request)));
         services.AddLegacyMcpTool("well_bore_architecture_batch_restore", "Validate and atomically restore a schema-version-1 backup. Exact catalogue UUID matching is the safe default; missing definitions preserve source UUIDs. Mapping by normalized name requires explicit AllowNormalizedNameMapping consent and still rejects ambiguity or incompatible semantics. Catalogue mapping and all writes share one transaction, so any failure leaves the database unchanged.", McpToolArgumentHelpers.CreateWellBoreArchitectureBatchRestoreSchema(),
             (sp, args, ct) => InvokeWithBodyResult<BatchRestoreRequestModel, OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchRestoreResponse>(args, "request", ct, request => Controller(sp).BatchRestoreWellBoreArchitectures(request)));
-        services.AddLegacyMcpTool("well_bore_architecture_create", "Persist a new complete wellbore architecture. Generate a non-empty wellBoreArchitecture.MetaInfo.ID first; an existing UUID produces a conflict. Supply at least one SurfaceSection, preserve top-to-bottom ordering, use WellBoreID only as an external reference, and encode physical values in SI through GaussianValue or DiracDistributionValue.", McpToolArgumentHelpers.CreateWellBoreArchitectureSchema(),
-            (sp, args, ct) => InvokeWithBody<ArchitectureModel>(args, "wellBoreArchitecture", ct, data => Controller(sp).PostWellBoreArchitecture(data)));
+        services.AddLegacyMcpTool("well_bore_architecture_create", "Persist a new complete wellbore architecture and return it with server-owned CreationDate and LastModificationDate. Generate a non-empty wellBoreArchitecture.MetaInfo.ID first; an existing UUID produces a conflict. SurfaceSections may be omitted or empty when no surface equipment exists; preserve top-to-bottom ordering for sections that are supplied, use WellBoreID only as an external reference, and encode physical values in SI through GaussianValue or DiracDistributionValue.", McpToolArgumentHelpers.CreateWellBoreArchitectureSchema(),
+            InvokeCreate);
         services.AddLegacyMcpTool("well_bore_architecture_update_by_id", "Replace an existing wellbore architecture using optimistic concurrency. The path id must equal MetaInfo.ID and expectedModifiedUtc must exactly match the latest LastModificationDate. Send the complete desired representation; stale or malformed writes change nothing.", McpToolArgumentHelpers.CreateWellBoreArchitectureSchema(includeId: true),
             (sp, args, ct) => InvokeFullUpdate(sp, args, ct));
         services.AddLegacyMcpTool("well_bore_architecture_details_update", "Update only Name and Description without resending construction arrays or assignments. expectedModifiedUtc must exactly match the latest architecture LastModificationDate; the complete updated architecture is returned and stale calls change nothing.", McpToolArgumentHelpers.CreateDetailsMutationSchema(),
@@ -104,7 +104,7 @@ public static class WellBoreArchitectureRestMcpToolRegistrations
         services.AddLegacyMcpTool(prefix + "_update_by_id", $"Replace one {definitionName} selected by stable componentId without resending other sections. section.ComponentID must equal componentId and expectedModifiedUtc is an opaque token copied exactly from the latest read.",
             McpToolArgumentHelpers.CreateSectionMutationSchema(definitionName, true, true),
             (sp, args, ct) => InvokeSectionUpdate(sp, args, sections, ct));
-        services.AddLegacyMcpTool(prefix + "_delete_by_id", $"Delete one {definitionName} selected by stable componentId. The latest opaque expectedModifiedUtc token is required; deleting the final SurfaceSection is rejected by architecture validation.",
+        services.AddLegacyMcpTool(prefix + "_delete_by_id", $"Delete one {definitionName} selected by stable componentId. The latest opaque expectedModifiedUtc token is required. Deleting the final section is permitted because an empty section collection is a valid architecture.",
             McpToolArgumentHelpers.CreateSectionMutationSchema(definitionName, true, false),
             (sp, args, ct) => InvokeSectionDelete(sp, args, sections, ct));
         services.AddLegacyMcpTool(prefix + "_reorder", $"Reorder all existing {definitionName} values top-to-bottom by stable ComponentID without resending their engineering payloads. The list must contain every current section ID exactly once and expectedModifiedUtc must be copied from the latest read.",
@@ -146,6 +146,17 @@ public static class WellBoreArchitectureRestMcpToolRegistrations
         if (value?.MetaInfo == null || value.MetaInfo.ID != id)
             return Task.FromResult<JsonNode?>(McpToolResponses.CreateValidationError("Argument 'id' must equal wellBoreArchitecture.MetaInfo.ID."));
         return Task.FromResult<JsonNode?>(Mutate(sp, id, expected, _ => value));
+    }
+
+    private static Task<JsonNode?> InvokeCreate(IServiceProvider sp, JsonObject? args, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        if (!TryDeserialize(args, "wellBoreArchitecture", out ArchitectureModel? value, out JsonNode? error))
+            return Task.FromResult(error);
+        ActionResult result = Controller(sp).PostWellBoreArchitecture(value);
+        JsonObject response = McpActionResultConverter.FromActionResult(result);
+        int status = response["status"]?.GetValue<int>() ?? 500;
+        return Task.FromResult<JsonNode?>(status is >= 200 and <= 299 && value != null ? Success(value) : response);
     }
 
     private static Task<JsonNode?> InvokeObjectMutation(IServiceProvider sp, JsonObject? args, string bodyName,

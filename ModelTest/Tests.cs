@@ -13,7 +13,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelTest
         }
 
         [Test]
-        public void Test_Calculus()
+        public void Calculate_accepts_an_architecture_without_surface_sections()
         {
             Guid guid = Guid.NewGuid();
             MetaInfo metaInfo = new() { ID = guid };
@@ -33,8 +33,11 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelTest
                 LastModificationDate = creationDate,
             };
 
-            wellBoreArchitecture.Calculate();
-            Assert.That(wellBoreArchitecture.Calculate(), Is.EqualTo(false));
+            Assert.Multiple(() =>
+            {
+                Assert.That(wellBoreArchitecture.SurfaceSections, Is.Empty);
+                Assert.That(wellBoreArchitecture.Calculate(), Is.True);
+            });
         }
 
         [OneTimeTearDown]

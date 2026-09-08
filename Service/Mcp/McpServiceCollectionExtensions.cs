@@ -85,7 +85,7 @@ public static class McpServiceCollectionExtensions
         if (name == "well_bore_architecture_search") return Tools.McpToolArgumentHelpers.CreateSearchOutputSchema();
         if (name == "well_bore_architecture_validate_external_references") return Tools.McpToolArgumentHelpers.CreateExternalReferenceValidationOutputSchema();
         if (name == "well_bore_architecture_audit_external_references") return Tools.McpToolArgumentHelpers.CreateExternalReferenceAuditOutputSchema();
-        if (name == "well_bore_architecture_get_by_id" || name.Contains("_assignment_", StringComparison.Ordinal) ||
+        if (name is "well_bore_architecture_get_by_id" or "well_bore_architecture_create" || name.Contains("_assignment_", StringComparison.Ordinal) ||
             name.Contains("_surface_section_", StringComparison.Ordinal) || name.Contains("_casing_section_", StringComparison.Ordinal) ||
             name is "well_bore_architecture_update_by_id" or "well_bore_architecture_details_update" or "well_bore_architecture_well_bore_link_update")
             return Tools.McpToolArgumentHelpers.CreateArchitectureOutputSchema();

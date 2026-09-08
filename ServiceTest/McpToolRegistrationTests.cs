@@ -130,13 +130,19 @@ public sealed class McpToolRegistrationTests
     {
         JsonObject schema = (JsonObject)_tools["well_bore_architecture_create"].InputSchema!;
         JsonObject definitions = (JsonObject)schema["$defs"]!;
+        JsonObject architecture = (JsonObject)definitions["WellBoreArchitecture"]!;
+        JsonObject properties = (JsonObject)architecture["properties"]!;
+        JsonObject surfaceSections = (JsonObject)properties["SurfaceSections"]!;
+        string[] required = architecture["required"]!.AsArray().Select(node => node!.GetValue<string>()).ToArray();
         string json = schema.ToJsonString();
 
         Assert.That(definitions.Count, Is.GreaterThanOrEqualTo(16));
         Assert.That(json, Does.Contain("WellBoreID"));
         Assert.That(json, Does.Contain("external reference to the WellBore microservice"));
         Assert.That(json, Does.Contain("SurfaceSections"));
-        Assert.That(json, Does.Contain("\"minItems\":1"));
+        Assert.That(surfaceSections.ContainsKey("minItems"), Is.False);
+        Assert.That(required, Does.Not.Contain("SurfaceSections"));
+        Assert.That(surfaceSections["description"]?.GetValue<string>(), Does.Contain("may be omitted or empty"));
         Assert.That(json, Does.Contain("ordered from top to bottom"));
         Assert.That(json, Does.Contain("CasingSectionElements"));
         Assert.That(json, Does.Contain("ElementConnectivities"));
@@ -182,6 +188,20 @@ public sealed class McpToolRegistrationTests
     {
         JsonObject? response = await _tools["well_bore_architecture_create"].InvokeAsync(new JsonObject(), CancellationToken.None) as JsonObject;
         Assert.That(response?["status"]?.GetValue<int>(), Is.EqualTo(400));
+    }
+
+    [Test]
+    public void Create_returns_the_architecture_with_server_owned_concurrency_timestamps()
+    {
+        IMcpTool create = _tools["well_bore_architecture_create"];
+        string outputSchema = create.OutputSchema.ToJsonString();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(create.Description, Does.Contain("return it with server-owned CreationDate and LastModificationDate"));
+            Assert.That(outputSchema, Does.Contain("WellBoreArchitecture"));
+            Assert.That(outputSchema, Does.Contain("Server-owned optimistic-concurrency token"));
+        });
     }
 
     [Test]
