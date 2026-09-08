@@ -24,9 +24,11 @@ dotnet build WellBoreArchitecture.sln
 
 Do not hand-edit generated outputs. Review their diff after generation because every WebApp and test consumer compiles against these files.
 
-## Current schema input
+## Current schema inputs
 
-`json-schemas/WellBoreArchitectureFullName.json` is exported from the service by its Debug build target. `json-schemas/VerticalDatumModel.json` supplies the Vertical Datum types used by WebPages for mean-sea-level display references.
+`json-schemas/WellBoreArchitectureFullName.json` is exported from the service by its Debug build target. The `Field.json`, `Cluster.json`, `Well.json`, `WellBore.json`, and `Rig.json` inputs must be refreshed from the corresponding service Swagger exports in each owning repository before regeneration. `VerticalDatumModel.json` must be refreshed from the Earth Vertical Datum merged service schema used for mean-sea-level display references.
+
+The pseudo-constructor generator intentionally emits helpers only for the DTO roots used by the architecture editors and their dependencies. When an editor starts constructing another generated DTO, add that type to the generator's explicit root set and regenerate; do not hand-edit `PseudoConstructors.cs`.
 
 Trajectory is not a ModelSharedOut schema dependency of WellBore Architecture;
 only its host WebApp carries the shared Trajectory service URL for composed pages.

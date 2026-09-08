@@ -275,9 +275,13 @@ class Program
                 SyntaxTree syntaxTreeNamespace = CSharpSyntaxTree.ParseText(namespaceCode);
                 string assemblyName = Path.GetRandomFileName();
                 //Add assembly references
-                var references = AppDomain.CurrentDomain.GetAssemblies()
+                var referencePaths = AppDomain.CurrentDomain.GetAssemblies()
                     .Where(a => !a.IsDynamic && !string.IsNullOrEmpty(a.Location))
-                    .Select(a => MetadataReference.CreateFromFile(a.Location))
+                    .Select(a => a.Location)
+                    .Append(typeof(System.ComponentModel.DataAnnotations.RequiredAttribute).Assembly.Location)
+                    .Distinct(StringComparer.OrdinalIgnoreCase);
+                var references = referencePaths
+                    .Select(path => MetadataReference.CreateFromFile(path))
                     .Cast<MetadataReference>();
                 //Compile namespace syntax tree and actual code 
                 var compilation = CSharpCompilation.Create(
@@ -292,7 +296,7 @@ class Program
                 //Show error if compilation fails
                 if (!result.Success)
                 {
-                    foreach (var diagnostic in result.Diagnostics)
+                    foreach (var diagnostic in result.Diagnostics.Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error))
                     {
                         Console.WriteLine(diagnostic.ToString());
                     }

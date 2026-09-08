@@ -1,1834 +1,10 @@
 {
-  "openapi": "3.0.3",
+  "openapi": "3.0.4",
   "info": {
-    "title": "ModelShared (Service)",
-    "description": "Data model containing model dependencies of the clients of the current microservice (WebApp, ServiceTest)",
+    "title": "Service, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
     "version": "1.0"
   },
   "paths": {
-    "/Cluster": {
-      "get": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "GetAllClusterId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "PostCluster",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Cluster"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Cluster"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Cluster"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Cluster/MetaInfo": {
-      "get": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "GetAllClusterMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Cluster/{id}": {
-      "get": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "GetClusterById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Cluster"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "PutClusterById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Cluster"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Cluster"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Cluster"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "DeleteClusterById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Cluster/HeavyData": {
-      "get": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "GetAllCluster",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Cluster"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/ClusterUsageStatistics": {
-      "get": {
-        "tags": [
-          "ClusterUsageStatistics"
-        ],
-        "operationId": "GetClusterUsageStatistics",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UsageStatisticsCluster"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicConversionSet": {
-      "get": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "GetAllCartographicConversionSetId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "PostCartographicConversionSet",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicConversionSet"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicConversionSet"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicConversionSet"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/CartographicConversionSet/MetaInfo": {
-      "get": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "GetAllCartographicConversionSetMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicConversionSet/{id}": {
-      "get": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "GetCartographicConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CartographicConversionSet"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "PutCartographicConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicConversionSet"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicConversionSet"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicConversionSet"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "DeleteCartographicConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/CartographicConversionSet/LightData": {
-      "get": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "GetAllCartographicConversionSetLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CartographicConversionSetLight"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicConversionSet/HeavyData": {
-      "get": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "GetAllCartographicConversionSet",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CartographicConversionSet"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjection": {
-      "get": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "GetAllCartographicProjectionId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "PostCartographicProjection",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicProjection"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicProjection"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicProjection"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/CartographicProjection/MetaInfo": {
-      "get": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "GetAllCartographicProjectionMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjection/{id}": {
-      "get": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "GetCartographicProjectionById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CartographicProjection"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "PutCartographicProjectionById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicProjection"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicProjection"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicProjection"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "DeleteCartographicProjectionById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/CartographicProjection/LightData": {
-      "get": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "GetAllCartographicProjectionLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CartographicProjectionLight"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjection/HeavyData": {
-      "get": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "GetAllCartographicProjection",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CartographicProjection"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjectionType": {
-      "get": {
-        "tags": [
-          "CartographicProjectionType"
-        ],
-        "operationId": "GetAllCartographicProjectionTypeId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjectionType/{id}": {
-      "get": {
-        "tags": [
-          "CartographicProjectionType"
-        ],
-        "operationId": "GetCartographicProjectionTypeById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CartographicProjectionType"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjectionType/HeavyData": {
-      "get": {
-        "tags": [
-          "CartographicProjectionType"
-        ],
-        "operationId": "GetAllCartographicProjectionType",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CartographicProjectionType"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjectionUsageStatistics": {
-      "get": {
-        "tags": [
-          "CartographicProjectionUsageStatistics"
-        ],
-        "operationId": "GetCartographicProjectionUsageStatistics",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UsageStatisticsCartographicProjection"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticConversionSet": {
-      "get": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "GetAllGeodeticConversionSetId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "PostGeodeticConversionSet",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticConversionSet"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticConversionSet"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticConversionSet"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/GeodeticConversionSet/MetaInfo": {
-      "get": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "GetAllGeodeticConversionSetMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticConversionSet/{id}": {
-      "get": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "GetGeodeticConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GeodeticConversionSet"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "PutGeodeticConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticConversionSet"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticConversionSet"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticConversionSet"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "DeleteGeodeticConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/GeodeticConversionSet/LightData": {
-      "get": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "GetAllGeodeticConversionSetLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/GeodeticConversionSetLight"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticConversionSet/HeavyData": {
-      "get": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "GetAllGeodeticConversionSet",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/GeodeticConversionSet"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticDatum": {
-      "get": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "GetAllGeodeticDatumId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "PostGeodeticDatum",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticDatum"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticDatum"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticDatum"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/GeodeticDatum/MetaInfo": {
-      "get": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "GetAllGeodeticDatumMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticDatum/{id}": {
-      "get": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "GetGeodeticDatumById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GeodeticDatum"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "PutGeodeticDatumById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticDatum"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticDatum"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticDatum"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "DeleteGeodeticDatumById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/GeodeticDatum/LightData": {
-      "get": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "GetAllGeodeticDatumLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/GeodeticDatumLight"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticDatum/HeavyData": {
-      "get": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "GetAllGeodeticDatum",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/GeodeticDatum"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticDatumUsageStatistics": {
-      "get": {
-        "tags": [
-          "GeodeticDatumUsageStatistics"
-        ],
-        "operationId": "GetGeodeticDatumUsageStatistics",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UsageStatisticsGeodeticDatum"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Spheroid": {
-      "get": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "GetAllSpheroidId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "PostSpheroid",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Spheroid"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Spheroid"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Spheroid"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Spheroid/MetaInfo": {
-      "get": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "GetAllSpheroidMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Spheroid/{id}": {
-      "get": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "GetSpheroidById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Spheroid"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "PutSpheroidById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Spheroid"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Spheroid"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Spheroid"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "DeleteSpheroidById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Spheroid/HeavyData": {
-      "get": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "GetAllSpheroid",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Spheroid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Field": {
-      "get": {
-        "tags": [
-          "Field"
-        ],
-        "operationId": "GetAllFieldId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Field"
-        ],
-        "operationId": "PostField",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Field"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Field"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Field"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Field/MetaInfo": {
-      "get": {
-        "tags": [
-          "Field"
-        ],
-        "operationId": "GetAllFieldMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Field/{id}": {
-      "get": {
-        "tags": [
-          "Field"
-        ],
-        "operationId": "GetFieldById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Field"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Field"
-        ],
-        "operationId": "PutFieldById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Field"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Field"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Field"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Field"
-        ],
-        "operationId": "DeleteFieldById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Field/HeavyData": {
-      "get": {
-        "tags": [
-          "Field"
-        ],
-        "operationId": "GetAllField",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Field"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/FieldCartographicConversionSet": {
-      "get": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "GetAllFieldCartographicConversionSetId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "PostFieldCartographicConversionSet",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/FieldCartographicConversionSet/MetaInfo": {
-      "get": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "GetAllFieldCartographicConversionSetMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/FieldCartographicConversionSet/{id}": {
-      "get": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "GetFieldCartographicConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FieldCartographicConversionSet"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "PutFieldCartographicConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "DeleteFieldCartographicConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/FieldCartographicConversionSet/LightData": {
-      "get": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "GetAllFieldCartographicConversionSetLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/FieldCartographicConversionSetLight"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/FieldCartographicConversionSet/HeavyData": {
-      "get": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "GetAllFieldCartographicConversionSet",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/FieldCartographicConversionSet"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/FieldUsageStatistics": {
-      "get": {
-        "tags": [
-          "FieldUsageStatistics"
-        ],
-        "operationId": "GetFieldUsageStatistics",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UsageStatisticsField"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/WellBore": {
       "get": {
         "tags": [
@@ -1861,17 +37,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/WellBore"
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBore"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/WellBore"
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBore"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/WellBore"
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBore"
               }
             }
           }
@@ -1897,7 +73,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
+                    "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
                   }
                 }
               }
@@ -1929,7 +105,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WellBore"
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBore"
                 }
               }
             }
@@ -1950,23 +126,32 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           }
         ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/WellBore"
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBore"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/WellBore"
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBore"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/WellBore"
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBore"
               }
             }
           }
@@ -1991,6 +176,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           }
         ],
         "responses": {
@@ -2014,7 +208,1404 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/WellBore"
+                    "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBore"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WellBore/Search": {
+      "get": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "SearchWellBores",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 50
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "wellId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "rigId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "parentWellBoreId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "isSidetrack",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "identityId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "identityValue",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "featureCategoryId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "featureOptionId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "modifiedFromUtc",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "modifiedToUtc",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreSearchResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreMutationErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WellBore/{id}/ExternalReferences": {
+      "get": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "ValidateWellBoreExternalReferences",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreExternalReferenceValidation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreMutationErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreMutationErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WellBore/ExternalReferenceAudit": {
+      "post": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "AuditWellBoreExternalReferences",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreExternalReferenceAuditRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreExternalReferenceAuditRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreExternalReferenceAuditRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreExternalReferenceAuditResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreMutationErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreMutationErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WellBore/BatchExport": {
+      "post": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "BatchExportWellBores",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreBatchExportRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreBatchExportRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreBatchExportRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreBatchExportDocument"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreBatchErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WellBore/BatchRestore": {
+      "post": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "BatchRestoreWellBores",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreBatchRestoreRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreBatchRestoreRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreBatchRestoreRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreBatchRestoreResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreBatchErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WellBore/ByWellID": {
+      "get": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "GetAllWellBoreByWellID",
+        "parameters": [
+          {
+            "name": "wellID",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBore"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WellBore/ByRigID": {
+      "get": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "GetAllWellBoreByRigId",
+        "parameters": [
+          {
+            "name": "rigID",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBore"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WellBore/ByParentID": {
+      "get": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "GetAllWellBoreByParentWellBoreId",
+        "parameters": [
+          {
+            "name": "parentID",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBore"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WellBore/IsSidetracked": {
+      "get": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "GetAllSidetrackedWellBore",
+        "parameters": [
+          {
+            "name": "parentID",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBore"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WellBore/{id}/Details": {
+      "put": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "PutWellBoreDetails",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreDetailsUpdate"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreDetailsUpdate"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreDetailsUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/WellBore/{id}/Topology": {
+      "put": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "PutWellBoreTopology",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreTopologyUpdate"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreTopologyUpdate"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreTopologyUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/WellBore/{wellBoreId}/IdentityAssignments": {
+      "post": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "PostWellBoreIdentityAssignment",
+        "parameters": [
+          {
+            "name": "wellBoreId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreIdentityAssignment"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreIdentityAssignment"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreIdentityAssignment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/WellBore/{wellBoreId}/IdentityAssignments/{assignmentId}": {
+      "put": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "PutWellBoreIdentityAssignment",
+        "parameters": [
+          {
+            "name": "wellBoreId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "assignmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreIdentityAssignment"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreIdentityAssignment"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreIdentityAssignment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "DeleteWellBoreIdentityAssignment",
+        "parameters": [
+          {
+            "name": "wellBoreId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "assignmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/WellBore/{wellBoreId}/FeatureAssignments": {
+      "post": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "PostWellBoreFeatureAssignment",
+        "parameters": [
+          {
+            "name": "wellBoreId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreFeatureAssignment"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreFeatureAssignment"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreFeatureAssignment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/WellBore/{wellBoreId}/FeatureAssignments/{assignmentId}": {
+      "put": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "PutWellBoreFeatureAssignment",
+        "parameters": [
+          {
+            "name": "wellBoreId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "assignmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreFeatureAssignment"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreFeatureAssignment"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreFeatureAssignment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "DeleteWellBoreFeatureAssignment",
+        "parameters": [
+          {
+            "name": "wellBoreId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "assignmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/WellBoreFeatureCategory": {
+      "get": {
+        "tags": [
+          "WellBoreFeatureCategory"
+        ],
+        "operationId": "GetAllWellBoreFeatureCategoryId",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "WellBoreFeatureCategory"
+        ],
+        "operationId": "PostWellBoreFeatureCategory",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreFeatureCategory"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreFeatureCategory"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreFeatureCategory"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreFeatureCategory"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WellBoreFeatureCategory/MetaInfo": {
+      "get": {
+        "tags": [
+          "WellBoreFeatureCategory"
+        ],
+        "operationId": "GetAllWellBoreFeatureCategoryMetaInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WellBoreFeatureCategory/{id}": {
+      "get": {
+        "tags": [
+          "WellBoreFeatureCategory"
+        ],
+        "operationId": "GetWellBoreFeatureCategoryById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreFeatureCategory"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "WellBoreFeatureCategory"
+        ],
+        "operationId": "PutWellBoreFeatureCategoryById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreFeatureCategory"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreFeatureCategory"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreFeatureCategory"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreFeatureCategory"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreMutationErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "WellBoreFeatureCategory"
+        ],
+        "operationId": "DeleteWellBoreFeatureCategoryById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/WellBoreFeatureCategory/HeavyData": {
+      "get": {
+        "tags": [
+          "WellBoreFeatureCategory"
+        ],
+        "operationId": "GetAllWellBoreFeatureCategory",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreFeatureCategory"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WellBoreIdentity": {
+      "get": {
+        "tags": [
+          "WellBoreIdentity"
+        ],
+        "operationId": "GetAllWellBoreIdentityId",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "WellBoreIdentity"
+        ],
+        "operationId": "PostWellBoreIdentity",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreIdentity"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreIdentity"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreIdentity"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreIdentity"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WellBoreIdentity/MetaInfo": {
+      "get": {
+        "tags": [
+          "WellBoreIdentity"
+        ],
+        "operationId": "GetAllWellBoreIdentityMetaInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WellBoreIdentity/{id}": {
+      "get": {
+        "tags": [
+          "WellBoreIdentity"
+        ],
+        "operationId": "GetWellBoreIdentityById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreIdentity"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "WellBoreIdentity"
+        ],
+        "operationId": "PutWellBoreIdentityById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreIdentity"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreIdentity"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreIdentity"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreIdentity"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreMutationErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "WellBoreIdentity"
+        ],
+        "operationId": "DeleteWellBoreIdentityById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/WellBoreIdentity/HeavyData": {
+      "get": {
+        "tags": [
+          "WellBoreIdentity"
+        ],
+        "operationId": "GetAllWellBoreIdentity",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreIdentity"
                   }
                 }
               }
@@ -2035,255 +1626,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UsageStatisticsWellBore"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Well": {
-      "get": {
-        "tags": [
-          "Well"
-        ],
-        "operationId": "GetAllWellId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Well"
-        ],
-        "operationId": "PostWell",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Well"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Well"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Well"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Well/MetaInfo": {
-      "get": {
-        "tags": [
-          "Well"
-        ],
-        "operationId": "GetAllWellMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Well/{id}": {
-      "get": {
-        "tags": [
-          "Well"
-        ],
-        "operationId": "GetWellById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Well"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Well"
-        ],
-        "operationId": "PutWellById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Well"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Well"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Well"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Well"
-        ],
-        "operationId": "DeleteWellById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Well/HeavyData": {
-      "get": {
-        "tags": [
-          "Well"
-        ],
-        "operationId": "GetAllWell",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Well"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Well/UsedSlot/{clusterId}": {
-      "get": {
-        "tags": [
-          "Well"
-        ],
-        "operationId": "GetAllUsedSlotMetaInfoByClusterId",
-        "parameters": [
-          {
-            "name": "clusterId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/WellUsageStatistics": {
-      "get": {
-        "tags": [
-          "WellUsageStatistics"
-        ],
-        "operationId": "GetWellUsageStatistics",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UsageStatisticsWell"
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.UsageStatisticsWellBore"
                 }
               }
             }
@@ -2294,171 +1637,16 @@
   },
   "components": {
     "schemas": {
-      "Cluster": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "FieldID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "IsSingleWell": {
-            "type": "boolean"
-          },
-          "RigID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "IsFixedPlatform": {
-            "type": "boolean"
-          },
-          "ReferenceLatitude": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "ReferenceLongitude": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "ReferenceDepth": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "GroundMudLineDepth": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "TopWaterDepth": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "Slots": {
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/Slot"
-            },
-            "nullable": true
-          }
-        }
-      },
-      "CountPerDay": {
-        "type": "object",
-        "properties": {
-          "Date": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "Count": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
-      "History": {
-        "type": "object",
-        "properties": {
-          "Data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CountPerDay"
-            },
-            "nullable": true
-          }
-        }
-      },
-      "Slot": {
-        "type": "object",
-        "properties": {
-          "ID": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "Latitude": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "Longitude": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          }
-        }
-      },
-      "UsageStatisticsCluster": {
-        "type": "object",
-        "properties": {
-          "LastSaved": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "BackUpInterval": {
-            "type": "string",
-            "format": "date-span"
-          },
-          "GetAllClusterIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllClusterMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetClusterByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllClusterPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostClusterPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutClusterByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteClusterByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          }
-        }
-      },
-      "GaussianDrillingProperty": {
+      "OSDC.DotnetLibraries.Drilling.DrillingProperties.GaussianDrillingProperty": {
         "type": "object",
         "properties": {
           "GaussianValue": {
-            "$ref": "#/components/schemas/GaussianDistribution"
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.Statistics.GaussianDistribution"
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "MetaInfo": {
+      "OSDC.DotnetLibraries.General.DataManagement.MetaInfo": {
         "type": "object",
         "properties": {
           "ID": {
@@ -2477,9 +1665,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "GaussianDistribution": {
+      "OSDC.DotnetLibraries.General.Statistics.GaussianDistribution": {
         "type": "object",
         "properties": {
           "MinValue": {
@@ -2500,1228 +1689,37 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "UsageStatisticsCartographicProjection": {
+      "OSDC.Drilling.WellBore.Model.CountPerDay": {
         "type": "object",
         "properties": {
-          "LastSaved": {
+          "Date": {
             "type": "string",
             "format": "date-time"
           },
-          "BackUpInterval": {
-            "type": "string",
-            "format": "date-span"
-          },
-          "GetAllCartographicProjectionTypeIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetCartographicProjectionTypeByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicProjectionTypePerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicProjectionIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicProjectionMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetCartographicProjectionByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicProjectionLightPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicProjectionPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostCartographicProjectionPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutCartographicProjectionByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteCartographicProjectionByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicConversionSetIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicConversionSetMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetCartographicConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicConversionSetLightPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicConversionSetPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostCartographicConversionSetPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutCartographicConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteCartographicConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          }
-        }
-      },
-      "AreaNormalizationTransformType": {
-        "enum": [
-          "None",
-          "Linear",
-          "Quadratic",
-          "Tangent"
-        ],
-        "type": "string"
-      },
-      "AxisType": {
-        "enum": [
-          "None",
-          "x",
-          "y"
-        ],
-        "type": "string"
-      },
-      "CartographicConversionSet": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "CartographicProjectionID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "CartographicCoordinateList": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CartographicCoordinate"
-            },
-            "nullable": true
-          }
-        }
-      },
-      "CartographicConversionSetLight": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "CartographicProjectionName": {
-            "type": "string",
-            "nullable": true
-          },
-          "CartographicProjectionDescription": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "CartographicCoordinate": {
-        "type": "object",
-        "properties": {
-          "Northing": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Easting": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "VerticalDepth": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "GeodeticCoordinate": {
-            "$ref": "#/components/schemas/GeodeticCoordinate"
-          },
-          "GridConvergenceDatum": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          }
-        },
-        "additionalProperties": { }
-      },
-      "CartographicProjection": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "ProjectionType": {
-            "$ref": "#/components/schemas/ProjectionType"
-          },
-          "GeodeticDatumID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "LatitudeOrigin": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Latitude1": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Latitude2": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "LatitudeTrueScale": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "LongitudeOrigin": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Scaling": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "FalseEasting": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "FalseNorthing": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Zone": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "IsSouth": {
-            "type": "boolean"
-          },
-          "IsHyperbolic": {
-            "type": "boolean"
-          },
-          "ProjectionHeight": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "HeightViewPoint": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Sweep": {
-            "$ref": "#/components/schemas/AxisType"
-          },
-          "AzimuthCentralLine": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Weight": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Landsat": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "Path": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "Alpha": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Gamma": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Longitude1": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Longitude2": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "LongitudeCentralPoint": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "NoOffset": {
-            "type": "boolean"
-          },
-          "NoRotation": {
-            "type": "boolean"
-          },
-          "AreaNormalizationTransform": {
-            "$ref": "#/components/schemas/AreaNormalizationTransformType"
-          },
-          "PegLatitude": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "PegLongitude": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "PegHeading": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "N": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Q": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          }
-        }
-      },
-      "CartographicProjectionLight": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "IsDefault": {
-            "type": "boolean"
-          }
-        }
-      },
-      "CartographicProjectionType": {
-        "type": "object",
-        "properties": {
-          "Projection": {
-            "$ref": "#/components/schemas/ProjectionType"
-          },
-          "UseLatitudeOrigin": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLatitude1": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLatitude2": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLatitudeTrueScale": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLongitudeOrigin": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseScaling": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseFalseEastingNorthing": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseZone": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseSouth": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseHyperbolic": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseProjectionHeight": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseHeightViewPoint": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseSweep": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseAzimuthCentralLine": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseWeight": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLandsat": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UsePath": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseAlpha": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseGamma": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLongitude1": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLongitude2": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLongitudeCentralPoint": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseNoOffset": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseNoRotation": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseAreaNormalizationTransform": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UsePegLatitude": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UsePegLongitude": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UsePegHeading": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseN": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseQ": {
-            "type": "boolean",
-            "readOnly": true
-          }
-        }
-      },
-      "ProjectionType": {
-        "enum": [
-          "Unknown",
-          "UTM",
-          "LambertConformalConic",
-          "LambertConformalConicAlternative",
-          "LambertEqualAreaConic",
-          "TransverseMercator",
-          "Mercator",
-          "Polyconic",
-          "ModifiedStereographicAlaska",
-          "AlbersEqualArea",
-          "AzimuthalEquidistant",
-          "Aitoff",
-          "Bonne",
-          "CalCoopOceanFish",
-          "Cassini",
-          "CentralCylinder",
-          "EqualAreaCylindrical",
-          "EquidistantCylindrical",
-          "EquidistantConic",
-          "GeostationarySatelliteView",
-          "GeneralSinusoidalSeries",
-          "ModifiedStereographic48US",
-          "ModifiedStereographic50US",
-          "InternationalMapWorldPolyconic",
-          "Laborde",
-          "LambertAzimuthalEqualArea",
-          "Lagrange",
-          "LeeOblatedStereographic",
-          "SpaceObliqueLandsat",
-          "McBrydeThomasFlatPolarSinusoidal",
-          "MillerOblatedStereographic",
-          "SpaceObliqueMISR",
-          "NewZealandMapGrid",
-          "ObliqueMercator",
-          "Orthographic",
-          "QuadrilateralizedSphericalCube",
-          "RoussilheStereographic",
-          "S2",
-          "SphericalCrossTrackHeight",
-          "Sinusoidal",
-          "SwissObliqueMercator",
-          "Stereographic",
-          "ObliqueStereographicAlternative",
-          "UniversalPolarStereographic",
-          "UrmaevV",
-          "WebMercator"
-        ],
-        "type": "string"
-      },
-      "GeodeticCoordinate": {
-        "type": "object",
-        "properties": {
-          "LatitudeWGS84": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "LongitudeWGS84": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "VerticalDepthWGS84": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "LatitudeDatum": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "LongitudeDatum": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "VerticalDepthDatum": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "OctreeDepth": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "OctreeCode": {
-            "$ref": "#/components/schemas/OctreeCodeLong"
-          }
-        },
-        "additionalProperties": { }
-      },
-      "OctreeCodeLong": {
-        "type": "object",
-        "properties": {
-          "Depth": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "CodeHigh": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "CodeLow": {
+          "Count": {
             "type": "integer",
             "format": "int64"
           }
         },
-        "additionalProperties": { }
+        "additionalProperties": false
       },
-      "UsageStatisticsGeodeticDatum": {
+      "OSDC.Drilling.WellBore.Model.History": {
         "type": "object",
         "properties": {
-          "LastSaved": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "BackUpInterval": {
-            "type": "string",
-            "format": "date-span"
-          },
-          "GetAllSpheroidIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllSpheroidMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetSpheroidByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllSpheroidPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostSpheroidPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutSpheroidByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteSpheroidByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticDatumIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticDatumMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetGeodeticDatumByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticDatumLightPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticDatumPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostGeodeticDatumPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutGeodeticDatumByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteGeodeticDatumByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticConversionSetIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticConversionSetMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetGeodeticConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticConversionSetLightPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticConversionSetPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostGeodeticConversionSetPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutGeodeticConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteGeodeticConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          }
-        }
-      },
-      "GeodeticConversionSet": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "GeodeticDatum": {
-            "$ref": "#/components/schemas/GeodeticDatum"
-          },
-          "OctreeBounds": {
-            "$ref": "#/components/schemas/Bounds"
-          },
-          "GeodeticCoordinates": {
+          "Data": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/GeodeticCoordinate"
+              "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.CountPerDay"
             },
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "GeodeticConversionSetLight": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "GeodeticDatumName": {
-            "type": "string",
-            "nullable": true
-          },
-          "GeodeticDatumDescription": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "GeodeticDatum": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "IsDefault": {
-            "type": "boolean"
-          },
-          "Spheroid": {
-            "$ref": "#/components/schemas/Spheroid"
-          },
-          "DeltaX": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "DeltaY": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "DeltaZ": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "RotationX": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "RotationY": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "RotationZ": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "ScaleFactor": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          }
-        }
-      },
-      "GeodeticDatumLight": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "IsDefault": {
-            "type": "boolean"
-          }
-        }
-      },
-      "Spheroid": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "IsDefault": {
-            "type": "boolean"
-          },
-          "SemiMajorAxis": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "IsSemiMajorAxisSet": {
-            "type": "boolean"
-          },
-          "SemiMinorAxis": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "IsSemiMinorAxisSet": {
-            "type": "boolean"
-          },
-          "Eccentricity": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "IsEccentricitySet": {
-            "type": "boolean"
-          },
-          "SquaredEccentricity": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "IsSquaredEccentricitySet": {
-            "type": "boolean"
-          },
-          "Flattening": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "IsFlatteningSet": {
-            "type": "boolean"
-          },
-          "InverseFlattening": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "IsInverseFlatteningSet": {
-            "type": "boolean"
-          }
-        }
-      },
-      "ScalarDrillingProperty": {
-        "type": "object",
-        "properties": {
-          "DiracDistributionValue": {
-            "$ref": "#/components/schemas/DiracDistribution"
-          }
-        }
-      },
-      "Point3D": {
-        "type": "object",
-        "properties": {
-          "X": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Y": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Z": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          }
-        }
-      },
-      "Bounds": {
-        "type": "object",
-        "properties": {
-          "MinX": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "MaxX": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "MinY": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "MaxY": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "MinZ": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "MaxZ": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "MiddleX": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "readOnly": true
-          },
-          "MiddleY": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "readOnly": true
-          },
-          "MiddleZ": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "readOnly": true
-          },
-          "IntervalX": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "readOnly": true
-          },
-          "IntervalY": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "readOnly": true
-          },
-          "IntervalZ": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "readOnly": true
-          },
-          "Center": {
-            "$ref": "#/components/schemas/Point3D"
-          }
-        }
-      },
-      "DiracDistribution": {
-        "type": "object",
-        "properties": {
-          "MinValue": {
-            "type": "number",
-            "format": "double"
-          },
-          "MaxValue": {
-            "type": "number",
-            "format": "double"
-          },
-          "Value": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          }
-        }
-      },
-      "Field": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "CartographicProjectionID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          }
-        }
-      },
-      "FieldCartographicConversionSet": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "FieldID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "CartographicCoordinateList": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CartographicCoordinate"
-            },
-            "nullable": true
-          }
-        }
-      },
-      "FieldCartographicConversionSetLight": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "FieldName": {
-            "type": "string",
-            "nullable": true
-          },
-          "FieldDescription": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "UsageStatisticsField": {
-        "type": "object",
-        "properties": {
-          "LastSaved": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "BackUpInterval": {
-            "type": "string",
-            "format": "date-span"
-          },
-          "GetAllFieldIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllFieldMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetFieldByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllFieldLightPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllFieldPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostFieldPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutFieldByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteFieldByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllFieldCartographicConversionSetIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllFieldCartographicConversionSetMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetFieldCartographicConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllFieldCartographicConversionSetLightPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllFieldCartographicConversionSetPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostFieldCartographicConversionSetPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutFieldCartographicConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteFieldCartographicConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          }
-        }
-      },
-      "SidetrackType": {
+      "OSDC.Drilling.WellBore.Model.SidetrackType": {
         "enum": [
           "Undefined",
           "Technical",
@@ -3731,7 +1729,7 @@
         ],
         "type": "string"
       },
-      "UsageStatisticsWellBore": {
+      "OSDC.Drilling.WellBore.Model.UsageStatisticsWellBore": {
         "type": "object",
         "properties": {
           "LastSaved": {
@@ -3743,33 +1741,46 @@
             "format": "date-span"
           },
           "GetAllWellBoreIdPerDay": {
-            "$ref": "#/components/schemas/History"
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.History"
           },
           "GetAllWellBoreMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.History"
           },
           "GetWellBoreByIdPerDay": {
-            "$ref": "#/components/schemas/History"
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.History"
           },
           "GetAllWellBorePerDay": {
-            "$ref": "#/components/schemas/History"
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.History"
+          },
+          "GetAllWellBoreByWellIDPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.History"
+          },
+          "GetAllWellBoreByRigIDPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.History"
+          },
+          "GetAllWellBoreByParentIDPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.History"
+          },
+          "GetAllSidetrackedWellBorePerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.History"
           },
           "PostWellBorePerDay": {
-            "$ref": "#/components/schemas/History"
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.History"
           },
           "PutWellBoreByIdPerDay": {
-            "$ref": "#/components/schemas/History"
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.History"
           },
           "DeleteWellBoreByIdPerDay": {
-            "$ref": "#/components/schemas/History"
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.History"
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "WellBore": {
+      "OSDC.Drilling.WellBore.Model.WellBore": {
         "type": "object",
         "properties": {
           "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
           },
           "Name": {
             "type": "string",
@@ -3808,58 +1819,492 @@
             "nullable": true
           },
           "TieInPointAlongHoleDepth": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.Drilling.DrillingProperties.GaussianDrillingProperty"
           },
           "SidetrackType": {
-            "$ref": "#/components/schemas/SidetrackType"
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.SidetrackType"
+          },
+          "WellBoreIdentityAssignments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreIdentityAssignment"
+            },
+            "nullable": true
+          },
+          "WellBoreFeatureAssignments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreFeatureAssignment"
+            },
+            "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "UsageStatisticsWell": {
+      "OSDC.Drilling.WellBore.Model.WellBoreBatchCatalogDependencies": {
         "type": "object",
         "properties": {
-          "LastSaved": {
-            "type": "string",
-            "format": "date-time"
+          "Identities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreIdentity"
+            },
+            "nullable": true
           },
-          "BackUpInterval": {
-            "type": "string",
-            "format": "date-span"
-          },
-          "GetAllWellIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllWellMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetWellByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllWellPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostWellPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutWellByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteWellByIdPerDay": {
-            "$ref": "#/components/schemas/History"
+          "FeatureCategories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreFeatureCategory"
+            },
+            "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "Well": {
+      "OSDC.Drilling.WellBore.Model.WellBoreBatchCatalogMapping": {
         "type": "object",
         "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
+          "Catalog": {
+            "type": "string",
+            "nullable": true
           },
           "Name": {
             "type": "string",
             "nullable": true
           },
+          "SourceID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "LocalID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Resolution": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBore.Model.WellBoreBatchCatalogRestorePolicy": {
+        "enum": [
+          "Unspecified",
+          "MapExisting",
+          "MapOrCreateMissing"
+        ],
+        "type": "string"
+      },
+      "OSDC.Drilling.WellBore.Model.WellBoreBatchError": {
+        "type": "object",
+        "properties": {
+          "PositionIndex": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "Property": {
+            "type": "string",
+            "nullable": true
+          },
+          "Code": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBore.Model.WellBoreBatchErrorEnvelope": {
+        "type": "object",
+        "properties": {
+          "Error": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          },
+          "Errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreBatchError"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBore.Model.WellBoreBatchExportDocument": {
+        "type": "object",
+        "properties": {
+          "FormatIdentifier": {
+            "type": "string",
+            "nullable": true
+          },
+          "SchemaVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ExportedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "CatalogDependencies": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreBatchCatalogDependencies"
+          },
+          "WellBores": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBore"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBore.Model.WellBoreBatchExportRequest": {
+        "type": "object",
+        "properties": {
+          "Scope": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreBatchExportScope"
+          },
+          "WellBoreIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBore.Model.WellBoreBatchExportScope": {
+        "enum": [
+          "Unspecified",
+          "All",
+          "Selected"
+        ],
+        "type": "string"
+      },
+      "OSDC.Drilling.WellBore.Model.WellBoreBatchRestoreConflictPolicy": {
+        "enum": [
+          "Unspecified",
+          "FailIfExists",
+          "ReplaceExisting"
+        ],
+        "type": "string"
+      },
+      "OSDC.Drilling.WellBore.Model.WellBoreBatchRestoreRequest": {
+        "type": "object",
+        "properties": {
+          "ConflictPolicy": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreBatchRestoreConflictPolicy"
+          },
+          "CatalogPolicy": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreBatchCatalogRestorePolicy"
+          },
+          "Document": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreBatchExportDocument"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBore.Model.WellBoreBatchRestoreResponse": {
+        "type": "object",
+        "properties": {
+          "RestoredAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "CreatedCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ReplacedCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CreatedCatalogDefinitionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CreatedCatalogOptionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CatalogMappings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreBatchCatalogMapping"
+            },
+            "nullable": true
+          },
+          "WellBoreIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBore.Model.WellBoreDetailsUpdate": {
+        "required": [
+          "Description",
+          "Name"
+        ],
+        "type": "object",
+        "properties": {
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
           "Description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBore.Model.WellBoreExternalReferenceAuditRequest": {
+        "required": [
+          "Scope"
+        ],
+        "type": "object",
+        "properties": {
+          "Scope": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreExternalReferenceAuditScope"
+          },
+          "WellBoreIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          },
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBore.Model.WellBoreExternalReferenceAuditResult": {
+        "type": "object",
+        "properties": {
+          "CheckedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ValidCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "InvalidCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "UnavailableCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreExternalReferenceValidation"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBore.Model.WellBoreExternalReferenceAuditScope": {
+        "enum": [
+          "All",
+          "Selected"
+        ],
+        "type": "string"
+      },
+      "OSDC.Drilling.WellBore.Model.WellBoreExternalReferenceIssue": {
+        "type": "object",
+        "properties": {
+          "Property": {
+            "type": "string",
+            "nullable": true
+          },
+          "Code": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBore.Model.WellBoreExternalReferenceValidation": {
+        "type": "object",
+        "properties": {
+          "WellBoreID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "WellID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "RigID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "WellExists": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "RigExists": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "Status": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreExternalReferenceValidationStatus"
+          },
+          "CheckedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Issues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreExternalReferenceIssue"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBore.Model.WellBoreExternalReferenceValidationStatus": {
+        "enum": [
+          "Valid",
+          "Invalid",
+          "Unavailable"
+        ],
+        "type": "string"
+      },
+      "OSDC.Drilling.WellBore.Model.WellBoreFeatureAssignment": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "FeatureCategoryID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "FeatureOptionID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "FromDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "ToDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBore.Model.WellBoreFeatureCategory": {
+        "type": "object",
+        "properties": {
+          "MetaInfo": {
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "IsExclusive": {
+            "type": "boolean"
+          },
+          "HasValidityPeriod": {
+            "type": "boolean"
+          },
+          "Options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreFeatureOption"
+            },
+            "nullable": true
+          },
+          "CreationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "LastModificationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBore.Model.WellBoreFeatureOption": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBore.Model.WellBoreIdentity": {
+        "type": "object",
+        "properties": {
+          "MetaInfo": {
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+          },
+          "Name": {
             "type": "string",
             "nullable": true
           },
@@ -3872,21 +2317,138 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
-          },
-          "SlotID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "ClusterID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "IsSingleWell": {
-            "type": "boolean"
           }
-        }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBore.Model.WellBoreIdentityAssignment": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "IdentityID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "Value": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBore.Model.WellBoreMutationError": {
+        "type": "object",
+        "properties": {
+          "Property": {
+            "type": "string",
+            "nullable": true
+          },
+          "Code": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          },
+          "ReferencingWellBoreIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBore.Model.WellBoreMutationErrorEnvelope": {
+        "type": "object",
+        "properties": {
+          "Error": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          },
+          "Errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBoreMutationError"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBore.Model.WellBoreSearchResult": {
+        "type": "object",
+        "properties": {
+          "Items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBore"
+            },
+            "nullable": true
+          },
+          "Total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBore.Model.WellBoreTopologyUpdate": {
+        "required": [
+          "IsSidetrack",
+          "ParentWellBoreID",
+          "RigID",
+          "SidetrackType",
+          "TieInPointAlongHoleDepth",
+          "WellID"
+        ],
+        "type": "object",
+        "properties": {
+          "WellID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "RigID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "IsSidetrack": {
+            "type": "boolean"
+          },
+          "ParentWellBoreID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "TieInPointAlongHoleDepth": {
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.Drilling.DrillingProperties.GaussianDrillingProperty"
+          },
+          "SidetrackType": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.SidetrackType"
+          }
+        },
+        "additionalProperties": false
       }
     }
   }

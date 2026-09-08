@@ -197,9 +197,9 @@
                         Cluster cluster = await Api.ClientCluster.GetClusterByIdAsync(well.ClusterID.Value);
                         if (cluster != null && cluster.FieldID != null && cluster.FieldID != Guid.Empty)
                         {
-                            if (cluster.ReferenceDepth != null && cluster.ReferenceDepth.GaussianValue != null && cluster.ReferenceDepth.GaussianValue.Mean != null)
+                            if (cluster.ReferencePoint?.TVD != null)
                             {
-                                DataUtils.UnitAndReferenceParameters.WellHeadDepthReferenceSource.WellHeadDepthReference = cluster.ReferenceDepth.GaussianValue.Mean;
+                                DataUtils.UnitAndReferenceParameters.WellHeadDepthReferenceSource.WellHeadDepthReference = cluster.ReferencePoint.TVD;
                             }
                             // if (cluster.RotaryTableDepth != null && cluster.RotaryTableDepth.DiracDistributionValue != null && cluster.RotaryTableDepth.DiracDistributionValue.Value != null)
                             // {

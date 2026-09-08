@@ -781,7 +781,7 @@
     private Field? _selectedField;
     private Cluster? _selectedCluster;
     private Cluster? _resolvedCluster;
-    private Rig? _resolvedRig;
+    private RigReadResponse? _resolvedRig;
     private Well? _selectedWell;
     private WellBore? _selectedWellBore;
     private Guid? _initializedArchitectureId;
@@ -1317,9 +1317,9 @@
 
     private static void ApplyClusterReferenceValues(Cluster cluster)
     {
-        if (cluster.ReferenceDepth?.GaussianValue?.Mean != null)
+        if (cluster.ReferencePoint?.TVD != null)
         {
-            DataUtils.UnitAndReferenceParameters.WellHeadDepthReferenceSource.WellHeadDepthReference = cluster.ReferenceDepth.GaussianValue.Mean;
+            DataUtils.UnitAndReferenceParameters.WellHeadDepthReferenceSource.WellHeadDepthReference = cluster.ReferencePoint.TVD;
         }
 
         if (cluster.GroundMudLineDepth?.GaussianValue?.Mean != null)
@@ -1393,7 +1393,7 @@
             return architectureWellHeadDepth;
         }
 
-        return _resolvedCluster?.ReferenceDepth?.GaussianValue?.Mean;
+        return _resolvedCluster?.ReferencePoint?.TVD;
     }
 
     private double? GetRotaryTableReferenceDepth()

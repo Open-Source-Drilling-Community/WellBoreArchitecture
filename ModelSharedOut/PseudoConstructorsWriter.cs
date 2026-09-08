@@ -4,36 +4,55 @@ using System.Text;
 using System.Linq;
 using System.Reflection;
 using OSDC.Drilling.WellBoreArchitecture.ModelShared;
- 
+
 namespace OSDC.Drilling.WellBoreArchitecture.PseudoConstructorsWriter
     {
     class Writer
-    {     
+    {
         private static readonly string NAMESPACE = "OSDC.Drilling.WellBoreArchitecture.ModelShared";
         private static readonly string PSEUDO_CTOR = "PseudoConstructors.cs";
         private static readonly string MODELSHARED_FOLDER = "ModelSharedOut";
-        private static string fullPath = ""; 
+        private static readonly System.Collections.Generic.HashSet<string> PSEUDO_CONSTRUCTOR_TYPE_NAMES = new(System.StringComparer.Ordinal)
+        {
+            "BoreHoleSize",
+            "CasingSection",
+            "CasingSectionElement",
+            "DiracDistribution",
+            "GaussianDistribution",
+            "GaussianDrillingProperty",
+            "OpenHoleSection",
+            "ScalarDrillingProperty"
+        };
+        private static string fullPath = "";
         private static string IDENTATION = "\n\t\t\t\t";
-        private static string ICOLLECTION_FULL_NAME = "System.Collections.Generic.ICollection`1[";                      
         private static string? dictionaryKey;
         private static string? dictionaryValue;
         private static bool isFromNamespace = false;
         private static int CollectionStacks(PropertyInfo propertyInfo)
         {
-            //Get number of list stacks
-            if (propertyInfo.PropertyType.AssemblyQualifiedName != null)
-                return propertyInfo.PropertyType.AssemblyQualifiedName.Split(ICOLLECTION_FULL_NAME).Length - 1;
-            else
-                return 0;
-        }        
+            int stacks = 0;
+            Type currentType = propertyInfo.PropertyType;
+            while (currentType.IsGenericType)
+            {
+                Type genericType = currentType.GetGenericTypeDefinition();
+                if (genericType != typeof(System.Collections.Generic.ICollection<>) && genericType != typeof(System.Collections.Generic.List<>))
+                {
+                    break;
+                }
+
+                stacks++;
+                currentType = currentType.GenericTypeArguments[0];
+            }
+            return stacks;
+        }
         private static string ReturnBaseType(Type type)
         {
-            if (type.GenericTypeArguments.Length > 0)        
-                return ReturnBaseType(type.GenericTypeArguments[0]);        
+            if (type.GenericTypeArguments.Length > 0)
+                return ReturnBaseType(type.GenericTypeArguments[0]);
             else if (type.IsPrimitive || type.Name == "String")
                 return type.Name.ToLower();
-            else      
-                return type.Name;                      
+            else
+                return type.Name;
         }
         private static string ReturnFullType(Type type)
         {
@@ -41,14 +60,14 @@ namespace OSDC.Drilling.WellBoreArchitecture.PseudoConstructorsWriter
             {
                 //If it is a list, create a list stack in the type
                 if (type.Name == "ICollection`1")
-                    return "List<" + ReturnFullType(type.GenericTypeArguments[0]) + ">";        
+                    return "List<" + ReturnFullType(type.GenericTypeArguments[0]) + ">";
                 else if (type.Name == "Nullable`1")
                     return ReturnFullType(type.GenericTypeArguments[0]) + "?";
                 else if (type.Name == "IDictionary`2")
                 {
-                    dictionaryKey = ReturnFullType(type.GenericTypeArguments[0]); 
-                    dictionaryValue = ReturnFullType(type.GenericTypeArguments[1]);                     
-                    return $"Dictionary<{dictionaryKey},{dictionaryValue}>";      
+                    dictionaryKey = ReturnFullType(type.GenericTypeArguments[0]);
+                    dictionaryValue = ReturnFullType(type.GenericTypeArguments[1]);
+                    return $"Dictionary<{dictionaryKey},{dictionaryValue}>";
                 }
                 else
                     return ReturnFullType(type.GenericTypeArguments[0]);
@@ -59,18 +78,18 @@ namespace OSDC.Drilling.WellBoreArchitecture.PseudoConstructorsWriter
                 {
                     return type.Name.ToLower();
                 }
-                else      
-                    return type.Name;      
-            }        
+                else
+                    return type.Name;
+            }
         }
         public static bool ChangeICollectionToList(DirectoryInfo directory)
         {
             bool success = false;
             try
-            {                
+            {
                 //Dynamic implementation seems to work better with relative paths
                 string filePath = fullPath + "WellBoreArchitectureMergedModel.cs";
-                //  Change all instances of "ICollection" to "List" in the MergedModel namespace. 
+                //  Change all instances of "ICollection" to "List" in the MergedModel namespace.
                 //this improves instantiation of stacked collections.
                 string fileContent = File.ReadAllText(filePath);
                 string iCollectionString = "ICollection";
@@ -79,9 +98,9 @@ namespace OSDC.Drilling.WellBoreArchitecture.PseudoConstructorsWriter
                 File.WriteAllText(filePath, updatedMergedModel);
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("\t\x1b[1m ✓ - Update of MergedModel namespace succeeded! \x1b[0m");
-                Console.ForegroundColor = ConsoleColor.White;          
+                Console.ForegroundColor = ConsoleColor.White;
                 success = true;
-            }    
+            }
             catch (Exception e)
             {
                 Console.WriteLine("\t\x1b[1m\x1b[31m ⚠ - Update of MergedModel namespace failed.  \x1b[0m");
@@ -95,27 +114,27 @@ namespace OSDC.Drilling.WellBoreArchitecture.PseudoConstructorsWriter
             if (isFromNamespace)
             {
                 //  Custom properties have default value ConstructMyClass()
-                // which is a call to their respective constructor.     
+                // which is a call to their respective constructor.
                 defaultValue = $"Construct{propBaseName}(),";
             }
-            
-            //Simple values  
+
+            //Simple values
             if (propBaseName.Contains("DateTimeOffset"))
             {
                 // Date & time are always set to "now"
                 defaultValue = "DateTimeOffset.UtcNow,";
-            }                                 
-            else if (propTypeName.Contains('?')) 
+            }
+            else if (propTypeName.Contains('?'))
             {
                 //  Nullables are set to null.
-                //if this is not desired, this  
+                //if this is not desired, this
                 //'else if' should be commented
-                defaultValue = $"null, ";   
+                defaultValue = $"null,";
             }
             else if (propBaseName == "double")
             {
                 // doubles are set to 0.0
-                defaultValue = "0.0, ";  
+                defaultValue = "0.0,";
             }
             else if (propBaseName == "string")
             {
@@ -123,21 +142,21 @@ namespace OSDC.Drilling.WellBoreArchitecture.PseudoConstructorsWriter
                 defaultValue = "\"\",";
             }
             //int does not descriminate int64, int32, int16...
-            else if (propBaseName == "int64" || propBaseName == "int32" || propBaseName == "int16" || propBaseName == "int8" || propBaseName == "int") 
+            else if (propBaseName == "int64" || propBaseName == "int32" || propBaseName == "int16" || propBaseName == "int8" || propBaseName == "int")
             {
                 //  Set int to 0
-                defaultValue = "0, ";  
+                defaultValue = "0,";
             }
-            else if (propBaseName.Contains("boolean")) 
+            else if (propBaseName.Contains("boolean"))
             {
                 // Set booleans to "false"
-                defaultValue = "false, ";  
+                defaultValue = "false,";
             }
             else if (propBaseName == "guid")
             {
                 // Guid are set to "new Guid()"
-                defaultValue = "new Guid(),";  
-            }            
+                defaultValue = "new Guid(),";
+            }
             else if (propBaseName == "datetime")
             {
                 // Date & time are always set to "now"
@@ -146,65 +165,67 @@ namespace OSDC.Drilling.WellBoreArchitecture.PseudoConstructorsWriter
             else if (!isFromNamespace)
             {
                 // default default value
-                defaultValue = $"new {propBaseName}(),";   
+                defaultValue = $"new {propBaseName}(),";
             }
-     
+
             return defaultValue;
         }
         public static string CreateMetaInfoConstructor()
         {
-            string code =   
+            string code =
                 "\n\t\tpublic static MetaInfo ConstructMetaInfo()" +
-                "\n\t\t\t{" +                            
+                "\n\t\t\t{" +
                 "\n\t\t\t\treturn new MetaInfo " +
                 "\n\t\t\t\t{" +
                 "\n\t\t\t\t\tID = Guid.NewGuid()," +
                 "\n\t\t\t\t\tHttpHostName = \"https://dev.digiwells.no/\"," +
                 "\n\t\t\t\t\tHttpHostBasePath = \"WellBoreArchitecture/api/\"," +
-                "\n\t\t\t\t\tHttpEndPoint = \"WellBoreArchitectureOrder/\"," +                                                                                                                
+                "\n\t\t\t\t\tHttpEndPoint = \"WellBoreArchitectureOrder/\"," +
                 "\n\t\t\t\t};" +
-                "\n\t\t\t}";  
+                "\n\t\t\t}";
 
 
-            code += "\n"+   
+            code += "\n"+
                 "\n\t\tpublic static MetaInfo ConstructMetaInfo(Guid id)" +
-                "\n\t\t\t{" +                            
+                "\n\t\t\t{" +
                 "\n\t\t\t\treturn new MetaInfo " +
                 "\n\t\t\t\t{" +
                 "\n\t\t\t\t\tID = id," +
                 "\n\t\t\t\t\tHttpHostName = \"https://dev.digiwells.no/\"," +
                 "\n\t\t\t\t\tHttpHostBasePath = \"WellBoreArchitecture/api/\"," +
-                "\n\t\t\t\t\tHttpEndPoint = \"WellBoreArchitectureOrder/\"," +                                                                                                                
+                "\n\t\t\t\t\tHttpEndPoint = \"WellBoreArchitectureOrder/\"," +
                 "\n\t\t\t\t};" +
-                "\n\t\t\t}";                                       
-                            
+                "\n\t\t\t}";
+
             return code ;
         }
         public static bool CreatePseudoConstructors()
-        {     
+        {
 
             try
-            {  
+            {
                 DirectoryInfo directory = new DirectoryInfo(Directory.GetCurrentDirectory());
-                //Loop until solution        
+                //Loop until solution
                 while (directory != null && !directory.GetFiles("*.sln").Any())
                 {
                     directory = directory.Parent;
                 }
-                fullPath = directory.ToString() + Path.DirectorySeparatorChar + MODELSHARED_FOLDER + Path.DirectorySeparatorChar;                          
+                fullPath = directory.ToString() + Path.DirectorySeparatorChar + MODELSHARED_FOLDER + Path.DirectorySeparatorChar;
                 //Get current file
                 //Change merged model ICollection instances to List
                 bool formatedMergedModel = ChangeICollectionToList(directory);
                 //Get all classes from current assembly
                 var classes = from t in Assembly.GetExecutingAssembly().GetTypes()
-                              where t.IsClass && t.Namespace == NAMESPACE
-                              select t;        
+                              where t.IsClass &&
+                                    t.Namespace == NAMESPACE &&
+                                    PSEUDO_CONSTRUCTOR_TYPE_NAMES.Contains(t.Name)
+                              select t;
                 classes = classes.ToList();
                 //Start main code header by creating the class and namespace
                 string pseudoConstructorsText = "namespace " + NAMESPACE + "\n{\n\tpublic class PseudoConstructors\n\t{";
                 pseudoConstructorsText += CreateMetaInfoConstructor();
                 foreach (var q in classes)
-                {                
+                {
                     //  Classes with exceptions in here are either not relevant
                     //or are residual from the methods generated from the schema.
                     if (q.Name != "Client" &&
@@ -222,7 +243,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.PseudoConstructorsWriter
                         foreach (var p in q.GetProperties())
                         {
                             if (p.Name != "AdditionalProperties")
-                            {                                                                                          
+                            {
                                 //Get the namespce of the properties
                                 isFromNamespace = (p.ToString()!.Contains(NAMESPACE));
                                 //Check if it is an enum
@@ -231,14 +252,14 @@ namespace OSDC.Drilling.WellBoreArchitecture.PseudoConstructorsWriter
                                 string propertyName = IDENTATION + p.Name + " = ";
                                 //  defaultValueString containts the lowest level of the default value. If p is of type
                                 // List<double>, then defaultValueString = "new double()". If the type of p is an arbitrary
-                                // type "MyType", then defaultValueString = "ConstructMyType()".   
+                                // type "MyType", then defaultValueString = "ConstructMyType()".
                                 string defaultValueString = "";
                                 //Get "full" type (e.g.: "List<double?>")
                                 string propTypeName = ReturnFullType(p.PropertyType);
-                                //Get base type (e.g.: "double")                            
-                                string propBaseName = ReturnBaseType(p.PropertyType);                           
+                                //Get base type (e.g.: "double")
+                                string propBaseName = ReturnBaseType(p.PropertyType);
                                 //Number of stacks of the list (e.g.: listStacks = 2 if p is a List<List<double>>)
-                                int listStacks = CollectionStacks(p);                                                                                                    
+                                int listStacks = CollectionStacks(p);
                                 //Handle ENUMs
                                 if (isEnum)
                                 {
@@ -246,10 +267,10 @@ namespace OSDC.Drilling.WellBoreArchitecture.PseudoConstructorsWriter
                                     defaultValueString = $"({propTypeName})0,";
                                 }
                                 else
-                                {                                                                             
+                                {
                                     if (p.PropertyType.ToString() == "System.String")
                                     {
-                                        //If it is a reference type, it is assumed to be a 
+                                        //If it is a reference type, it is assumed to be a
                                         //string and a default name is used.
                                         defaultValueString = "\"Default " + p.Name + "\",";
                                     }
@@ -258,21 +279,21 @@ namespace OSDC.Drilling.WellBoreArchitecture.PseudoConstructorsWriter
 
                                         string keyDefaultValue = CreateDefaultSystemValue((string) dictionaryKey, (string) dictionaryKey).Replace(",","");
                                         string valueDefaultValue = CreateDefaultSystemValue((string) dictionaryValue, (string) dictionaryValue).Replace(",","");
-                                        
+
                                         defaultValueString = $"new {propTypeName}" +
                                         "\n\t\t\t\t\t{"
                                         +"\n\t\t\t\t\t\t{ " + $"{keyDefaultValue}, {valueDefaultValue}" + " }"
                                         +"\n\t\t\t\t\t},"
-                                        ;   
+                                        ;
                                     }
                                     else
                                     {
                                         defaultValueString = CreateDefaultSystemValue(propBaseName, propTypeName);
-                                    }                                 
-                                }//Close 'IF isEnum{} ELSE{}' section 
+                                    }
+                                }//Close 'IF isEnum{} ELSE{}' section
                                 //Special treatment in case of collections/lists
                                 if (listStacks > 0)
-                                {   
+                                {
                                     //Create identation for a list constructors, e.g.:
                                     // List<List<var>> myVar = new List<List<var>>
                                     //      {
@@ -287,9 +308,9 @@ namespace OSDC.Drilling.WellBoreArchitecture.PseudoConstructorsWriter
                                         identationList = identationList + "\t";
                                     }
                                     identationList = IDENTATION + identationList;
-                                    //Radical is the "left side" of the constructor 
-                                    string listRadical = $"List<{propBaseName}>";  
-                                    //listInnerInitializer contains the the code that is contained within the "{ }", e.g.: { new List<double> { new double()} }                      
+                                    //Radical is the "left side" of the constructor
+                                    string listRadical = $"List<{propBaseName}>";
+                                    //listInnerInitializer contains the the code that is contained within the "{ }", e.g.: { new List<double> { new double()} }
                                     string listInnerInitializer = listRadical + identationList + "{" + identationList + "\t" + defaultValueString +  identationList + "}";
                                     for (int i = listStacks - 1; i > 0; i--)
                                     {
@@ -300,16 +321,16 @@ namespace OSDC.Drilling.WellBoreArchitecture.PseudoConstructorsWriter
                                             identationList = identationList + "\t";
                                         }
                                         identationList = IDENTATION + identationList;
-                                        listRadical = $"List<{listRadical}>";   
+                                        listRadical = $"List<{listRadical}>";
                                         listInnerInitializer = listRadical + identationList + "{" + identationList + "\tnew " + listInnerInitializer + identationList + "}";
-                                    }                                                                                                     
+                                    }
                                     propertiesText += propertyName + "new " + listInnerInitializer + ",";
                                 }
                                 //Else, create an empty instance of the property
                                 else
                                 {
                                     propertiesText += propertyName + defaultValueString;
-                                }//Close 'IF isList{} ELSE{}' logic 
+                                }//Close 'IF isList{} ELSE{}' logic
                             }
                         }//Close "is not AdditionalProperty"
                         //Add property instance to the constructor
@@ -326,13 +347,13 @@ namespace OSDC.Drilling.WellBoreArchitecture.PseudoConstructorsWriter
                 Console.WriteLine("\t\x1b[1m ✓ - PseudoConstuctors.cs file generated successfully! \x1b[0m");
                 Console.ForegroundColor = ConsoleColor.White; // Reset color to default
                 //Dynamic implementation seems to work better with relative paths
-                File.WriteAllText(fullPath + PSEUDO_CTOR, pseudoConstructorsText);                
+                File.WriteAllText(fullPath + PSEUDO_CTOR, pseudoConstructorsText);
                 return true;
             }//Close TRY
             catch (Exception e)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("\t\x1b[1m ⚠ - PseudoConstuctors.cs generation failed!  \x1b[0m" + e);            
+                Console.WriteLine("\t\x1b[1m ⚠ - PseudoConstuctors.cs generation failed!  \x1b[0m" + e);
                 Console.ForegroundColor = ConsoleColor.White; // Reset color to default
                 return false;
             }//Close CATCH
