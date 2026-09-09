@@ -1398,9 +1398,9 @@
 
     private double? GetRotaryTableReferenceDepth()
     {
-        if (_resolvedRig?.DrillFloorElevation != null)
+        if (_resolvedRig?.FixedPlatformProperties?.DrillFloorDepth?.GaussianValue?.Mean is double drillFloorDepth)
         {
-            return _resolvedRig.DrillFloorElevation;
+            return drillFloorDepth;
         }
 
         return null;
@@ -1756,7 +1756,8 @@
         }
     }
 
-    private double? GetDrillFloorDepth() => _resolvedRig?.DrillFloorElevation;
+    private double? GetDrillFloorDepth() =>
+        _resolvedRig?.FixedPlatformProperties?.DrillFloorDepth?.GaussianValue?.Mean;
 
     private List<SurfaceSection> EnsureSurfaceSectionsList()
     {
