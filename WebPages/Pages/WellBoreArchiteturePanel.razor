@@ -782,6 +782,7 @@
     private Cluster? _selectedCluster;
     private Cluster? _resolvedCluster;
     private RigReadResponse? _resolvedRig;
+    private RigJob? _resolvedRigJob;
     private Well? _selectedWell;
     private WellBore? _selectedWellBore;
     private Guid? _initializedArchitectureId;
@@ -1132,6 +1133,7 @@
         _selectedCluster = null;
         _resolvedCluster = null;
         _resolvedRig = null;
+        _resolvedRigJob = null;
         _selectedWell = null;
         _selectedWellBore = null;
         _includeBop = WellBoreArchitecture.SurfaceSections?.Any(section => section.Type == SurfaceSectionType.BOP) ?? true;
@@ -1398,6 +1400,11 @@
 
     private double? GetRotaryTableReferenceDepth()
     {
+        if (_resolvedRigJob?.DrillFloorDepthSource == DrillFloorDepthSource.RigJob &&
+            _resolvedRigJob.DrillFloorDepth?.GaussianValue?.Mean is double jobDrillFloorDepth)
+        {
+            return jobDrillFloorDepth;
+        }
         if (_resolvedRig?.FixedPlatformProperties?.DrillFloorDepth?.GaussianValue?.Mean is double drillFloorDepth)
         {
             return drillFloorDepth;
@@ -1412,6 +1419,7 @@
         _selectedCluster = null;
         _resolvedCluster = null;
         _resolvedRig = null;
+        _resolvedRigJob = null;
         _selectedWell = null;
         _selectedWellBore = null;
         EnsureSurfaceSectionsForCurrentConfiguration();
@@ -1435,6 +1443,7 @@
         _selectedCluster = cluster;
         _resolvedCluster = cluster;
         _resolvedRig = null;
+        _resolvedRigJob = null;
         _selectedWell = null;
         _selectedWellBore = null;
 
@@ -1467,6 +1476,7 @@
         _selectedWellBore = null;
         _resolvedCluster = null;
         _resolvedRig = null;
+        _resolvedRigJob = null;
 
         if (well?.ClusterID != null && well.ClusterID != Guid.Empty && Clusters != null && Clusters.TryGetValue(well.ClusterID.Value, out var cluster))
         {
@@ -1726,19 +1736,24 @@
     private async Task ResolveRigAsync()
     {
         _resolvedRig = null;
+        _resolvedRigJob = _selectedWellBore?.RigJobs?
+            .OrderBy(job => job.StartDate)
+            .LastOrDefault();
 
-        var rigId = _selectedWellBore?.RigID;
-        if ((!rigId.HasValue || rigId == Guid.Empty) && _resolvedCluster?.RigID is Guid clusterRigId && clusterRigId != Guid.Empty)
+        Guid? rigId;
+        if (_selectedWellBore?.RigJobs is not null)
         {
-            rigId = clusterRigId;
+            rigId = _resolvedRigJob?.RigID;
         }
-
-        if ((!rigId.HasValue || rigId == Guid.Empty) && _resolvedCluster?.MetaInfo?.ID is Guid clusterId && clusterId != Guid.Empty)
+        else
         {
-            rigId = Rigs?
-                .Values
-                .FirstOrDefault(rig => rig?.ClusterID == clusterId)
-                ?.MetaInfo?.ID;
+#pragma warning disable CS0612
+            rigId = _selectedWellBore?.RigID;
+#pragma warning restore CS0612
+            if ((!rigId.HasValue || rigId == Guid.Empty) && _resolvedCluster?.RigID is Guid clusterRigId && clusterRigId != Guid.Empty)
+                rigId = clusterRigId;
+            if ((!rigId.HasValue || rigId == Guid.Empty) && _resolvedCluster?.MetaInfo?.ID is Guid clusterId && clusterId != Guid.Empty)
+                rigId = Rigs?.Values.FirstOrDefault(rig => rig?.ClusterID == clusterId)?.MetaInfo?.ID;
         }
 
         if (!rigId.HasValue || rigId == Guid.Empty)
@@ -1756,8 +1771,7 @@
         }
     }
 
-    private double? GetDrillFloorDepth() =>
-        _resolvedRig?.FixedPlatformProperties?.DrillFloorDepth?.GaussianValue?.Mean;
+    private double? GetDrillFloorDepth() => GetRotaryTableReferenceDepth();
 
     private List<SurfaceSection> EnsureSurfaceSectionsList()
     {
