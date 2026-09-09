@@ -199,7 +199,7 @@
                         {
                             if (cluster.ReferencePoint?.TVD != null)
                             {
-                                DataUtils.UnitAndReferenceParameters.WellHeadDepthReferenceSource.WellHeadDepthReference = cluster.ReferencePoint.TVD;
+                                DataUtils.UnitAndReferenceParameters.WellHeadDepthReferenceSource.WellHeadDepthReference = -cluster.ReferencePoint.TVD;
                             }
                             // if (cluster.RotaryTableDepth != null && cluster.RotaryTableDepth.DiracDistributionValue != null && cluster.RotaryTableDepth.DiracDistributionValue.Value != null)
                             // {
@@ -207,11 +207,11 @@
                             // }
                             if (cluster.GroundMudLineDepth != null && cluster.GroundMudLineDepth.GaussianValue != null && cluster.GroundMudLineDepth.GaussianValue.Mean != null)
                             {
-                                DataUtils.UnitAndReferenceParameters.GroundMudLineDepthReferenceSource.GroundMudLineDepthReference = cluster.GroundMudLineDepth.GaussianValue.Mean;
+                                DataUtils.UnitAndReferenceParameters.GroundMudLineDepthReferenceSource.GroundMudLineDepthReference = -cluster.GroundMudLineDepth.GaussianValue.Mean;
                             }
                             if (cluster.TopWaterDepth != null && cluster.TopWaterDepth.GaussianValue != null && cluster.TopWaterDepth.GaussianValue.Mean != null)
                             {
-                                DataUtils.UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource.SeaWaterLevelDepthReference = cluster.TopWaterDepth.GaussianValue.Mean;
+                                DataUtils.UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource.SeaWaterLevelDepthReference = -cluster.TopWaterDepth.GaussianValue.Mean;
                             }
                             if (!cluster.IsSingleWell)
                             {
