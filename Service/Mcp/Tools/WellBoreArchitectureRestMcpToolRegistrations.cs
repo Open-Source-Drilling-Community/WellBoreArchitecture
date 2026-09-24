@@ -49,9 +49,9 @@ public static class WellBoreArchitectureRestMcpToolRegistrations
             McpToolArgumentHelpers.CreateExternalReferenceAuditSchema(),
             (sp, args, ct) => InvokeWithBodyResultAsync<ExternalAuditRequestModel, ExternalAuditResultModel>(args, "request", ct,
                 (request, token) => Controller(sp).AuditExternalReferences(request, token)));
-        services.AddLegacyMcpTool("well_bore_architecture_batch_export", "Create a read-only, schema-version-1 JSON backup of all stored WellBoreArchitectures or an explicitly ordered selection. The response contains complete construction records and only the identity definitions, feature categories, and options referenced by them. WellBoreID remains an external UUID reference. An invalid or missing selected record rejects the complete export.", McpToolArgumentHelpers.CreateWellBoreArchitectureBatchExportSchema(),
+        services.AddLegacyMcpTool("well_bore_architecture_batch_export", "Create a read-only, schema-version-2 JSON backup of all stored WellBoreArchitectures or an explicitly ordered selection. The response contains complete construction records and only the identity definitions, feature categories, and options referenced by them. WellBoreID remains an external UUID reference. An invalid or missing selected record rejects the complete export.", McpToolArgumentHelpers.CreateWellBoreArchitectureBatchExportSchema(),
             (sp, args, ct) => InvokeWithBodyResult<BatchExportRequestModel, OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchExportDocument>(args, "request", ct, request => Controller(sp).BatchExportWellBoreArchitectures(request)));
-        services.AddLegacyMcpTool("well_bore_architecture_batch_restore", "Validate and atomically restore a schema-version-1 backup. Exact catalogue UUID matching is the safe default; missing definitions preserve source UUIDs. Mapping by normalized name requires explicit AllowNormalizedNameMapping consent and still rejects ambiguity or incompatible semantics. Catalogue mapping and all writes share one transaction, so any failure leaves the database unchanged.", McpToolArgumentHelpers.CreateWellBoreArchitectureBatchRestoreSchema(),
+        services.AddLegacyMcpTool("well_bore_architecture_batch_restore", "Validate and atomically restore a schema-version-2 backup. Exact catalogue UUID matching is the safe default; missing definitions preserve source UUIDs. Mapping by normalized name requires explicit AllowNormalizedNameMapping consent and still rejects ambiguity or incompatible semantics. Catalogue mapping and all writes share one transaction, so any failure leaves the database unchanged.", McpToolArgumentHelpers.CreateWellBoreArchitectureBatchRestoreSchema(),
             (sp, args, ct) => InvokeWithBodyResult<BatchRestoreRequestModel, OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureBatchRestoreResponse>(args, "request", ct, request => Controller(sp).BatchRestoreWellBoreArchitectures(request)));
         services.AddLegacyMcpTool("well_bore_architecture_create", "Persist a new complete wellbore architecture and return it with server-owned CreationDate and LastModificationDate. Generate a non-empty wellBoreArchitecture.MetaInfo.ID first; an existing UUID produces a conflict. SurfaceSections may be omitted or empty when no surface equipment exists; preserve top-to-bottom ordering for sections that are supplied, use WellBoreID only as an external reference, and encode physical values in SI through GaussianValue or DiracDistributionValue.", McpToolArgumentHelpers.CreateWellBoreArchitectureSchema(),
             InvokeCreate);
@@ -408,10 +408,12 @@ public static class WellBoreArchitectureRestMcpToolRegistrations
         }
         foreach (var casing in architecture.CasingSections ?? [])
         {
-            if (casing.ComponentID == id || casing.OpenHoleSection?.ComponentID == id) return true;
+            if (casing.ComponentID == id) return true;
             if ((casing.CasingSectionElements ?? []).Any(value => value.ComponentID == id)) return true;
-            if ((casing.OpenHoleSection?.HoleSizes ?? []).Any(value => value.ComponentID == id)) return true;
+            if ((casing.CasingSectionSizeTable ?? []).Any(value => value.ComponentID == id)) return true;
         }
+        if (architecture.OpenHoleSection?.ComponentID == id) return true;
+        if ((architecture.OpenHoleSection?.HoleSizes ?? []).Any(value => value.ComponentID == id)) return true;
         return false;
     }
 

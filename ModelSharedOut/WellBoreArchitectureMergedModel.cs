@@ -27803,9 +27803,6 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("CasingSectionSizeTable")]
         public System.Collections.Generic.List<BoreHoleSize> CasingSectionSizeTable { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("OpenHoleSection")]
-        public OpenHoleSection OpenHoleSection { get; set; }
-
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
         [System.Text.Json.Serialization.JsonExtensionData]
@@ -28215,6 +28212,9 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 
         [System.Text.Json.Serialization.JsonPropertyName("CasingSections")]
         public System.Collections.Generic.List<CasingSection> CasingSections { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("OpenHoleSection")]
+        public OpenHoleSection OpenHoleSection { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 

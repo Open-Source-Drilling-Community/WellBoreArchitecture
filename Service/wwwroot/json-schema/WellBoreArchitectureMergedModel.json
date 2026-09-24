@@ -19802,9 +19802,6 @@
               "$ref": "#/components/schemas/BoreHoleSize"
             },
             "nullable": true
-          },
-          "OpenHoleSection": {
-            "$ref": "#/components/schemas/OpenHoleSection"
           }
         }
       },
@@ -20149,6 +20146,9 @@
               "$ref": "#/components/schemas/CasingSection"
             },
             "nullable": true
+          },
+          "OpenHoleSection": {
+            "$ref": "#/components/schemas/OpenHoleSection"
           }
         }
       },

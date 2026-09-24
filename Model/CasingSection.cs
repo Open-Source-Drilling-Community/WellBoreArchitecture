@@ -21,19 +21,11 @@ namespace OSDC.Drilling.WellBoreArchitecture.Model
         /// The top-of-cement depth is a Gaussian depth quantity stored in metres and referenced to the WGS84 datum.
         /// </summary>
         public GaussianDrillingProperty TopCementDepth { get; set; } = new GaussianDrillingProperty();
-        public List<CasingSectionElement> CasingSectionElements { get; set; }
+        public List<CasingSectionElement> CasingSectionElements { get; set; } = new();
         /// <summary>
         /// Table containing length and diameter of each casing section 
         /// </summary>
-        public List<BoreHoleSize> CasingSectionSizeTable { get; set; }
-
-        /// <summary>
-        /// The open hole section starts from where it finished in the previous casing section 
-        /// or the ground level for the first casing section
-        /// </summary>
-        public OpenHoleSection? OpenHoleSection { get; set; }
-
-
+        public List<BoreHoleSize> CasingSectionSizeTable { get; set; } = new();
 
         /// <summary>
         /// Default constructor
@@ -63,9 +55,13 @@ namespace OSDC.Drilling.WellBoreArchitecture.Model
                     realization.CasingSectionElements.Add(element.Realize());
                 }
             }
-            if (OpenHoleSection != null)
+            if (CasingSectionSizeTable != null)
             {
-                realization.OpenHoleSection = OpenHoleSection.Realize();
+                realization.CasingSectionSizeTable = new();
+                foreach (var size in CasingSectionSizeTable)
+                {
+                    realization.CasingSectionSizeTable.Add(size.Realize());
+                }
             }
             return realization;
         }

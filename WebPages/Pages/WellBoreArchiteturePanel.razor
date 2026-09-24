@@ -426,7 +426,7 @@
                             <MudItem xs="4">
                                 <MudIconButton Icon="@Icons.Material.Filled.ArrowUpward" Disabled="@(index == 0)" OnClick="@(() => MoveOpenHoleRow(index, -1))" />
                                 <MudIconButton Icon="@Icons.Material.Filled.ArrowDownward" Disabled="@(index == OpenHoleRows.Count - 1)" OnClick="@(() => MoveOpenHoleRow(index, 1))" />
-                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Disabled="@(OpenHoleRows.Count == 1)" OnClick="@(() => RemoveOpenHoleRow(index))" />
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="@(() => RemoveOpenHoleRow(index))" />
                             </MudItem>
                         </MudGrid>
                     }
@@ -2218,8 +2218,7 @@
             Length = ConversionsFromOSDC.DoubleToGaussian(null),
             TopCementDepth = ConversionsFromOSDC.DoubleToGaussian(null),
             CasingSectionElements = new List<CasingSectionElement> { CreateDefaultCasingSectionElement() },
-            CasingSectionSizeTable = new List<BoreHoleSize> { CreateDefaultCasingSectionSizeRow() },
-            OpenHoleSection = null
+            CasingSectionSizeTable = new List<BoreHoleSize> { CreateDefaultCasingSectionSizeRow() }
         };
     }
 
@@ -2274,23 +2273,6 @@
         }
     }
 
-    private void EnsureOpenHoleAttachedToLastCasing()
-    {
-        var casingSections = WellBoreArchitecture?.CasingSections?.ToList();
-        if (casingSections == null || casingSections.Count == 0)
-        {
-            return;
-        }
-        var retainedOpenHole = casingSections.Select(section => section.OpenHoleSection).LastOrDefault(section => section != null) ?? CreateDefaultOpenHoleSection();
-        foreach (var section in casingSections)
-        {
-            section.OpenHoleSection = null;
-        }
-
-        casingSections[^1].OpenHoleSection = retainedOpenHole;
-        WellBoreArchitecture!.CasingSections = casingSections;
-    }
-
     private static OpenHoleSection CreateDefaultOpenHoleSection()
     {
         return new OpenHoleSection
@@ -2310,18 +2292,14 @@
 
     private List<BoreHoleSize> EnsureOpenHoleRows()
     {
-        EnsureOpenHoleAttachedToLastCasing();
-        var lastCasing = EnsureCasingSectionsList().Last();
-        lastCasing.OpenHoleSection ??= CreateDefaultOpenHoleSection();
-        if (lastCasing.OpenHoleSection.HoleSizes is not List<BoreHoleSize> rows)
+        if (WellBoreArchitecture?.OpenHoleSection == null)
         {
-            rows = lastCasing.OpenHoleSection.HoleSizes?.ToList() ?? new List<BoreHoleSize>();
-            lastCasing.OpenHoleSection.HoleSizes = rows;
+            return new List<BoreHoleSize>();
         }
-
-        if (rows.Count == 0)
+        if (WellBoreArchitecture.OpenHoleSection.HoleSizes is not List<BoreHoleSize> rows)
         {
-            rows.Add(CreateDefaultOpenHoleRow());
+            rows = WellBoreArchitecture.OpenHoleSection.HoleSizes?.ToList() ?? new List<BoreHoleSize>();
+            WellBoreArchitecture.OpenHoleSection.HoleSizes = rows;
         }
 
         return rows;
@@ -2439,10 +2417,6 @@
             rows.Add(CreateDefaultSimplifiedCasingRow());
         }
 
-        var retainedOpenHole = EnsureCasingSectionsList()
-            .Select(section => section.OpenHoleSection)
-            .LastOrDefault(section => section != null) ?? CreateDefaultOpenHoleSection();
-
         var detailedSections = new List<CasingSection>();
         CasingSection? currentSection = null;
         double? currentEnd = null;
@@ -2473,11 +2447,6 @@
             currentEnd = rowEnd;
         }
 
-        foreach (var section in detailedSections)
-        {
-            section.OpenHoleSection = null;
-        }
-
         var groupedRows = BuildSimplifiedCasingGroups(rows);
         for (var i = 0; i < detailedSections.Count; i++)
         {
@@ -2495,7 +2464,6 @@
                 : ConversionsFromOSDC.DoubleToGaussian(null);
         }
 
-        detailedSections[^1].OpenHoleSection = retainedOpenHole;
         WellBoreArchitecture!.CasingSections = detailedSections;
     }
 
@@ -2742,17 +2710,21 @@
 
     private void AddOpenHoleRow()
     {
+        if (WellBoreArchitecture!.OpenHoleSection == null)
+        {
+            WellBoreArchitecture.OpenHoleSection = CreateDefaultOpenHoleSection();
+            return;
+        }
         OpenHoleRows.Add(CreateDefaultOpenHoleRow());
     }
 
     private void RemoveOpenHoleRow(int index)
     {
-        if (OpenHoleRows.Count == 1)
-        {
-            return;
-        }
-
         OpenHoleRows.RemoveAt(index);
+        if (OpenHoleRows.Count == 0)
+        {
+            WellBoreArchitecture!.OpenHoleSection = null;
+        }
     }
 
     private void MoveOpenHoleRow(int index, int delta)

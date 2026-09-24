@@ -31,7 +31,8 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
         public static readonly string HOME_DIRECTORY = ".." + Path.DirectorySeparatorChar + "home" + Path.DirectorySeparatorChar;
         public static readonly string DATABASE_FILENAME = "WellBoreArchitecture.db";
         public static readonly string DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
-        public const int CURRENT_SCHEMA_VERSION = 2;
+        public const int CATALOG_SCHEMA_VERSION = 2;
+        public const int CURRENT_SCHEMA_VERSION = OpenHoleSectionDocumentMigration.TargetSchemaVersion;
 
         // dictionary describing tables format
         // Light weight data fields are enumerated explicitly in the data table implementing the light weight data concept
@@ -178,7 +179,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
                         index.CommandText = $"CREATE UNIQUE INDEX {table.Key}Index ON {table.Key} (ID)";
                         index.ExecuteNonQuery();
                     }
-                    SetSchemaVersion(connection, transaction);
+                    SetSchemaVersion(connection, transaction, CURRENT_SCHEMA_VERSION);
                     transaction.Commit();
                 }
                 catch
@@ -202,7 +203,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
             if (malformedExistingCatalogs.Count > 0)
                 throw new InvalidOperationException($"Existing WellBoreArchitecture catalog tables are malformed. No data was changed: [{string.Join(',', malformedExistingCatalogs)}].");
 
-            if (schemaVersion < CURRENT_SCHEMA_VERSION)
+            if (schemaVersion < CATALOG_SCHEMA_VERSION)
             {
                 using SqliteTransaction transaction = connection.BeginTransaction();
                 try
@@ -221,7 +222,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
                         index.CommandText = $"CREATE UNIQUE INDEX IF NOT EXISTS {table.Key}Index ON {table.Key} (ID)";
                         index.ExecuteNonQuery();
                     }
-                    SetSchemaVersion(connection, transaction);
+                    SetSchemaVersion(connection, transaction, CATALOG_SCHEMA_VERSION);
                     transaction.Commit();
                 }
                 catch
@@ -230,16 +231,21 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
                     throw;
                 }
                 tableNames = _tableStructureDict.Keys.ToList();
+                schemaVersion = CATALOG_SCHEMA_VERSION;
             }
+
+            if (schemaVersion < CURRENT_SCHEMA_VERSION)
+                throw new InvalidOperationException(
+                    "The database requires the explicit open-hole document migration. Stop the service, run with --audit-open-hole-migration, then --apply-open-hole-migration after reviewing the report.");
 
             ValidateExpectedSchema(connection, tableNames);
         }
 
-        private static void SetSchemaVersion(SqliteConnection connection, SqliteTransaction transaction)
+        private static void SetSchemaVersion(SqliteConnection connection, SqliteTransaction transaction, int version)
         {
             using SqliteCommand command = connection.CreateCommand();
             command.Transaction = transaction;
-            command.CommandText = $"PRAGMA user_version = {CURRENT_SCHEMA_VERSION}";
+            command.CommandText = $"PRAGMA user_version = {version}";
             command.ExecuteNonQuery();
         }
 

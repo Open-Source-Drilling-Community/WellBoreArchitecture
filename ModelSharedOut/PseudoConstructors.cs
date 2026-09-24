@@ -81,7 +81,6 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 					{
 						ConstructBoreHoleSize(),
 					},
-				OpenHoleSection = ConstructOpenHoleSection(),
 			};
 		}
 		public static CasingSectionElement ConstructCasingSectionElement()

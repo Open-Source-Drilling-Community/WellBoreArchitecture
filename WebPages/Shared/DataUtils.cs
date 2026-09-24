@@ -75,8 +75,7 @@ public static class DataUtils
             Length = casingSection.Length, 
             TopCementDepth = casingSection.TopCementDepth,
             CasingSectionElements = elements,
-            CasingSectionSizeTable = casingSection.CasingSectionSizeTable,
-            OpenHoleSection = casingSection.OpenHoleSection
+            CasingSectionSizeTable = casingSection.CasingSectionSizeTable
         };
     }
     public static CasingSectionElement? CreateCopy(CasingSectionElement element)

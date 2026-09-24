@@ -16,12 +16,11 @@ namespace OSDC.Drilling.WellBoreArchitecture.Model
         /// the top of cement depth 
         /// </summary>
         public double? TopCementDepth { get; set; } 
-        public List<CasingSectionElementRealization> CasingSectionElements { get; set; }
+        public List<CasingSectionElementRealization> CasingSectionElements { get; set; } = new();
         /// <summary>
-        /// The open hole section starts from where it finished in the previous casing section 
-        /// or the ground level for the first casing section
+        /// Borehole diameter and interval-length rows applicable to this casing section.
         /// </summary>
-        public OpenHoleSectionRealization OpenHoleSection { get; set; }
+        public List<BoreHoleSizeRealization> CasingSectionSizeTable { get; set; } = new();
 
         /// <summary>
         /// Default constructor

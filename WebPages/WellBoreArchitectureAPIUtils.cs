@@ -154,17 +154,6 @@ public class WellBoreArchitectureAPIUtils : APIUtils, IWellBoreArchitectureAPIUt
                         HoleSize = ConversionsFromOSDC.DoubleToGaussian(null),
                         Length = ConversionsFromOSDC.DoubleToGaussian(null)
                     }
-                },
-                OpenHoleSection = new OpenHoleSection
-                {
-                    HoleSizes = new List<BoreHoleSize>
-                    {
-                        new()
-                        {
-                            HoleSize = ConversionsFromOSDC.DoubleToGaussian(null),
-                            Length = ConversionsFromOSDC.DoubleToGaussian(null)
-                        }
-                    }
                 }
             }
         };

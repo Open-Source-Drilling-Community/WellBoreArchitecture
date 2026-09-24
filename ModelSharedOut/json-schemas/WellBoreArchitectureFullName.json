@@ -1001,9 +1001,6 @@
               "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.BoreHoleSize"
             },
             "nullable": true
-          },
-          "OpenHoleSection": {
-            "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.OpenHoleSection"
           }
         },
         "additionalProperties": false
@@ -1383,6 +1380,9 @@
               "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.CasingSection"
             },
             "nullable": true
+          },
+          "OpenHoleSection": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.OpenHoleSection"
           }
         },
         "additionalProperties": false

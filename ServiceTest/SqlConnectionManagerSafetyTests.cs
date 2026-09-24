@@ -39,7 +39,7 @@ public sealed class SqlConnectionManagerSafetyTests
     }
 
     [Test]
-    public void Valid_legacy_database_is_adopted_without_changing_existing_rows()
+    public void Valid_legacy_database_requires_explicit_document_migration_without_changing_existing_rows()
     {
         WithDatabase(path =>
         {
@@ -50,7 +50,7 @@ public sealed class SqlConnectionManagerSafetyTests
                                     "VALUES ('marker','{\"ID\":\"marker\"}','preserve-name','preserve-description','created','modified','{\"payload\":\"preserve-me\"}')");
             }
 
-            _ = Manager(path);
+            Assert.That(() => Manager(path), Throws.TypeOf<InvalidOperationException>());
 
             using SqliteConnection verification = Open(path);
             Assert.Multiple(() =>
@@ -61,7 +61,7 @@ public sealed class SqlConnectionManagerSafetyTests
                 Assert.That(ScalarString(verification,
                     "SELECT Name FROM WellBoreArchitectureTable WHERE ID='marker'"), Is.EqualTo("preserve-name"));
                 Assert.That(ScalarLong(verification, "PRAGMA user_version"),
-                    Is.EqualTo(SqlConnectionManager.CURRENT_SCHEMA_VERSION));
+                    Is.EqualTo(SqlConnectionManager.CATALOG_SCHEMA_VERSION));
                 Assert.That(ScalarLong(verification,
                     "SELECT COUNT(*) FROM sqlite_master WHERE type='index' AND name='WellBoreArchitectureTableIndex'"), Is.EqualTo(1));
                 Assert.That(ScalarLong(verification,
@@ -73,7 +73,7 @@ public sealed class SqlConnectionManagerSafetyTests
     }
 
     [Test]
-    public void Version_one_database_is_upgraded_additively_without_rewriting_architectures()
+    public void Version_one_database_adds_catalog_tables_then_requires_explicit_document_migration()
     {
         WithDatabase(path =>
         {
@@ -83,7 +83,7 @@ public sealed class SqlConnectionManagerSafetyTests
                 Execute(connection, "INSERT INTO WellBoreArchitectureTable (ID,Name,WellBoreArchitecture) VALUES ('marker','preserve-me','{\"Name\":\"preserve-me\"}')");
                 Execute(connection, "PRAGMA user_version = 1");
             }
-            _ = Manager(path);
+            Assert.That(() => Manager(path), Throws.TypeOf<InvalidOperationException>());
             using SqliteConnection verification = Open(path);
             Assert.Multiple(() =>
             {

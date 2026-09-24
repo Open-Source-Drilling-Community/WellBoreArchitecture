@@ -14,7 +14,8 @@ public sealed class WellBoreArchitectureComponentIdentityTests
         {
             MetaInfo = new MetaInfo { ID = Guid.NewGuid() },
             SurfaceSections = [new SurfaceSection { SideConnectors = [new SideConnector { FirstSideElement = new SideElement() }] }],
-            CasingSections = [new CasingSection { CasingSectionElements = [new CasingSectionElement()], OpenHoleSection = new OpenHoleSection { HoleSizes = [new BoreHoleSize()] } }]
+            CasingSections = [new CasingSection { CasingSectionElements = [new CasingSectionElement()], CasingSectionSizeTable = [new BoreHoleSize()] }],
+            OpenHoleSection = new OpenHoleSection { HoleSizes = [new BoreHoleSize()] }
         };
 
         Assert.That(WellBoreArchitectureComponentIdentity.Ensure(architecture), Is.True);
@@ -48,7 +49,8 @@ public sealed class WellBoreArchitectureComponentIdentityTests
         value.SurfaceSections[0].SideConnectors[0].FirstSideElement!.ComponentID,
         value.CasingSections[0].ComponentID,
         value.CasingSections[0].CasingSectionElements[0].ComponentID,
-        value.CasingSections[0].OpenHoleSection!.ComponentID,
-        value.CasingSections[0].OpenHoleSection!.HoleSizes[0].ComponentID
+        value.CasingSections[0].CasingSectionSizeTable[0].ComponentID,
+        value.OpenHoleSection!.ComponentID,
+        value.OpenHoleSection.HoleSizes[0].ComponentID
     ];
 }

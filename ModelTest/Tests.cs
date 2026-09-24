@@ -40,6 +40,41 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelTest
             });
         }
 
+        [Test]
+        public void Realize_keeps_casing_borehole_diameters_and_root_open_hole_separate()
+        {
+            OSDC.DotnetLibraries.General.DrillingProperties.GaussianDrillingProperty value = new()
+            {
+                GaussianValue = new GaussianDistribution { Mean = 1.0 }
+            };
+            Model.WellBoreArchitecture architecture = new()
+            {
+                CasingSections =
+                [
+                    new CasingSection
+                    {
+                        TopDepth = value,
+                        Length = value,
+                        TopCementDepth = value,
+                        CasingSectionElements = [],
+                        CasingSectionSizeTable = [new BoreHoleSize { HoleSize = value, Length = value }]
+                    }
+                ],
+                OpenHoleSection = new OpenHoleSection
+                {
+                    HoleSizes = [new BoreHoleSize { HoleSize = value, Length = value }]
+                }
+            };
+
+            WellBoreArchitectureRealization realization = architecture.Realize();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(realization.CasingSections[0].CasingSectionSizeTable, Has.Count.EqualTo(1));
+                Assert.That(realization.OpenHoleSection?.HoleSizes, Has.Count.EqualTo(1));
+            });
+        }
+
         [OneTimeTearDown]
         public void OneTimeTearDown()
         {

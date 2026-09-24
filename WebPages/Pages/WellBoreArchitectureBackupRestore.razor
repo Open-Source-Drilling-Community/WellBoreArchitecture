@@ -174,7 +174,7 @@
     {
         if (_document == null) { _validationErrors.Add("The document is empty."); return; }
         if (_document.FormatIdentifier != ExpectedFormat) _validationErrors.Add($"FormatIdentifier must be '{ExpectedFormat}'.");
-        if (_document.SchemaVersion != 1) _validationErrors.Add("SchemaVersion must be 1.");
+        if (_document.SchemaVersion != 2) _validationErrors.Add("SchemaVersion must be 2.");
         if (_document.CatalogDependencies == null) _validationErrors.Add("CatalogDependencies is required.");
         if (_document.ExportedAtUtc == default || _document.ExportedAtUtc.Offset != TimeSpan.Zero) _validationErrors.Add("ExportedAtUtc must be a UTC timestamp.");
         if (_document.WellBoreArchitectures == null || _document.WellBoreArchitectures.Count == 0) { _validationErrors.Add("At least one architecture is required."); return; }

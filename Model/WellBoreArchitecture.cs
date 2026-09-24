@@ -57,6 +57,11 @@ namespace OSDC.Drilling.WellBoreArchitecture.Model
         public List<CasingSection> CasingSections { get; set; } = new List<CasingSection>();
 
         /// <summary>
+        /// Optional final open-hole interval below the casing construction.
+        /// </summary>
+        public OpenHoleSection? OpenHoleSection { get; set; }
+
+        /// <summary>
         /// default constructor
         /// </summary>
         public WellBoreArchitecture() : base()
@@ -93,6 +98,10 @@ namespace OSDC.Drilling.WellBoreArchitecture.Model
                 {
                     realization.CasingSections.Add(casing.Realize());
                 }
+            }
+            if (OpenHoleSection != null)
+            {
+                realization.OpenHoleSection = OpenHoleSection.Realize();
             }
             return realization;
         }

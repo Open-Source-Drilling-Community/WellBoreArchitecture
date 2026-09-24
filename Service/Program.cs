@@ -8,6 +8,25 @@ using OSDC.Drilling.WellBoreArchitecture.Service;
 using OSDC.Drilling.WellBoreArchitecture.Service.Managers;
 using OSDC.Drilling.WellBoreArchitecture.Service.Mcp;
 using OSDC.Drilling.WellBoreArchitecture.Service.Mcp.Tools;
+using System.Text.Json;
+using System;
+using System.Linq;
+
+string? migrationArgument = args.FirstOrDefault(value =>
+    value is "--audit-open-hole-migration" or "--apply-open-hole-migration");
+if (migrationArgument != null)
+{
+    OpenHoleSectionMigrationMode mode = migrationArgument == "--apply-open-hole-migration"
+        ? OpenHoleSectionMigrationMode.Apply
+        : OpenHoleSectionMigrationMode.Audit;
+    string connectionString = $"Data Source={SqlConnectionManager.HOME_DIRECTORY}{SqlConnectionManager.DATABASE_FILENAME}";
+    OpenHoleSectionMigrationReport report = OpenHoleSectionDocumentMigration.Run(connectionString, mode, DateTimeOffset.UtcNow);
+    JsonSerializerOptions reportOptions = new() { WriteIndented = true };
+    reportOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    Console.WriteLine(JsonSerializer.Serialize(report, reportOptions));
+    Environment.ExitCode = report.CanApply ? 0 : 2;
+    return;
+}
 
 var builder = WebApplication.CreateBuilder(args);
 

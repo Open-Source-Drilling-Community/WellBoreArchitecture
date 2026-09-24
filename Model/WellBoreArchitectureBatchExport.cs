@@ -15,7 +15,7 @@ public sealed class WellBoreArchitectureBatchExportRequest
 public sealed class WellBoreArchitectureBatchExportDocument
 {
     public const string CurrentFormatIdentifier = "OSDC.Drilling.WellBoreArchitecture.BatchExport";
-    public const int CurrentSchemaVersion = 1;
+    public const int CurrentSchemaVersion = 2;
     public string FormatIdentifier { get; set; } = CurrentFormatIdentifier;
     public int SchemaVersion { get; set; } = CurrentSchemaVersion;
     public DateTimeOffset ExportedAtUtc { get; set; }

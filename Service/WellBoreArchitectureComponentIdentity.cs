@@ -83,19 +83,27 @@ public static class WellBoreArchitectureComponentIdentity
                 if (!Assign(ref elementId, $"{casingPath}/element/{elementIndex}")) return false;
                 element.ComponentID = elementId;
             }
-            if (casing.OpenHoleSection != null)
+            casing.CasingSectionSizeTable ??= [];
+            for (int sizeIndex = 0; sizeIndex < casing.CasingSectionSizeTable.Count; sizeIndex++)
             {
-                Guid openHoleId = casing.OpenHoleSection.ComponentID;
-                if (!Assign(ref openHoleId, casingPath + "/open-hole")) return false;
-                casing.OpenHoleSection.ComponentID = openHoleId;
-                casing.OpenHoleSection.HoleSizes ??= [];
-                for (int sizeIndex = 0; sizeIndex < casing.OpenHoleSection.HoleSizes.Count; sizeIndex++)
-                {
-                    BoreHoleSize size = casing.OpenHoleSection.HoleSizes[sizeIndex];
-                    Guid sizeId = size.ComponentID;
-                    if (!Assign(ref sizeId, $"{casingPath}/open-hole/size/{sizeIndex}")) return false;
-                    size.ComponentID = sizeId;
-                }
+                BoreHoleSize size = casing.CasingSectionSizeTable[sizeIndex];
+                Guid sizeId = size.ComponentID;
+                if (!Assign(ref sizeId, $"{casingPath}/borehole-size/{sizeIndex}")) return false;
+                size.ComponentID = sizeId;
+            }
+        }
+        if (architecture.OpenHoleSection != null)
+        {
+            Guid openHoleId = architecture.OpenHoleSection.ComponentID;
+            if (!Assign(ref openHoleId, "open-hole")) return false;
+            architecture.OpenHoleSection.ComponentID = openHoleId;
+            architecture.OpenHoleSection.HoleSizes ??= [];
+            for (int sizeIndex = 0; sizeIndex < architecture.OpenHoleSection.HoleSizes.Count; sizeIndex++)
+            {
+                BoreHoleSize size = architecture.OpenHoleSection.HoleSizes[sizeIndex];
+                Guid sizeId = size.ComponentID;
+                if (!Assign(ref sizeId, $"open-hole/size/{sizeIndex}")) return false;
+                size.ComponentID = sizeId;
             }
         }
         return true;

@@ -207,14 +207,14 @@
 
                                     <MudItem xs="5">
                                         <div class="d-flex align-center justify-space-between mb-2">
-                                            <MudText Typo="Typo.subtitle2">Open Hole Section</MudText>
+                                            <MudText Typo="Typo.subtitle2">Borehole Diameters</MudText>
                                             <div>
                                                 <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Secondary" OnClick="@(val => AddBoreHole(capturedContext))" Size="Size.Small"> Add </MudButton>
                                                 <MudButton StartIcon="@Icons.Material.Filled.ContentCopy" Color="Color.Primary" OnClick="@(val => CopyBoreHole(capturedContext))" Size="Size.Small"> Copy </MudButton>
                                                 <MudButton StartIcon="@Icons.Material.Filled.Remove" Color="Color.Tertiary" OnClick="@(val => RemoveBoreHole(capturedContext))" Size="Size.Small"> Remove </MudButton>
                                             </div>
                                         </div>
-                                        <MudTable T="BoreHoleSize" Items="capturedContext.OpenHoleSection?.HoleSizes" Context="holeSize"
+                                        <MudTable T="BoreHoleSize" Items="capturedContext.CasingSectionSizeTable" Context="holeSize"
                                                   Dense="true" Elevation="0" Bordered="true" Striped="true">
                                             <HeaderContent>
                                                 <MudTh>OD [@(Parent?.GetUnitLabel("DiameterPipeDrilling"))]</MudTh>
@@ -246,6 +246,42 @@
 
 
     }
+
+    <MudPaper Class="@Class">
+        <MudExpansionPanels>
+            <MudExpansionPanel Text="Open Hole Section">
+                <div class="d-flex align-center justify-space-between mb-2">
+                    <MudText Typo="Typo.subtitle2">Final Open Hole</MudText>
+                    <div>
+                        <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Secondary" OnClick="AddOpenHoleRow" Size="Size.Small"> Add </MudButton>
+                        <MudButton StartIcon="@Icons.Material.Filled.ContentCopy" Color="Color.Primary" OnClick="CopyOpenHoleRow" Size="Size.Small"> Copy </MudButton>
+                        <MudButton StartIcon="@Icons.Material.Filled.Remove" Color="Color.Tertiary" OnClick="RemoveOpenHoleRow" Size="Size.Small"> Remove </MudButton>
+                    </div>
+                </div>
+                <MudTable T="BoreHoleSize" Items="WellBoreArchitectureInstance.OpenHoleSection?.HoleSizes" Context="openHoleSize"
+                          Dense="true" Elevation="0" Bordered="true" Striped="true">
+                    <HeaderContent>
+                        <MudTh>OD [@(Parent?.GetUnitLabel("DiameterPipeDrilling"))]</MudTh>
+                        <MudTh>Length [@(Parent?.GetUnitLabel("Length"))]</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>
+                            <MudInputWithUnit VariantType="Variant.Text"
+                                       QuantityName="DiameterPipeDrilling"
+                                       SIValueNullable="openHoleSize.HoleSize?.GaussianValue?.Mean"
+                                       SIValueNullableChanged="@(val => UpdateBoreHoleSize(openHoleSize, val))" />
+                        </MudTd>
+                        <MudTd>
+                            <MudInputWithUnitAdornment VariantType="Variant.Text"
+                                       QuantityName="Length"
+                                       SIValueNullable="openHoleSize.Length?.GaussianValue?.Mean"
+                                       SIValueNullableChanged="@(val => UpdateBoreHoleLength(openHoleSize, val))" />
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+    </MudPaper>
 }
 
 @code{
@@ -270,6 +306,12 @@
     {
         WellBoreArchitectureInstance.WellBoreArchitectureIdentityAssignments ??= [];
         WellBoreArchitectureInstance.WellBoreArchitectureFeatureAssignments ??= [];
+        WellBoreArchitectureInstance.CasingSections ??= [];
+        foreach (CasingSection section in WellBoreArchitectureInstance.CasingSections)
+        {
+            section.CasingSectionElements ??= [];
+            section.CasingSectionSizeTable ??= [];
+        }
         if (identityCatalog.Count == 0) identityCatalog = await Api.ClientWellBoreArchitecture.GetAllWellBoreArchitectureIdentityAsync();
         if (featureCatalog.Count == 0) featureCatalog = await Api.ClientWellBoreArchitecture.GetAllWellBoreArchitectureFeatureCategoryAsync();
     }
@@ -417,26 +459,56 @@
 
     private async Task AddBoreHole(CasingSection casingSection)
    {
-        if (casingSection.OpenHoleSection == null)
-            casingSection.OpenHoleSection = PseudoConstructors.ConstructOpenHoleSection();
-
-        casingSection.OpenHoleSection.HoleSizes.Add(PseudoConstructors.ConstructBoreHoleSize());
+        casingSection.CasingSectionSizeTable ??= [];
+        casingSection.CasingSectionSizeTable.Add(PseudoConstructors.ConstructBoreHoleSize());
         await SendMessage();
    }
 
    private async Task RemoveBoreHole(CasingSection casingSection)
    {
-        if (casingSection.OpenHoleSection.HoleSizes.Count > 0)
-            casingSection.OpenHoleSection.HoleSizes.RemoveAt(casingSection.OpenHoleSection.HoleSizes.Count-1);
+        if (casingSection.CasingSectionSizeTable?.Count > 0)
+            casingSection.CasingSectionSizeTable.RemoveAt(casingSection.CasingSectionSizeTable.Count-1);
         await SendMessage();
    }
 
    private async Task CopyBoreHole(CasingSection casingSection)
    {
-        if (casingSection.OpenHoleSection?.HoleSizes?.Count > 0)
+        if (casingSection.CasingSectionSizeTable?.Count > 0)
         {
-            BoreHoleSize? last = casingSection.OpenHoleSection.HoleSizes.Last();
-            casingSection.OpenHoleSection.HoleSizes.Add(DataUtils.CreateCopy(last));
+            BoreHoleSize? last = casingSection.CasingSectionSizeTable.Last();
+            casingSection.CasingSectionSizeTable.Add(DataUtils.CreateCopy(last));
+        }
+        await SendMessage();
+   }
+
+   private async Task AddOpenHoleRow()
+   {
+        if (WellBoreArchitectureInstance.OpenHoleSection == null)
+        {
+            WellBoreArchitectureInstance.OpenHoleSection = PseudoConstructors.ConstructOpenHoleSection();
+            await SendMessage();
+            return;
+        }
+        WellBoreArchitectureInstance.OpenHoleSection.HoleSizes ??= [];
+        WellBoreArchitectureInstance.OpenHoleSection.HoleSizes.Add(PseudoConstructors.ConstructBoreHoleSize());
+        await SendMessage();
+   }
+
+   private async Task RemoveOpenHoleRow()
+   {
+        if (WellBoreArchitectureInstance.OpenHoleSection?.HoleSizes?.Count > 0)
+            WellBoreArchitectureInstance.OpenHoleSection.HoleSizes.RemoveAt(WellBoreArchitectureInstance.OpenHoleSection.HoleSizes.Count - 1);
+        if (WellBoreArchitectureInstance.OpenHoleSection?.HoleSizes?.Count == 0)
+            WellBoreArchitectureInstance.OpenHoleSection = null;
+        await SendMessage();
+   }
+
+   private async Task CopyOpenHoleRow()
+   {
+        if (WellBoreArchitectureInstance.OpenHoleSection?.HoleSizes?.Count > 0)
+        {
+            BoreHoleSize last = WellBoreArchitectureInstance.OpenHoleSection.HoleSizes.Last();
+            WellBoreArchitectureInstance.OpenHoleSection.HoleSizes.Add(DataUtils.CreateCopy(last));
         }
         await SendMessage();
    }

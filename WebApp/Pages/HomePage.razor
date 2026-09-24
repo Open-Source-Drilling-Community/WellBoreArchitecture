@@ -22,8 +22,8 @@
                 server-owned creation and modification timestamps, an optional <code>WellBoreID</code> linking it to
                 the wellbore it describes, its identity and feature assignments, and the physical structure itself —
                 a <b>well head</b>, any fluids sitting above ground level, zero or more ordered <b>surface
-                sections</b>, and an ordered list of <b>casing sections</b> with their elements and open-hole
-                intervals. Most engineering quantities are stored as probabilistic (Gaussian or scalar) drilling
+                sections</b>, an ordered list of <b>casing sections</b> with their elements and borehole-diameter
+                tables, and an optional final <b>open-hole section</b>. Most engineering quantities are stored as probabilistic (Gaussian or scalar) drilling
                 properties rather than single numbers, and each construction object exposes a <code>Realize()</code>
                 method that samples them down to a deterministic snapshot when a single realistic value is needed.
             </MudText>
@@ -91,9 +91,9 @@
             <MudText Typo="Typo.body1">
                 The <b>downhole architecture</b> starts at the well head and continues through the ordered
                 <code>CasingSections</code> list, sorted top to bottom, each with a top depth, length, and
-                top-of-cement depth, its casing section elements, a size table of length and diameter pairs, and the
-                open-hole interval that continues from where the previous casing section — or the ground level for
-                the first one — left off.
+                top-of-cement depth, its casing section elements, and a borehole size table of length and diameter
+                pairs. A separate nullable <code>OpenHoleSection</code> on the architecture describes the final
+                uncased interval below the casing construction.
             </MudText>
         </MudPaper>
     </MudItem>

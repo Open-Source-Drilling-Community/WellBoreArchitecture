@@ -284,7 +284,8 @@ internal static class McpToolArgumentHelpers
                 ["WellHead"] = Ref("WellHead", "Wellhead dimensions and depth/hanger locations."),
                 ["FluidsAboveGroundLevel"] = Array("WellBoreArchitectureFluid", "Ordered fluid layers above ground or mudline. The last listed fluid extends to ground level."),
                 ["SurfaceSections"] = Array("SurfaceSection", "Optional surface equipment sections above the wellhead, ordered from top to bottom. The list may be omitted or empty when the architecture has no surface equipment."),
-                ["CasingSections"] = Array("CasingSection", "Casing sections beginning at the wellhead and ordered from top to bottom.")
+                ["CasingSections"] = Array("CasingSection", "Casing sections beginning at the wellhead and ordered from top to bottom."),
+                ["OpenHoleSection"] = NullableRef("OpenHoleSection", "Optional final open-hole interval below the casing construction.")
             }, "MetaInfo"),
 
         ["WellBoreArchitectureIdentityAssignment"] = Object("One architecture-specific identity value.", new JsonObject
@@ -380,8 +381,7 @@ internal static class McpToolArgumentHelpers
             ["Length"] = Ref("GaussianDrillingProperty", "Casing-section length in metres (m)."),
             ["TopCementDepth"] = Ref("GaussianDrillingProperty", "Top-of-cement depth in metres (m), referenced to the WGS84 datum."),
             ["CasingSectionElements"] = Array("CasingSectionElement", "Ordered casing-element specifications used through this interval."),
-            ["CasingSectionSizeTable"] = Array("BoreHoleSize", "Borehole diameter/length rows applicable to this casing section."),
-            ["OpenHoleSection"] = NullableRef("OpenHoleSection", "Optional open-hole interval following this casing section; it begins where the previous casing interval ends, or at ground level for the first section.")
+            ["CasingSectionSizeTable"] = Array("BoreHoleSize", "Borehole diameter/length rows applicable to this casing section.")
         }),
 
         ["CasingSectionElement"] = Object("Casing tubular specification and interval length, with uncertainty wrappers for physical properties.", new JsonObject
@@ -493,7 +493,7 @@ internal static class McpToolArgumentHelpers
             ["properties"] = new JsonObject
             {
                 ["FormatIdentifier"] = new JsonObject { ["type"] = "string", ["const"] = "OSDC.Drilling.WellBoreArchitecture.BatchExport" },
-                ["SchemaVersion"] = new JsonObject { ["type"] = "integer", ["const"] = 1 },
+                ["SchemaVersion"] = new JsonObject { ["type"] = "integer", ["const"] = 2 },
                 ["ExportedAtUtc"] = String("UTC timestamp at which the snapshot was created.", "date-time"),
                 ["CatalogDependencies"] = Object("Dependency-closed identity and feature catalogue subset.", new JsonObject
                 {

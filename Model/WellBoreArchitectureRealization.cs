@@ -24,6 +24,10 @@ namespace OSDC.Drilling.WellBoreArchitecture.Model
         /// List of Sections starting from the well head sorted top to down
         /// </summary>
         public List<CasingSectionRealization> CasingSections { get; set; }
+        /// <summary>
+        /// Optional final open-hole interval below the casing construction.
+        /// </summary>
+        public OpenHoleSectionRealization? OpenHoleSection { get; set; }
 
         /// <summary>
         /// default constructor
