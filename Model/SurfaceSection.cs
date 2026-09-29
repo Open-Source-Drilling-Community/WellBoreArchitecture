@@ -1,66 +1,82 @@
+using OSDC.DotnetLibraries.Drilling.SemanticCatalogue;
 using OSDC.DotnetLibraries.General.DrillingProperties;
 using System.Collections.Generic;
 using System;
 
 namespace OSDC.Drilling.WellBoreArchitecture.Model
 {
+    [Semantic(Concepts.SurfaceConstructionSection)]
     public class SurfaceSection
     {
         /// <summary>Stable identifier used to address this nested component independently.</summary>
+        [Semantic(Concepts.ResourceIdentifier)]
         public Guid ComponentID { get; set; }
 
         public SurfaceSectionType Type { get; set; } = SurfaceSectionType.Unknown;
         /// <summary>
         /// The length of the section element is a gaussian distribution.
         /// </summary>
+        [EngineeringQuantity(Concepts.PhysicalLengthExtent, Concepts.DimensionalLengthStandardUncertainty, Role = Concepts.SectionExtent)]
         public GaussianDrillingProperty? SectionLength { get; set; } = new GaussianDrillingProperty();
         /// <summary>
         /// the body OD of the element
         /// </summary>
+        [EngineeringQuantity(Concepts.PipeDiameter, Concepts.DimensionalLengthStandardUncertainty, Role = Concepts.OuterDiameter)]
         public GaussianDrillingProperty? BodyOD { get; set; } = new GaussianDrillingProperty();
         /// <summary>
         /// the body ID of the element
         /// </summary>
+        [EngineeringQuantity(Concepts.PipeDiameter, Concepts.DimensionalLengthStandardUncertainty, Role = Concepts.InnerDiameter)]
         public GaussianDrillingProperty? BodyID { get; set; } = new GaussianDrillingProperty();
         /// <summary>
         /// Description of the joint connection thread
         /// </summary>
+        [Semantic(Concepts.ConnectionThreadDescription)]
         public string? ConnectionType { get; set; }
         /// <summary>
         /// Material grade
         /// </summary>
+        [Semantic(Concepts.MaterialGrade)]
         public string? Grade { get; set; }
         /// <summary>
         /// Average material density of the section
         /// </summary>
+        [EngineeringQuantity(Concepts.MaterialDensity, Concepts.MassDensityStandardUncertainty)]
         public GaussianDrillingProperty? MaterialDensity { get; set; } = new GaussianDrillingProperty();
         /// <summary>
         /// Material Young modulus
         /// </summary>
+        [EngineeringQuantity(Concepts.YoungModulus, Concepts.ElasticModulusStandardUncertainty)]
         public GaussianDrillingProperty? YoungModulus { get; set; } = new GaussianDrillingProperty();
         /// <summary>
         /// Average linear weight of the section
         /// </summary>
+        [EngineeringQuantity(Concepts.LinearMassDensity, Concepts.LinearMassDensityStandardUncertainty)]
         public GaussianDrillingProperty? LinearWeight { get; set; } = new GaussianDrillingProperty();
         /// <summary>
         /// Average tensile strength of the section
         /// </summary>
+        [EngineeringQuantity(Concepts.TensileStrength, Concepts.MaterialStrengthStandardUncertainty)]
         public GaussianDrillingProperty? TensileStrength { get; set; } = new GaussianDrillingProperty();
         /// <summary>
         /// Mean value of the burst pressure
         /// </summary>
+        [EngineeringQuantity(Concepts.BurstPressureCapacity, Concepts.PressureDifferenceStandardUncertainty)]
         public GaussianDrillingProperty? BurstPressure { get; set; } = new GaussianDrillingProperty();
         /// <summary>
         /// Mean value of the collapse pressure
         /// </summary>
+        [EngineeringQuantity(Concepts.CollapsePressureCapacity, Concepts.PressureDifferenceStandardUncertainty)]
         public GaussianDrillingProperty? CollapsePressure { get; set; } = new GaussianDrillingProperty();
         /// <summary>
         /// Mean value of the yield stress
         /// </summary>
+        [EngineeringQuantity(Concepts.YieldStress, Concepts.MaterialStrengthStandardUncertainty)]
         public GaussianDrillingProperty? YieldStress { get; set; } = new GaussianDrillingProperty();
         /// <summary>
         /// Recommended make up torque
         /// </summary>
+        [EngineeringQuantity(Concepts.RecommendedMakeUpTorque)]
         public ScalarDrillingProperty? MakeUpTorqueRecommended { get; set; } = new ScalarDrillingProperty();
         /// <summary>
         /// possible side ports that connect to additional circuitry

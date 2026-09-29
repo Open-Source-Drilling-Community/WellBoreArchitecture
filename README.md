@@ -107,3 +107,11 @@ Before a Kubernetes cutover, take and verify a snapshot of `wellborearchitecture
 ## Shared resource classification
 
 The model uses `OSDC.DotnetLibraries.General.ResourceClassification` 0.1.0 for identity definitions/assignments and feature categories/options/assignments. Service-specific class names remain as thin subclasses, preserving stored JSON and REST/MCP payloads. No database migration or new membership catalogue is introduced. Catalogue ownership, defaults and validation remain service responsibilities.
+
+## Curated architecture semantics (0.10.0)
+
+The Model references published `OSDC.DotnetLibraries.Drilling.SemanticCatalogue` **0.10.0** unconditionally, alongside ResourceClassification 0.1.0. REST and MCP share one provider binding registry. All 43 engineering fields declare physical quantities, SI units and contextual scalar/uncertainty bindings without changing payload shapes or stored values.
+
+Casing top and top-of-cement are along-hole coordinates with the WGS84 path-intersection origin. Wellhead/hangers and fluid-layer tops are vertical WGS84 coordinates. SideConnector.Position is a local host-top/downward coordinate. Extents use LengthStandard; tensile strength is stress, torsional capacity is torque, and burst/collapse capacities are pressure differences. No TensileCapacity payload field is introduced. User-selected display references remain supported.
+
+`WebPagesTest` covers connector edits: changing vertical depth must preserve the independent host-relative position. No database migration is needed.

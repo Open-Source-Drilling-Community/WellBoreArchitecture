@@ -1,3 +1,4 @@
+using OSDC.DotnetLibraries.Drilling.SemanticCatalogue;
 using System;
 using System.Collections.Generic;
 using OSDC.DotnetLibraries.General.Statistics;
@@ -8,28 +9,34 @@ using System.Text.Json;
 
 namespace OSDC.Drilling.WellBoreArchitecture.Model
 {
+    [Semantic(Concepts.WellBoreArchitecture)]
     public class WellBoreArchitecture
     {
         /// <summary>
         /// a MetaInfo for the WellBore Architecture
         /// </summary>
+        [Semantic(Concepts.ResourceMetadata)]
         public MetaInfo MetaInfo { get; set; } = new MetaInfo();
 
+        [Semantic(Concepts.ResourceName)]
         public string? Name { get; set; }
 
         /// <summary>
         /// a description of the data
         /// </summary>
+        [Semantic(Concepts.ResourceDescription)]
         public string? Description { get; set; }
 
         /// <summary>
         /// the date when the data was created
         /// </summary>
+        [Semantic(Concepts.Instant, Role = Concepts.CreationTime, Reference = Concepts.Utc)]
         public DateTimeOffset? CreationDate { get; set; }
 
         /// <summary>
         /// the date when the data was last modified
         /// </summary>
+        [Semantic(Concepts.Instant, Role = Concepts.LastModificationTime, Reference = Concepts.Utc)]
         public DateTimeOffset? LastModificationDate { get; set; }
         /// <summary>Identity values assigned to this architecture.</summary>
         public List<WellBoreArchitectureIdentityAssignment>? WellBoreArchitectureIdentityAssignments { get; set; }
@@ -38,6 +45,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.Model
         /// <summary>
         ///  the ID of the wellbore in which this architecture belongs to
         /// </summary>
+        [Semantic(Concepts.ResourceIdentifier)]
         public Guid? WellBoreID { get; set; }
         /// <summary>
         /// The well head 

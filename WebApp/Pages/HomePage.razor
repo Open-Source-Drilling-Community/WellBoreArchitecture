@@ -76,6 +76,14 @@
         <MudPaper Class="pa-6 mt-4" Elevation="2">
             <MudText Typo="Typo.h5" Class="mb-3">Top and downhole architecture, split at the well head</MudText>
             <MudText Typo="Typo.body1" Class="mb-2">
+                Casing-top and top-of-cement depths are along-hole coordinates; wellhead, hanger and fluid-layer-top depths
+                are vertical coordinates. Stored depths use SI metres and the WGS84 reference: along-hole zero is the
+                path's intersection or defined extension to the ellipsoid. Supported MSL, ground/mud-line and other
+                display references remain selectable. Connector position is local to its host top and increases downward.
+                Section lengths are extents, not depth coordinates. Tensile strength is stress; burst and collapse
+                capacities are pressure differences, not absolute pressures.
+            </MudText>
+            <MudText Typo="Typo.body1" Class="mb-2">
                 Every architecture is organized around its <b>well head</b>, the upper anchor of the downhole
                 construction and the fixed point that separates what sits above it from what hangs below it. The well
                 head itself carries a depth, minimum and maximum outside diameter, and the casing- and tubing-hanger

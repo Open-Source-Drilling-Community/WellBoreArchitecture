@@ -221,7 +221,7 @@
                             </MudItem>
                             <MudItem xs="3">
                                 <MudInputWithUnitAdornment VariantType="Variant.Text"
-                                                           QuantityName="DepthDrilling"
+                                                           QuantityName="LengthStandard"
                                                            SIValueNullable="@GetGaussianValue(section.SectionLength)"
                                                            SIValueNullableChanged="value => UpdateSurfaceSectionLength(index, value)" />
                             </MudItem>
@@ -419,7 +419,7 @@
                             </MudItem>
                             <MudItem xs="4">
                                 <MudInputWithUnitAdornment VariantType="Variant.Text"
-                                                           QuantityName="DepthDrilling"
+                                                           QuantityName="LengthStandard"
                                                            SIValueNullable="@GetGaussianValue(row.Length)"
                                                            SIValueNullableChanged="value => UpdateOpenHoleLength(index, value)" />
                             </MudItem>
@@ -2047,7 +2047,7 @@
     {
         var type = name == "ChokeLine" ? SideElementType.Choke : SideElementType.Pipe;
         var connector = EnsureNamedSideConnector(GetBopSurfaceSection(), name, type);
-        connector.Position = ConversionsFromOSDC.DoubleToGaussian(value);
+        // Host-relative Position is independent of this absolute vertical coordinate.
         connector.VerticalDepth = ConversionsFromOSDC.DoubleToGaussian(value);
         if (connector.FirstSideElement != null)
         {
@@ -2076,7 +2076,7 @@
     private void UpdateBoosterLineDepth(double? value)
     {
         var connector = EnsureNamedSideConnector(GetMarineRiserSection(), "BoosterLine", SideElementType.Pipe);
-        connector.Position = ConversionsFromOSDC.DoubleToGaussian(value);
+        // Host-relative Position is independent of this absolute vertical coordinate.
         connector.VerticalDepth = ConversionsFromOSDC.DoubleToGaussian(value);
         if (connector.FirstSideElement != null)
         {
@@ -2099,7 +2099,7 @@
     private void UpdateLiftPumpDepth(double? value)
     {
         var connector = EnsureNamedSideConnector(GetLiftPumpHostSection(), "LiftPump", SideElementType.Pipe);
-        connector.Position = ConversionsFromOSDC.DoubleToGaussian(value);
+        // Host-relative Position is independent of this absolute vertical coordinate.
         connector.VerticalDepth = ConversionsFromOSDC.DoubleToGaussian(value);
         if (connector.FirstSideElement != null)
         {

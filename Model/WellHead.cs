@@ -1,3 +1,4 @@
+using OSDC.DotnetLibraries.Drilling.SemanticCatalogue;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,28 +8,34 @@ using OSDC.UnitConversion.Conversion.DrillingEngineering;
 
 namespace OSDC.Drilling.WellBoreArchitecture.Model
 {
+    [Semantic(Concepts.Wellhead)]
     public class WellHead
     {
         /// <summary>
         /// 
         /// </summary>
+        [EngineeringQuantity(Concepts.PipeDiameter, Role = Concepts.MaximumWellheadOutsideDiameter)]
         public ScalarDrillingProperty? MaxOD { get; set; } = new ScalarDrillingProperty();
 
         /// <summary>
         /// 
         /// </summary>
+        [EngineeringQuantity(Concepts.PipeDiameter, Role = Concepts.MinimumWellheadOutsideDiameter)]
         public ScalarDrillingProperty? MinOD { get; set; } = new ScalarDrillingProperty();
 
+        [EngineeringQuantity(Concepts.EllipsoidalDepth, Concepts.LinearStandardUncertainty, Role = Concepts.WellheadLocation)]
         public GaussianDrillingProperty? Depth { get; set; } = new GaussianDrillingProperty();
 
         /// <summary>
         /// 
         /// </summary>
+        [EngineeringQuantity(Concepts.EllipsoidalDepth, Role = Concepts.CasingHangerLocation)]
         public ScalarDrillingProperty? CasingHangerDepth { get; set; } = new ScalarDrillingProperty();
 
         /// <summary>
         /// 
         /// </summary>
+        [EngineeringQuantity(Concepts.EllipsoidalDepth, Role = Concepts.TubingHangerLocation)]
         public ScalarDrillingProperty? TubingHangerDepth { get; set; } = new ScalarDrillingProperty();
 
         /// <summary>

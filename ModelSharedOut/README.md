@@ -37,4 +37,12 @@ Regenerate the shared output after changing this schema or the service REST cont
 
 ## Shared resource classification
 
-ResourceClassification 0.1.0 adoption changes the Model implementation only. The service Swagger generator produces the same schemas and paths as the checked-in own-service OpenAPI input, verified by `ResourceClassificationContractTests`. Existing generated client, pseudo-constructors and merged document therefore remain applicable without regeneration.
+ResourceClassification 0.1.0 preserves classification payload shapes. SemanticCatalogue integration adds descriptions and extension metadata, so the client, pseudo-constructors and merged document have now been regenerated. `ResourceClassificationContractTests` checks the current semantic OpenAPI against the service generator.
+
+## Curated architecture semantics (0.10.0)
+
+The own-service OpenAPI input now carries catalogue 0.10.0 metadata and relative JSON Pointer bindings for shared Gaussian/scalar wrappers. The merged schema preserves extension metadata; the generated C# exposes the clarified descriptions without new payload properties. Run the existing generator in a terminal (it uses Console.Clear and interactive Y prompts). Generated C# whitespace is normalized by the generator itself.
+
+This increment refreshes WellBoreArchitecture's own-service input; existing dependency schema inputs are unchanged.
+
+`SemanticOpenApiExtensions` restores semantic extension values from raw JSON after OpenAPI parsing, both during schema merging and when serving Swagger. This preserves string versions such as `1.1.0`, which the reader otherwise treats as dates. A regression test checks all 43 engineering bindings through both stages.

@@ -144,14 +144,14 @@ internal static class McpToolArgumentHelpers
     public static JsonObject CreateArchitectureLightListOutputSchema() => SuccessEnvelope(new JsonObject
     {
         ["type"] = "array",
-        ["items"] = Object("Lightweight architecture discovery record.", new JsonObject
+        ["items"] = Model.ProviderSemantics.Annotate(Object("Lightweight architecture discovery record.", new JsonObject
         {
             ["MetaInfo"] = new JsonObject { ["$ref"] = "#/$defs/MetaInfo" },
             ["Name"] = NullableString("Architecture name."),
             ["Description"] = NullableString("Architecture description."),
             ["CreationDate"] = NullableDateTime("Server-owned creation timestamp."),
             ["LastModificationDate"] = NullableDateTime("Latest optimistic-concurrency token.")
-        }, "MetaInfo")
+        }, "MetaInfo"), typeof(Model.WellBoreArchitectureLight))
     }, Definitions());
 
     public static JsonObject CreateIdentityOutputSchema() => SuccessEnvelope(IdentityDefinition());
@@ -236,7 +236,7 @@ internal static class McpToolArgumentHelpers
         {
             ["wellBoreArchitectureId"] = String("UUID from WellBoreArchitecture.MetaInfo.ID.", "uuid"),
             ["expectedModifiedUtc"] = String("Exact LastModificationDate returned by the latest read.", "date-time"),
-            [bodyName] = body
+            [bodyName] = Model.ProviderSemantics.Annotate(body, typeof(Model.WellBoreArchitecture))
         },
         ["required"] = new JsonArray("wellBoreArchitectureId", "expectedModifiedUtc", bodyName),
         ["additionalProperties"] = false
@@ -267,7 +267,22 @@ internal static class McpToolArgumentHelpers
         };
     }
 
-    private static JsonObject Definitions() => new()
+    private static JsonObject Definitions()
+    {
+        var definitions = RawDefinitions();
+        var root = new JsonObject { ["$defs"] = definitions };
+        foreach (var definition in definitions)
+        {
+            var type = typeof(Model.WellBoreArchitecture).Assembly.GetType("OSDC.Drilling.WellBoreArchitecture.Model." + definition.Key);
+            if (definition.Key == "MetaInfo") type = typeof(OSDC.DotnetLibraries.General.DataManagement.MetaInfo);
+            if (type != null)
+                Model.ProviderSemantics.AnnotateDefinition(root, definition.Key, type);
+        }
+        root.Remove("$defs");
+        return definitions;
+    }
+
+    private static JsonObject RawDefinitions() => new()
     {
         ["WellBoreArchitecture"] = Object(
             "Complete wellbore construction architecture. Physical values are SI and every persisted depth is referenced to the WGS84 datum. Alternative depth references are UI-only display transformations and are never persisted in this payload.",
@@ -528,7 +543,9 @@ internal static class McpToolArgumentHelpers
         };
     }
 
-    private static JsonObject IdentityDefinition() => Object("User-managed identity definition.", new JsonObject
+    private static JsonObject IdentityDefinition() => Model.ProviderSemantics.Annotate(IdentityDefinitionRaw(), typeof(Model.WellBoreArchitectureIdentity));
+
+    private static JsonObject IdentityDefinitionRaw() => Object("User-managed identity definition.", new JsonObject
     {
         ["MetaInfo"] = Object("Identity-definition metadata.", new JsonObject
         {
@@ -540,7 +557,9 @@ internal static class McpToolArgumentHelpers
         ["Name"] = NullableString("Identity category name."), ["CreationDate"] = NullableDateTime("Server-owned creation time."), ["LastModificationDate"] = NullableDateTime("Server-owned concurrency token.")
     }, "MetaInfo");
 
-    private static JsonObject FeatureCategoryDefinition() => Object("User-managed feature category and options.", new JsonObject
+    private static JsonObject FeatureCategoryDefinition() => Model.ProviderSemantics.Annotate(FeatureCategoryDefinitionRaw(), typeof(Model.WellBoreArchitectureFeatureCategory));
+
+    private static JsonObject FeatureCategoryDefinitionRaw() => Object("User-managed feature category and options.", new JsonObject
     {
         ["MetaInfo"] = Object("Feature-category metadata.", new JsonObject
         {
@@ -596,10 +615,17 @@ internal static class McpToolArgumentHelpers
     {
         var schema = new JsonObject { ["type"] = "string", ["description"] = description };
         if (format is not null) schema["format"] = format;
+        if (format == "uuid") schema[OSDC.DotnetLibraries.Drilling.SemanticCatalogue.SemanticMetadata.ExtensionName] =
+            Model.ProviderSemantics.Metadata(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.ResourceIdentifier);
         return schema;
     }
     private static JsonObject NullableString(string description) => new() { ["type"] = new JsonArray("string", "null"), ["description"] = description };
-    private static JsonObject NullableUuid(string description) => new() { ["type"] = new JsonArray("string", "null"), ["format"] = "uuid", ["description"] = description };
+    private static JsonObject NullableUuid(string description)
+    {
+        var schema = String(description, "uuid");
+        schema["type"] = new JsonArray("string", "null");
+        return schema;
+    }
     private static JsonObject NullableDateTime(string description) => new() { ["type"] = new JsonArray("string", "null"), ["format"] = "date-time", ["description"] = description };
     private static JsonObject Number(string description) => new() { ["type"] = "number", ["description"] = description };
     private static JsonObject NullableNumber(string description) => new() { ["type"] = new JsonArray("number", "null"), ["description"] = description };

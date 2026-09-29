@@ -1,3 +1,4 @@
+using OSDC.DotnetLibraries.Drilling.SemanticCatalogue;
 using OSDC.DotnetLibraries.General.DrillingProperties;
 using OSDC.UnitConversion.Conversion.DrillingEngineering;
 using System.Collections.Generic;
@@ -5,13 +6,16 @@ using System;
 
 namespace OSDC.Drilling.WellBoreArchitecture.Model
 {
+    [Semantic(Concepts.SideCircuitElement)]
     public class SideElement
     {
         /// <summary>Stable identifier used to address this nested component independently.</summary>
+        [Semantic(Concepts.ResourceIdentifier)]
         public Guid ComponentID { get; set; }
         /// <summary>
         /// Name of the element
         /// </summary>
+        [Semantic(Concepts.ResourceName)]
         public string Name { get; set; }
         /// <summary>
         /// the type of the element
@@ -20,18 +24,22 @@ namespace OSDC.Drilling.WellBoreArchitecture.Model
         /// <summary>
         /// the length of the element
         /// </summary>
+        [EngineeringQuantity(Concepts.PhysicalLengthExtent, Concepts.DimensionalLengthStandardUncertainty, Role = Concepts.SectionExtent)]
         public GaussianDrillingProperty Length { get; set; } = new GaussianDrillingProperty();
         /// <summary>
         /// the vertical depth of the top of the element
         /// </summary>
+        [EngineeringQuantity(Concepts.EllipsoidalDepth, Concepts.LinearStandardUncertainty, Role = Concepts.TopDepthBoundary)]
         public GaussianDrillingProperty TopVerticalDepth { get; set; } = new GaussianDrillingProperty();
         /// <summary>
         /// the typical outer diameter of the element
         /// </summary>
+        [EngineeringQuantity(Concepts.PipeDiameter, Concepts.DimensionalLengthStandardUncertainty, Role = Concepts.OuterDiameter)]
         public GaussianDrillingProperty OD { get; set; } = new GaussianDrillingProperty();
         /// <summary>
         ///  the typical inner diameter of the element
         /// </summary>
+        [EngineeringQuantity(Concepts.PipeDiameter, Concepts.DimensionalLengthStandardUncertainty, Role = Concepts.InnerDiameter)]
         public GaussianDrillingProperty ID { get; set; } = new GaussianDrillingProperty();
         /// <summary>
         /// The element connected at the end of the element

@@ -1,25 +1,31 @@
+using OSDC.DotnetLibraries.Drilling.SemanticCatalogue;
 using OSDC.DotnetLibraries.General.DrillingProperties;
 using System.Collections.Generic;
 using System;
 
 namespace OSDC.Drilling.WellBoreArchitecture.Model
 {
+    [Semantic(Concepts.CasingSection)]
     public class CasingSection
     {
         /// <summary>Stable identifier used to address this nested component independently.</summary>
+        [Semantic(Concepts.ResourceIdentifier)]
         public Guid ComponentID { get; set; }
 
         /// <summary>
         /// The top depth is a Gaussian depth quantity stored in metres and referenced to the WGS84 datum.
         /// </summary>
+        [EngineeringQuantity(Concepts.AlongHoleDepth, Concepts.LinearStandardUncertainty, Role = Concepts.CasingTopLocation)]
         public GaussianDrillingProperty TopDepth { get; set; } = new GaussianDrillingProperty();
         /// <summary>
         /// the length is a Gaussian value that is standard length quantity.
         /// </summary>
+        [EngineeringQuantity(Concepts.PhysicalLengthExtent, Concepts.DimensionalLengthStandardUncertainty, Role = Concepts.SectionExtent)]
         public GaussianDrillingProperty Length { get; set; } = new GaussianDrillingProperty();
         /// <summary>
         /// The top-of-cement depth is a Gaussian depth quantity stored in metres and referenced to the WGS84 datum.
         /// </summary>
+        [EngineeringQuantity(Concepts.AlongHoleDepth, Concepts.LinearStandardUncertainty, Role = Concepts.TopOfCementLocation)]
         public GaussianDrillingProperty TopCementDepth { get; set; } = new GaussianDrillingProperty();
         public List<CasingSectionElement> CasingSectionElements { get; set; } = new();
         /// <summary>

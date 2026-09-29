@@ -23,3 +23,9 @@ The live HTTP tests require the service at the configured test base URL; databas
 ## Shared resource classification
 
 `ResourceClassificationContractTests` creates an unstarted ASP.NET host and uses the service Swagger configuration to compare schemas and REST paths with `ModelSharedOut/json-schemas/WellBoreArchitectureFullName.json`. It requires no running endpoint or database. The model project also tests stored classification JSON compatibility and typed option adapters. Migration verification passed 8 model tests and 44 isolated service tests; the external HTTP fixtures (`ServiceTest.Tests` and `McpServerHttpTests`) were not run.
+
+## Curated architecture semantics (0.10.0)
+
+`SemanticContractTests` checks all 43 engineering fields for REST/MCP equality, Reviewed 0.10.0 bindings, physical quantities, SI units, canonical references, origin-free uncertainties and quantity-neutral shared wrappers. `ResourceClassificationContractTests` now includes the semantic filter when comparing live-generated OpenAPI with the checked-in own-service contract. External HTTP fixtures still require a separately configured running service.
+
+Final local verification: full Release solution build succeeded; 68 tests passed across ModelTest (8), ServiceTest (56) and WebPagesTest (4). The service tests include merged/served semantic metadata preservation. External HTTP fixtures were excluded. No deployment was performed.

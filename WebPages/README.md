@@ -70,3 +70,7 @@ The architecture pages call the stateless Earth Vertical Datum conversion API th
 The service contract always stores SI metres relative to WGS84. Alternative references such as MSL, RKB, wellhead, ground level, and mud line are UI-only transformations and are converted back to WGS84 before save. If Earth Vertical Datum is temporarily unavailable, the editor remains usable and omits only the mean-sea-level reference. The exact shared-utility version is declared in `WebPages.csproj`.
 
 For rotary-table references, the editor resolves the latest chronological WellBore `RigJob`. A mobile-rig job supplies its own Gaussian drill-floor depth; a Platform Rig job uses the depth owned by the Rig. An authoritative empty history does not infer a rig, while a null history retains the legacy direct-`RigID` and Cluster fallback during the migration period.
+
+## Curated architecture semantics (0.10.0)
+
+Extent and host-position inputs use LengthStandard engineering precision. Existing depth-reference selectors and SI persistence remain intact. Simplified connector depth edits update VerticalDepth and the first side-element's TopVerticalDepth without overwriting the independent host-relative Position. Existing Position values are preserved, not retroactively converted; any historical values require an informed review. A newly created connector's local position remains unspecified until provided through its position editor.

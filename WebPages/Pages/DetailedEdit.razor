@@ -134,7 +134,7 @@
                                     <MudItem xs="4">
                                         <MudText Typo="Typo.caption" Class="mud-text-secondary">Length [@(Parent?.GetUnitLabel("Length"))]</MudText>
                                         <MudInputWithUnit VariantType="Variant.Text"
-                                                   QuantityName="Length"
+                                                   QuantityName="LengthStandard"
                                                    SIValueNullable="capturedContext.Length?.GaussianValue?.Mean"
                                                    SIValueNullableChanged="@(val => UpdateCasingSectionLength(capturedContext, val))" />
                                     </MudItem>
@@ -191,13 +191,13 @@
                                                 </MudTd>
                                                 <MudTd>
                                                     <MudInputWithUnitAdornment VariantType="Variant.Text"
-                                                               QuantityName="Length"
+                                                               QuantityName="LengthStandard"
                                                                SIValueNullable="casingElements.JointLength?.GaussianValue?.Mean"
                                                                SIValueNullableChanged="@(val => UpdateElementJointLength(casingElements, val))" />
                                                 </MudTd>
                                                 <MudTd>
                                                     <MudInputWithUnitAdornment VariantType="Variant.Text"
-                                                               QuantityName="Length"
+                                                               QuantityName="LengthStandard"
                                                                SIValueNullable="casingElements.SectionLength?.GaussianValue?.Mean"
                                                                SIValueNullableChanged="@(val => UpdateElementSectionLength(casingElements, val))" />
                                                 </MudTd>
@@ -229,7 +229,7 @@
                                                 </MudTd>
                                                 <MudTd>
                                                     <MudInputWithUnitAdornment VariantType="Variant.Text"
-                                                               QuantityName="Length"
+                                                               QuantityName="LengthStandard"
                                                                SIValueNullable="holeSize.Length?.GaussianValue?.Mean"
                                                                SIValueNullableChanged="@(val => UpdateBoreHoleLength(holeSize, val))" />
                                                 </MudTd>
@@ -273,7 +273,7 @@
                         </MudTd>
                         <MudTd>
                             <MudInputWithUnitAdornment VariantType="Variant.Text"
-                                       QuantityName="Length"
+                                       QuantityName="LengthStandard"
                                        SIValueNullable="openHoleSize.Length?.GaussianValue?.Mean"
                                        SIValueNullableChanged="@(val => UpdateBoreHoleLength(openHoleSize, val))" />
                         </MudTd>

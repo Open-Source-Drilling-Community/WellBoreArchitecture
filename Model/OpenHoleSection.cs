@@ -1,11 +1,14 @@
+using OSDC.DotnetLibraries.Drilling.SemanticCatalogue;
 using System.Collections.Generic;
 using System;
 
 namespace OSDC.Drilling.WellBoreArchitecture.Model
 {
+	[Semantic(Concepts.OpenHoleSection)]
 	public class OpenHoleSection
 	{
 		/// <summary>Stable identifier used to address this nested component independently.</summary>
+		[Semantic(Concepts.ResourceIdentifier)]
 		public Guid ComponentID { get; set; }
 		/// <summary>
 		/// the list of hole size of the open hole section

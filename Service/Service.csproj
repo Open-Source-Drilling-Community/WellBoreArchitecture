@@ -25,6 +25,7 @@
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="ServiceTest" />
+        <Compile Include="../ModelSharedOut/SemanticOpenApiExtensions.cs" Link="SemanticOpenApiExtensions.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

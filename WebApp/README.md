@@ -71,3 +71,7 @@ The current work has been funded by the [Research Council of Norway](https://www
 The host uses OSDC Field, Cluster, Rig, Well, and WellBore page packages for contextual data. The contextual menu intentionally excludes Cartographic Projection, Geodetic Datum, and Spheroid management pages. Cartographic conversion, Earth Vertical Datum, Earth Gravity, and Earth Magnetic Field remain available under Calculators. Local wrapper routes prevent the Earth packages' own home routes from conflicting with the application home page.
 
 Keep development and production settings aligned with their respective deployments.
+
+## Curated architecture semantics (0.10.0)
+
+The Home page explains along-hole versus vertical coordinates, WGS84 canonical storage, local connector position, physical extents and differential-pressure capacities. Supported presentation references remain selectable. The reusable WebPages project includes the connector-coordinate correction and LengthStandard display precision.

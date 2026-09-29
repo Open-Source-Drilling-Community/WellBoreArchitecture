@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Extensions;
@@ -50,6 +50,7 @@ public static class SwaggerMiddlewareExtensions
         using var stream = File.OpenRead(filePath);
         var reader = new OpenApiStreamReader();
         var document = reader.Read(stream, out var diagnostic);
+        OSDC.Drilling.WellBoreArchitecture.Contracts.SemanticOpenApiExtensions.Restore(document, File.ReadAllText(filePath));
 
         if (diagnostic.Errors.Count > 0)
         {

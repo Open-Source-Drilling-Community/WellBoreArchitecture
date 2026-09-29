@@ -20,7 +20,11 @@ public class ResourceClassificationContractTests
         services.AddLogging();
         services.AddControllers().AddApplicationPart(typeof(WellBoreArchitectureController).Assembly)
             .AddJsonOptions(options => JsonSettings.ApplyTo(options.JsonSerializerOptions));
-        services.AddSwaggerGen(options => options.CustomSchemaIds(type => type.FullName));
+        services.AddSwaggerGen(options =>
+        {
+            options.CustomSchemaIds(type => type.FullName);
+            options.SchemaFilter<SemanticSchemaFilter>();
+        });
         await using var app = builder.Build();
         var document = app.Services.GetRequiredService<ISwaggerProvider>().GetSwagger("v1");
         using var text = new StringWriter(CultureInfo.InvariantCulture);

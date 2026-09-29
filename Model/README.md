@@ -84,3 +84,9 @@ if (architecture.Calculate())
 ## Shared resource classification
 
 The five `WellBoreArchitectureIdentity*` and `WellBoreArchitectureFeature*` DTOs inherit their implementation from `OSDC.DotnetLibraries.General.ResourceClassification` 0.1.0. The category uses `FeatureCategory<WellBoreArchitectureFeatureOption>` to preserve its concrete option type and DataManagement interface adapter. Property names, null collections, UUIDs, timestamps and validity bounds remain unchanged; constructors do not assign identifiers or timestamps. ComponentID remains an architecture-specific concern. Model tests cover legacy JSON round trips and typed option adaptation.
+
+## Curated architecture semantics (0.10.0)
+
+Model annotations bind reviewed catalogue 0.10.0 concepts. `EngineeringQuantityAttribute` identifies each Gaussian/scalar measurand, uncertainty and field role; `ProviderSemantics` adds inherited classification and shared-wrapper bindings. Quantities are attached at `/GaussianValue/Mean`, `/GaussianValue/StandardDeviation`, domain-bound paths and `/DiracDistributionValue/Value` in the containing property's context. Shared wrapper types remain quantity-neutral.
+
+References apply to canonical storage/API values only. Casing top/cement-top coordinates use AlongHoleDepth; wellhead/hanger/fluid-top coordinates use EllipsoidalDepth. Connector Position starts at the host top and increases downward; it is not a WGS84 coordinate. Uncertainty has no origin offset. Null standard deviation is unspecified. Bounds are domain limits, not confidence limits or an assertion of Gaussian truncation.

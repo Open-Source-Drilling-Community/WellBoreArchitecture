@@ -101,4 +101,12 @@ Physical values use SI units. Deterministic properties use `DiracDistributionVal
 
 ## Shared resource classification
 
-Identity and feature DTO implementations come from ResourceClassification 0.1.0 through Model. Catalogue tables, seeded UUIDs, validation, backup/restore and transaction handling remain service-owned. This extraction introduces no new validation rules or data migration. The in-process Swagger regression test confirms all service-owned schemas and REST paths match the checked-in OpenAPI document.
+Identity and feature DTO implementations come from ResourceClassification 0.1.0 through Model. Catalogue tables, seeded UUIDs, validation, backup/restore and transaction handling remain service-owned. This extraction introduces no new validation rules or data migration. The in-process Swagger regression test includes the semantic filter and confirms that all service-owned schemas and REST paths match the current checked-in OpenAPI document.
+
+## Curated architecture semantics (0.10.0)
+
+`SemanticSchemaFilter` publishes `x-osdc-semantic` and property-context `x-osdc-semantic-bindings` from the Model registry. MCP definitions use the same registry, including nested engineering components, catalogue assignments, light records, granular mutations and backup/restore components. Reviewed catalogue version is 0.10.0; canonical drilling reference profile is 1.1.0. Metadata describes meaning, not additional runtime validation.
+
+The payload shape and database schema remain unchanged. Descriptions now distinguish stress from force, differential from absolute pressure, extents from coordinates, and local connector position from vertical depth. Regenerate the service OpenAPI and ModelSharedOut before publishing images.
+
+`SemanticOpenApiExtensions` restores semantic extension values from raw JSON after OpenAPI parsing, both during schema merging and when serving Swagger. This preserves string versions such as `1.1.0`, which the reader otherwise treats as dates. A regression test checks all 43 engineering bindings through both stages.

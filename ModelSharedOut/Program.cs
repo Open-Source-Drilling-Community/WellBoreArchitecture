@@ -163,6 +163,7 @@ class Program
                         PrettyPrint(file, "Processing Open Api doc into API client...");
                         var stream = File.OpenRead(file);
                         var doc = new OpenApiStreamReader().Read(stream, out var diagnostic);
+                        OSDC.Drilling.WellBoreArchitecture.Contracts.SemanticOpenApiExtensions.Restore(doc, File.ReadAllText(file));
 
                         // Merge paths
                         foreach (var p in doc.Paths)
@@ -211,7 +212,7 @@ class Program
                         ResponseArrayType = "System.Collections.Generic.List"
                     };
                     var generator = new CSharpClientGenerator(nswDocument, settings);
-                    var code = generator.GenerateFile();
+                    var code = string.Join(Environment.NewLine, generator.GenerateFile().Split('\n').Select(line => line.TrimEnd()));
                     using (StreamWriter writer = new StreamWriter(modelSharedDir + Path.DirectorySeparatorChar + CSHARP_MODEL))
                     {
                         writer.WriteLine(code);

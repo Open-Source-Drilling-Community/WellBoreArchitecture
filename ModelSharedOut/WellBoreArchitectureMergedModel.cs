@@ -17019,6 +17019,9 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class MetaInfo
     {
+        /// <summary>
+        /// A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ID")]
         public System.Guid ID { get; set; }
@@ -27760,12 +27763,23 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class BoreHoleSize
     {
+        /// <summary>
+        /// Stable component UUID scoped to the containing architecture; not a physical dimension.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ComponentID")]
         public System.Guid ComponentID { get; set; }
 
+        /// <summary>
+        /// Diameter of the borehole over the applicable interval. Physical quantity: DiameterPipeDrilling; SI unit: metres (m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("HoleSize")]
         public GaussianDrillingProperty HoleSize { get; set; }
+
+        /// <summary>
+        /// Additive geometric extent of a physical interval; distinct from a position coordinate. Extent of the interval to which a borehole diameter applies. Physical quantity: LengthStandard; SI unit: metres (m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("Length")]
         public GaussianDrillingProperty Length { get; set; }
@@ -27784,15 +27798,30 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class CasingSection
     {
+        /// <summary>
+        /// Stable component UUID scoped to the containing architecture; not a physical dimension.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ComponentID")]
         public System.Guid ComponentID { get; set; }
 
+        /// <summary>
+        /// Curvilinear abscissa along an oriented wellbore path, expressed as accumulated arc length from the origin established by the applicable reference convention. It may be planned, calculated, interpolated or measured. Along-hole location of the casing top; bind to AlongHoleDepth under the canonical drilling profile. Physical quantity: DepthDrilling; SI unit: metres (m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions. Zero along-hole depth is the intersection of the oriented wellbore path, or its defined extension, with the WGS84 ellipsoid. The coordinate is signed accumulated arc length from that intersection along the declared path orientation. It is not obtained by adding or subtracting a vertical elevation offset. This reference applies to canonical storage and APIs; supported user-selected presentation references remain allowed.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("TopDepth")]
         public GaussianDrillingProperty TopDepth { get; set; }
 
+        /// <summary>
+        /// Additive geometric extent of a physical interval; distinct from a position coordinate. Extent of the specified construction section or component interval. Physical quantity: LengthStandard; SI unit: metres (m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("Length")]
         public GaussianDrillingProperty Length { get; set; }
+
+        /// <summary>
+        /// Curvilinear abscissa along an oriented wellbore path, expressed as accumulated arc length from the origin established by the applicable reference convention. It may be planned, calculated, interpolated or measured. Along-hole location of the top of cement; bind to AlongHoleDepth under the canonical drilling profile. Physical quantity: DepthDrilling; SI unit: metres (m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions. Zero along-hole depth is the intersection of the oriented wellbore path, or its defined extension, with the WGS84 ellipsoid. The coordinate is signed accumulated arc length from that intersection along the declared path orientation. It is not obtained by adding or subtracting a vertical elevation offset. This reference applies to canonical storage and APIs; supported user-selected presentation references remain allowed.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("TopCementDepth")]
         public GaussianDrillingProperty TopCementDepth { get; set; }
@@ -27817,57 +27846,128 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class CasingSectionElement
     {
+        /// <summary>
+        /// Stable component UUID scoped to the containing architecture; not a physical dimension.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ComponentID")]
         public System.Guid ComponentID { get; set; }
 
+        /// <summary>
+        /// Diameter of a tubular or component body with an explicit inner, outer or envelope role. Diameter of the exterior body. Physical quantity: DiameterPipeDrilling; SI unit: metres (m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("BodyOD")]
         public GaussianDrillingProperty BodyOD { get; set; }
+
+        /// <summary>
+        /// Diameter of a tubular or component body with an explicit inner, outer or envelope role. Diameter of the interior opening; SideElement.ID denotes this dimension, not an identifier. Physical quantity: DiameterPipeDrilling; SI unit: metres (m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("BodyID")]
         public GaussianDrillingProperty BodyID { get; set; }
 
+        /// <summary>
+        /// Diameter of a tubular or component body with an explicit inner, outer or envelope role. Exterior diameter at the collar. Physical quantity: DiameterPipeDrilling; SI unit: metres (m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("CollarOD")]
         public GaussianDrillingProperty CollarOD { get; set; }
+
+        /// <summary>
+        /// Additive geometric extent of a physical interval; distinct from a position coordinate. Extent of a casing joint. Physical quantity: LengthStandard; SI unit: metres (m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("JointLength")]
         public GaussianDrillingProperty JointLength { get; set; }
 
+        /// <summary>
+        /// Additive geometric extent of a physical interval; distinct from a position coordinate. Extent of the specified construction section or component interval. Physical quantity: LengthStandard; SI unit: metres (m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("SectionLength")]
         public GaussianDrillingProperty SectionLength { get; set; }
+
+        /// <summary>
+        /// Maximum allowable path curvature for the applicable component, not a survey angle or observed curvature. Physical quantity: CurvatureDrilling; SI unit: radians per metre (rad/m). The SI value is stored at DiracDistributionValue.Value; MinValue/MaxValue are domain bounds in the same unit and reference.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("MaxDLS")]
         public ScalarDrillingProperty MaxDLS { get; set; }
 
+        /// <summary>
+        /// Textual connection or thread specification; distinct from network connectivity.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("ConnectionType")]
         public string ConnectionType { get; set; }
+
+        /// <summary>
+        /// Material grade designation interpreted within its material and applicable standard; text alone does not determine a strength value.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("Grade")]
         public string Grade { get; set; }
 
+        /// <summary>
+        /// Mass density of component material; not inferred from an environmental fluid classification. Physical quantity: MassDensityDrilling; SI unit: kg/m³. GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("MaterialDensity")]
         public GaussianDrillingProperty MaterialDensity { get; set; }
+
+        /// <summary>
+        /// Young modulus describing elastic stiffness of material, not absolute pressure. Physical quantity: ElasticModulus; SI unit: pascals (Pa). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("YoungModulus")]
         public GaussianDrillingProperty YoungModulus { get; set; }
 
+        /// <summary>
+        /// Mass per unit length, including collars where specified; not force per length. Physical quantity: MassGradientPerLengthDrilling; SI unit: kilograms per metre (kg/m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("LinearWeight")]
         public GaussianDrillingProperty LinearWeight { get; set; }
+
+        /// <summary>
+        /// Material tensile strength expressed as stress, distinct from component axial force capacity. Physical quantity: DrillStemMaterialStrengthDrilling; SI unit: pascals (Pa). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("TensileStrength")]
         public GaussianDrillingProperty TensileStrength { get; set; }
 
+        /// <summary>
+        /// Torque limit of a specified component or connection; not shear stress. Physical quantity: TorqueDrilling; SI unit: N·m. GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("TorsionalStrength")]
         public GaussianDrillingProperty TorsionalStrength { get; set; }
+
+        /// <summary>
+        /// Limiting internal-minus-external pressure difference for the specified component and burst criterion. Physical quantity: PressureDrilling; SI unit: pascals (Pa). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("BurstPressure")]
         public GaussianDrillingProperty BurstPressure { get; set; }
 
+        /// <summary>
+        /// Limiting external-minus-internal pressure difference for the specified component and collapse criterion. Physical quantity: PressureDrilling; SI unit: pascals (Pa). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("CollapsePressure")]
         public GaussianDrillingProperty CollapsePressure { get; set; }
 
+        /// <summary>
+        /// Material stress at the stated yield criterion; distinct from ultimate tensile strength. Physical quantity: DrillStemMaterialStrengthDrilling; SI unit: pascals (Pa). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("YieldStress")]
         public GaussianDrillingProperty YieldStress { get; set; }
+
+        /// <summary>
+        /// Recommended assembly make-up torque for the specified connection; not torsional failure capacity. Physical quantity: TorqueDrilling; SI unit: N·m. The SI value is stored at DiracDistributionValue.Value; MinValue/MaxValue are domain bounds in the same unit and reference.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("MakeUpTorqueRecommended")]
         public ScalarDrillingProperty MakeUpTorqueRecommended { get; set; }
@@ -27886,12 +27986,23 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class ElementConnectivity
     {
+        /// <summary>
+        /// Stable component UUID scoped to the containing architecture; not a physical dimension.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ComponentID")]
         public System.Guid ComponentID { get; set; }
 
+        /// <summary>
+        /// Pipe, hose, valve, choke or pump forming part of a side-circuit network.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("UpstreamElement")]
         public SideElement UpstreamElement { get; set; }
+
+        /// <summary>
+        /// Pipe, hose, valve, choke or pump forming part of a side-circuit network.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("DownstreamElement")]
         public SideElement DownstreamElement { get; set; }
@@ -27922,6 +28033,9 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class OpenHoleSection
     {
+        /// <summary>
+        /// Stable component UUID scoped to the containing architecture; not a physical dimension.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ComponentID")]
         public System.Guid ComponentID { get; set; }
@@ -27943,12 +28057,23 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class SideConnector
     {
+        /// <summary>
+        /// Stable component UUID scoped to the containing architecture; not a physical dimension.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ComponentID")]
         public System.Guid ComponentID { get; set; }
 
+        /// <summary>
+        /// Curvilinear position along the host component from its top, increasing downward along the host; not a global wellbore depth. Physical quantity: LengthStandard; SI unit: metres (m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions. Zero is the top of the identified host component; the coordinate increases downward along its path. This reference applies to canonical storage and APIs; supported user-selected presentation references remain allowed.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("Position")]
         public GaussianDrillingProperty Position { get; set; }
+
+        /// <summary>
+        /// Negative ellipsoidal height measured along the ellipsoid normal: positive inward from the reference ellipsoid. Vertical location of a side connector; bind to EllipsoidalDepth under the canonical drilling profile. Physical quantity: DepthDrilling; SI unit: metres (m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions. WGS84 geodetic latitude/longitude with Greenwich origin and ellipsoidal depth positive downward; not a fully specified terrestrial frame realization or epoch. This reference applies to canonical storage and APIs; supported user-selected presentation references remain allowed.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("VerticalDepth")]
         public GaussianDrillingProperty VerticalDepth { get; set; }
@@ -27973,25 +28098,52 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class SideElement
     {
+        /// <summary>
+        /// Stable component UUID scoped to the containing architecture; not a physical dimension.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ComponentID")]
         public System.Guid ComponentID { get; set; }
 
+        /// <summary>
+        /// Human-readable name of a resource, definition or option; not necessarily unique or stable.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
+
+        /// <summary>
+        /// Finite classification of side circuit element kind.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("Type")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
         public SideElementType Type { get; set; }
 
+        /// <summary>
+        /// Additive geometric extent of a physical interval; distinct from a position coordinate. Extent of the specified construction section or component interval. Physical quantity: LengthStandard; SI unit: metres (m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("Length")]
         public GaussianDrillingProperty Length { get; set; }
+
+        /// <summary>
+        /// Negative ellipsoidal height measured along the ellipsoid normal: positive inward from the reference ellipsoid. Role of the shallower vertical depth limit of a delineated domain; distinct from measured depth along a borehole. Physical quantity: DepthDrilling; SI unit: metres (m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions. WGS84 geodetic latitude/longitude with Greenwich origin and ellipsoidal depth positive downward; not a fully specified terrestrial frame realization or epoch. This reference applies to canonical storage and APIs; supported user-selected presentation references remain allowed.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("TopVerticalDepth")]
         public GaussianDrillingProperty TopVerticalDepth { get; set; }
 
+        /// <summary>
+        /// Diameter of a tubular or component body with an explicit inner, outer or envelope role. Diameter of the exterior body. Physical quantity: DiameterPipeDrilling; SI unit: metres (m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("OD")]
         public GaussianDrillingProperty OD { get; set; }
+
+        /// <summary>
+        /// Diameter of a tubular or component body with an explicit inner, outer or envelope role. Diameter of the interior opening; SideElement.ID denotes this dimension, not an identifier. Physical quantity: DiameterPipeDrilling; SI unit: metres (m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ID")]
         public GaussianDrillingProperty ID { get; set; }
@@ -28034,49 +28186,108 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class SurfaceSection
     {
+        /// <summary>
+        /// Stable component UUID scoped to the containing architecture; not a physical dimension.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ComponentID")]
         public System.Guid ComponentID { get; set; }
+
+        /// <summary>
+        /// Finite classification of surface section kind.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("Type")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
         public SurfaceSectionType Type { get; set; }
 
+        /// <summary>
+        /// Additive geometric extent of a physical interval; distinct from a position coordinate. Extent of the specified construction section or component interval. Physical quantity: LengthStandard; SI unit: metres (m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("SectionLength")]
         public GaussianDrillingProperty SectionLength { get; set; }
+
+        /// <summary>
+        /// Diameter of a tubular or component body with an explicit inner, outer or envelope role. Diameter of the exterior body. Physical quantity: DiameterPipeDrilling; SI unit: metres (m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("BodyOD")]
         public GaussianDrillingProperty BodyOD { get; set; }
 
+        /// <summary>
+        /// Diameter of a tubular or component body with an explicit inner, outer or envelope role. Diameter of the interior opening; SideElement.ID denotes this dimension, not an identifier. Physical quantity: DiameterPipeDrilling; SI unit: metres (m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("BodyID")]
         public GaussianDrillingProperty BodyID { get; set; }
+
+        /// <summary>
+        /// Textual connection or thread specification; distinct from network connectivity.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ConnectionType")]
         public string ConnectionType { get; set; }
 
+        /// <summary>
+        /// Material grade designation interpreted within its material and applicable standard; text alone does not determine a strength value.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("Grade")]
         public string Grade { get; set; }
+
+        /// <summary>
+        /// Mass density of component material; not inferred from an environmental fluid classification. Physical quantity: MassDensityDrilling; SI unit: kg/m³. GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("MaterialDensity")]
         public GaussianDrillingProperty MaterialDensity { get; set; }
 
+        /// <summary>
+        /// Young modulus describing elastic stiffness of material, not absolute pressure. Physical quantity: ElasticModulus; SI unit: pascals (Pa). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("YoungModulus")]
         public GaussianDrillingProperty YoungModulus { get; set; }
+
+        /// <summary>
+        /// Mass per unit length, including collars where specified; not force per length. Physical quantity: MassGradientPerLengthDrilling; SI unit: kilograms per metre (kg/m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("LinearWeight")]
         public GaussianDrillingProperty LinearWeight { get; set; }
 
+        /// <summary>
+        /// Material tensile strength expressed as stress, distinct from component axial force capacity. Physical quantity: DrillStemMaterialStrengthDrilling; SI unit: pascals (Pa). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("TensileStrength")]
         public GaussianDrillingProperty TensileStrength { get; set; }
+
+        /// <summary>
+        /// Limiting internal-minus-external pressure difference for the specified component and burst criterion. Physical quantity: PressureDrilling; SI unit: pascals (Pa). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("BurstPressure")]
         public GaussianDrillingProperty BurstPressure { get; set; }
 
+        /// <summary>
+        /// Limiting external-minus-internal pressure difference for the specified component and collapse criterion. Physical quantity: PressureDrilling; SI unit: pascals (Pa). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("CollapsePressure")]
         public GaussianDrillingProperty CollapsePressure { get; set; }
 
+        /// <summary>
+        /// Material stress at the stated yield criterion; distinct from ultimate tensile strength. Physical quantity: DrillStemMaterialStrengthDrilling; SI unit: pascals (Pa). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("YieldStress")]
         public GaussianDrillingProperty YieldStress { get; set; }
+
+        /// <summary>
+        /// Recommended assembly make-up torque for the specified connection; not torsional failure capacity. Physical quantity: TorqueDrilling; SI unit: N·m. The SI value is stored at DiracDistributionValue.Value; MinValue/MaxValue are domain bounds in the same unit and reference.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("MakeUpTorqueRecommended")]
         public ScalarDrillingProperty MakeUpTorqueRecommended { get; set; }
@@ -28176,18 +28387,37 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WellBoreArchitecture
     {
+        /// <summary>
+        /// Identity and service-location metadata accompanying a managed resource; a locator is not the semantic identity.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("MetaInfo")]
         public MetaInfo MetaInfo { get; set; }
 
+        /// <summary>
+        /// Human-readable name of a resource, definition or option; not necessarily unique or stable.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
+
+        /// <summary>
+        /// Human-readable descriptive text about a resource.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("Description")]
         public string Description { get; set; }
 
+        /// <summary>
+        /// A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("CreationDate")]
         public System.DateTimeOffset? CreationDate { get; set; }
+
+        /// <summary>
+        /// Server-owned last-modification timestamp and optimistic-concurrency token; echo exactly on update or delete.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("LastModificationDate")]
         public System.DateTimeOffset? LastModificationDate { get; set; }
@@ -28197,6 +28427,10 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 
         [System.Text.Json.Serialization.JsonPropertyName("WellBoreArchitectureFeatureAssignments")]
         public System.Collections.Generic.List<WellBoreArchitectureFeatureAssignment> WellBoreArchitectureFeatureAssignments { get; set; }
+
+        /// <summary>
+        /// UUID of the externally owned WellBore resource to which this architecture belongs; not an embedded path or architecture UUID.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("WellBoreID")]
         public System.Guid? WellBoreID { get; set; }
@@ -28602,6 +28836,10 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("WellBoreArchitectureID")]
         public System.Guid WellBoreArchitectureID { get; set; }
 
+        /// <summary>
+        /// UUID of the externally owned WellBore resource to which this architecture belongs; not an embedded path or architecture UUID.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("WellBoreID")]
         public System.Guid? WellBoreID { get; set; }
 
@@ -28647,18 +28885,37 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WellBoreArchitectureFeatureAssignment
     {
+        /// <summary>
+        /// A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ID")]
         public System.Guid ID { get; set; }
 
+        /// <summary>
+        /// A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("FeatureCategoryID")]
         public System.Guid? FeatureCategoryID { get; set; }
+
+        /// <summary>
+        /// A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("FeatureOptionID")]
         public System.Guid? FeatureOptionID { get; set; }
 
+        /// <summary>
+        /// A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("FromDate")]
         public System.DateTimeOffset? FromDate { get; set; }
+
+        /// <summary>
+        /// A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ToDate")]
         public System.DateTimeOffset? ToDate { get; set; }
@@ -28677,15 +28934,30 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WellBoreArchitectureFeatureCategory
     {
+        /// <summary>
+        /// Identity and service-location metadata accompanying a managed resource; a locator is not the semantic identity.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("MetaInfo")]
         public MetaInfo MetaInfo { get; set; }
 
+        /// <summary>
+        /// Human-readable name of a resource, definition or option; not necessarily unique or stable.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
+        /// <summary>
+        /// Boolean rule declaring that at most one category assignment may be active on a resource at the same instant.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("IsExclusive")]
         public bool IsExclusive { get; set; }
+
+        /// <summary>
+        /// Boolean rule indicating whether assignments in a category may carry validity bounds.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("HasValidityPeriod")]
         public bool HasValidityPeriod { get; set; }
@@ -28693,8 +28965,16 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("Options")]
         public System.Collections.Generic.List<WellBoreArchitectureFeatureOption> Options { get; set; }
 
+        /// <summary>
+        /// A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("CreationDate")]
         public System.DateTimeOffset? CreationDate { get; set; }
+
+        /// <summary>
+        /// Server-owned last-modification timestamp and optimistic-concurrency token; echo exactly on update or delete.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("LastModificationDate")]
         public System.DateTimeOffset? LastModificationDate { get; set; }
@@ -28713,9 +28993,16 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WellBoreArchitectureFeatureOption
     {
+        /// <summary>
+        /// A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ID")]
         public System.Guid ID { get; set; }
+
+        /// <summary>
+        /// Human-readable name of a resource, definition or option; not necessarily unique or stable.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
@@ -28734,10 +29021,17 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WellBoreArchitectureFluid
     {
+        /// <summary>
+        /// Finite classification of environmental fluid kind.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("Fluid")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
         public FluidType Fluid { get; set; }
+
+        /// <summary>
+        /// Negative ellipsoidal height measured along the ellipsoid normal: positive inward from the reference ellipsoid. Top boundary of an environmental fluid layer, represented by vertical EllipsoidalDepth. Physical quantity: DepthDrilling; SI unit: metres (m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions. WGS84 geodetic latitude/longitude with Greenwich origin and ellipsoidal depth positive downward; not a fully specified terrestrial frame realization or epoch. This reference applies to canonical storage and APIs; supported user-selected presentation references remain allowed.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("Depth")]
         public GaussianDrillingProperty Depth { get; set; }
@@ -28756,15 +29050,30 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WellBoreArchitectureIdentity
     {
+        /// <summary>
+        /// Identity and service-location metadata accompanying a managed resource; a locator is not the semantic identity.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("MetaInfo")]
         public MetaInfo MetaInfo { get; set; }
 
+        /// <summary>
+        /// Human-readable name of a resource, definition or option; not necessarily unique or stable.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
+        /// <summary>
+        /// A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("CreationDate")]
         public System.DateTimeOffset? CreationDate { get; set; }
+
+        /// <summary>
+        /// Server-owned last-modification timestamp and optimistic-concurrency token; echo exactly on update or delete.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("LastModificationDate")]
         public System.DateTimeOffset? LastModificationDate { get; set; }
@@ -28783,12 +29092,23 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WellBoreArchitectureIdentityAssignment
     {
+        /// <summary>
+        /// A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ID")]
         public System.Guid ID { get; set; }
 
+        /// <summary>
+        /// A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("IdentityID")]
         public System.Guid? IdentityID { get; set; }
+
+        /// <summary>
+        /// Value identifying a resource within a selected identification scheme; its interpretation and uniqueness depend on that scheme.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("Value")]
         public string Value { get; set; }
@@ -28807,18 +29127,37 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WellBoreArchitectureLight
     {
+        /// <summary>
+        /// Identity and service-location metadata accompanying a managed resource; a locator is not the semantic identity.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("MetaInfo")]
         public MetaInfo MetaInfo { get; set; }
 
+        /// <summary>
+        /// Human-readable name of a resource, definition or option; not necessarily unique or stable.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
+
+        /// <summary>
+        /// Human-readable descriptive text about a resource.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("Description")]
         public string Description { get; set; }
 
+        /// <summary>
+        /// A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("CreationDate")]
         public System.DateTimeOffset? CreationDate { get; set; }
+
+        /// <summary>
+        /// Server-owned last-modification timestamp and optimistic-concurrency token; echo exactly on update or delete.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("LastModificationDate")]
         public System.DateTimeOffset? LastModificationDate { get; set; }
@@ -28837,18 +29176,37 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WellHead
     {
+        /// <summary>
+        /// Diameter of a tubular or component body with an explicit inner, outer or envelope role. Maximum outside diameter of the wellhead geometric envelope, not a statistical upper bound. Physical quantity: DiameterPipeDrilling; SI unit: metres (m). The SI value is stored at DiracDistributionValue.Value; MinValue/MaxValue are domain bounds in the same unit and reference.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("MaxOD")]
         public ScalarDrillingProperty MaxOD { get; set; }
 
+        /// <summary>
+        /// Diameter of a tubular or component body with an explicit inner, outer or envelope role. Minimum outside diameter of the wellhead geometric envelope, not a statistical lower bound. Physical quantity: DiameterPipeDrilling; SI unit: metres (m). The SI value is stored at DiracDistributionValue.Value; MinValue/MaxValue are domain bounds in the same unit and reference.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("MinOD")]
         public ScalarDrillingProperty MinOD { get; set; }
+
+        /// <summary>
+        /// Negative ellipsoidal height measured along the ellipsoid normal: positive inward from the reference ellipsoid. Vertical location of the wellhead; bind to EllipsoidalDepth under the canonical drilling profile. Physical quantity: DepthDrilling; SI unit: metres (m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions. WGS84 geodetic latitude/longitude with Greenwich origin and ellipsoidal depth positive downward; not a fully specified terrestrial frame realization or epoch. This reference applies to canonical storage and APIs; supported user-selected presentation references remain allowed.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("Depth")]
         public GaussianDrillingProperty Depth { get; set; }
 
+        /// <summary>
+        /// Negative ellipsoidal height measured along the ellipsoid normal: positive inward from the reference ellipsoid. Vertical location of the casing hanger; bind to EllipsoidalDepth under the canonical drilling profile. Physical quantity: DepthDrilling; SI unit: metres (m). The SI value is stored at DiracDistributionValue.Value; MinValue/MaxValue are domain bounds in the same unit and reference. WGS84 geodetic latitude/longitude with Greenwich origin and ellipsoidal depth positive downward; not a fully specified terrestrial frame realization or epoch. This reference applies to canonical storage and APIs; supported user-selected presentation references remain allowed.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("CasingHangerDepth")]
         public ScalarDrillingProperty CasingHangerDepth { get; set; }
+
+        /// <summary>
+        /// Negative ellipsoidal height measured along the ellipsoid normal: positive inward from the reference ellipsoid. Vertical location of the tubing hanger; bind to EllipsoidalDepth under the canonical drilling profile. Physical quantity: DepthDrilling; SI unit: metres (m). The SI value is stored at DiracDistributionValue.Value; MinValue/MaxValue are domain bounds in the same unit and reference. WGS84 geodetic latitude/longitude with Greenwich origin and ellipsoidal depth positive downward; not a fully specified terrestrial frame realization or epoch. This reference applies to canonical storage and APIs; supported user-selected presentation references remain allowed.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("TubingHangerDepth")]
         public ScalarDrillingProperty TubingHangerDepth { get; set; }
