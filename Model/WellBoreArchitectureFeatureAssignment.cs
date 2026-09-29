@@ -1,13 +1,8 @@
-using OSDC.DotnetLibraries.General.DataManagement;
-using System;
+using OSDC.DotnetLibraries.General.ResourceClassification;
 
 namespace OSDC.Drilling.WellBoreArchitecture.Model;
 
-public class WellBoreArchitectureFeatureAssignment : IFeatureAssignment
+/// <summary>Architecture classification contract backed by the shared resource classification implementation.</summary>
+public class WellBoreArchitectureFeatureAssignment : FeatureAssignment
 {
-    public Guid ID { get; set; }
-    public Guid? FeatureCategoryID { get; set; }
-    public Guid? FeatureOptionID { get; set; }
-    public DateTimeOffset? FromDate { get; set; }
-    public DateTimeOffset? ToDate { get; set; }
 }

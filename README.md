@@ -103,3 +103,7 @@ All WellBoreArchitecture-owned namespaces, generated contracts, Razor assets, pa
 The SQLite filename and persistent-volume mount remain `WellBoreArchitecture.db` under `/home`. Schema version 3 stores the aggregate-level open-hole representation. Version-2 databases require the explicit, fail-closed open-hole audit and migration commands before normal startup; unknown, ambiguous, malformed, or newer data is never rewritten automatically. The former automatic 90-day deletion service has been removed.
 
 Before a Kubernetes cutover, take and verify a snapshot of `wellborearchitecture-claim`, scale the legacy service deployment to zero so two SQLite writers cannot overlap, and use the existing claim through `persistence.existingClaim=wellborearchitecture-claim` if installing under a new Helm release. The service chart uses the `Recreate` strategy and marks newly managed PVCs with `helm.sh/resource-policy: keep`.
+
+## Shared resource classification
+
+The model uses `OSDC.DotnetLibraries.General.ResourceClassification` 0.1.0 for identity definitions/assignments and feature categories/options/assignments. Service-specific class names remain as thin subclasses, preserving stored JSON and REST/MCP payloads. No database migration or new membership catalogue is introduced. Catalogue ownership, defaults and validation remain service responsibilities.

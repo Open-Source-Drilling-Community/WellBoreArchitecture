@@ -1,11 +1,8 @@
-using OSDC.DotnetLibraries.General.DataManagement;
-using System;
+using OSDC.DotnetLibraries.General.ResourceClassification;
 
 namespace OSDC.Drilling.WellBoreArchitecture.Model;
 
-public class WellBoreArchitectureIdentityAssignment : IIdentityAssignment
+/// <summary>Architecture classification contract backed by the shared resource classification implementation.</summary>
+public class WellBoreArchitectureIdentityAssignment : IdentityAssignment
 {
-    public Guid ID { get; set; }
-    public Guid? IdentityID { get; set; }
-    public string? Value { get; set; }
 }

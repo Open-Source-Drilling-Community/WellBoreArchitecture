@@ -34,3 +34,7 @@ Trajectory is not a ModelSharedOut schema dependency of WellBore Architecture;
 only its host WebApp carries the shared Trajectory service URL for composed pages.
 
 Regenerate the shared output after changing this schema or the service REST contract, then rebuild its consumers to verify compatibility.
+
+## Shared resource classification
+
+ResourceClassification 0.1.0 adoption changes the Model implementation only. The service Swagger generator produces the same schemas and paths as the checked-in own-service OpenAPI input, verified by `ResourceClassificationContractTests`. Existing generated client, pseudo-constructors and merged document therefore remain applicable without regeneration.

@@ -98,3 +98,7 @@ Physical values use SI units. Deterministic properties use `DiracDistributionVal
 - Utility tool: `ping`
 - Optional external MCP-hub registration: configured in `appsettings.json`, disabled by default
 - WellBore reference checks: configure `WellBoreHostURL`; the Helm chart defaults to the in-cluster `http://osdcwellboreservice/`
+
+## Shared resource classification
+
+Identity and feature DTO implementations come from ResourceClassification 0.1.0 through Model. Catalogue tables, seeded UUIDs, validation, backup/restore and transaction handling remain service-owned. This extraction introduces no new validation rules or data migration. The in-process Swagger regression test confirms all service-owned schemas and REST paths match the checked-in OpenAPI document.

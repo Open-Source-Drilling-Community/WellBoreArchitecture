@@ -19,3 +19,7 @@ This project validates the WellBoreArchitecture service API and its MCP surface.
 - `McpServerHttpTests.cs` exercises MCP initialization, tool listing, and representative calls against a running service.
 
 The live HTTP tests require the service at the configured test base URL; database-safety and registration tests are self-contained. Run the suite with `dotnet test ServiceTest/ServiceTest.csproj`.
+
+## Shared resource classification
+
+`ResourceClassificationContractTests` creates an unstarted ASP.NET host and uses the service Swagger configuration to compare schemas and REST paths with `ModelSharedOut/json-schemas/WellBoreArchitectureFullName.json`. It requires no running endpoint or database. The model project also tests stored classification JSON compatibility and typed option adapters. Migration verification passed 8 model tests and 44 isolated service tests; the external HTTP fixtures (`ServiceTest.Tests` and `McpServerHttpTests`) were not run.

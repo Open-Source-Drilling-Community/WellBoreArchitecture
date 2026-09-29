@@ -80,3 +80,7 @@ if (architecture.Calculate())
 - Update or add unit tests in `ModelTest` so service builds remain stable.
 - Consider the impact on the REST contract (`Service`) and regenerate the shared model (`ModelSharedOut`) if the API surface changes.
 - Refresh DocFX output if you maintain published API documentation.
+
+## Shared resource classification
+
+The five `WellBoreArchitectureIdentity*` and `WellBoreArchitectureFeature*` DTOs inherit their implementation from `OSDC.DotnetLibraries.General.ResourceClassification` 0.1.0. The category uses `FeatureCategory<WellBoreArchitectureFeatureOption>` to preserve its concrete option type and DataManagement interface adapter. Property names, null collections, UUIDs, timestamps and validity bounds remain unchanged; constructors do not assign identifiers or timestamps. ComponentID remains an architecture-specific concern. Model tests cover legacy JSON round trips and typed option adaptation.
