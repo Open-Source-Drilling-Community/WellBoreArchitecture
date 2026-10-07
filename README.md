@@ -110,7 +110,7 @@ The model uses `OSDC.DotnetLibraries.General.ResourceClassification` 0.1.0 for i
 
 ## Curated architecture semantics (0.10.0)
 
-The Model references published `OSDC.DotnetLibraries.Drilling.SemanticCatalogue` **0.15.0** unconditionally, alongside ResourceClassification 0.1.0. REST and MCP share one provider binding registry. All 43 engineering fields declare physical quantities, SI units and contextual scalar/uncertainty bindings without changing payload shapes or stored values.
+The Model references published `OSDC.DotnetLibraries.Drilling.SemanticCatalogue` **0.16.0** unconditionally, alongside ResourceClassification 0.1.0. REST and MCP share one provider binding registry. All 43 engineering fields declare physical quantities, SI units and contextual scalar/uncertainty bindings without changing payload shapes or stored values.
 
 Casing top and top-of-cement are along-hole coordinates with the WGS84 path-intersection origin. Wellhead/hangers and fluid-layer tops are vertical WGS84 coordinates. SideConnector.Position is a local host-top/downward coordinate. Extents use LengthStandard; tensile strength is stress, torsional capacity is torque, and burst/collapse capacities are pressure differences. No TensileCapacity payload field is introduced. User-selected display references remain supported.
 
