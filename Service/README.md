@@ -105,7 +105,7 @@ Identity and feature DTO implementations come from ResourceClassification 0.1.0 
 
 ## Curated architecture semantics (0.10.0)
 
-`SemanticSchemaFilter` publishes `x-osdc-semantic` and property-context `x-osdc-semantic-bindings` from the Model registry. MCP definitions use the same registry, including nested engineering components, catalogue assignments, light records, granular mutations and backup/restore components. Reviewed catalogue version is 0.10.0; canonical drilling reference profile is 1.1.0. Metadata describes meaning, not additional runtime validation.
+`SemanticSchemaFilter` publishes `x-osdc-semantic` and property-context `x-osdc-semantic-bindings` from the Model registry. MCP definitions use the same registry, including nested engineering components, catalogue assignments, light records, granular mutations and backup/restore components. Retrieval identifiers carry the operation's resource type, and the external `WellBoreID` relationship identifies `wellbore` as its target type. Reviewed catalogue version is 0.18.0; canonical drilling reference profile is 1.1.0. Metadata describes meaning, not additional runtime validation.
 
 The payload shape and database schema remain unchanged. Descriptions now distinguish stress from force, differential from absolute pressure, extents from coordinates, and local connector position from vertical depth. Regenerate the service OpenAPI and ModelSharedOut before publishing images.
 

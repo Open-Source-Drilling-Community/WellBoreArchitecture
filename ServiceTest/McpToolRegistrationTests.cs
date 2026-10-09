@@ -124,6 +124,21 @@ public sealed class McpToolRegistrationTests
     }
 
     [Test]
+    public void Resource_identifiers_declare_their_target_resource_types()
+    {
+        IMcpTool read = _tools["well_bore_architecture_get_by_id"];
+        JsonObject inputId = (JsonObject)read.InputSchema!["properties"]!["id"]!;
+        JsonObject architecture = (JsonObject)read.OutputSchema!["$defs"]!["WellBoreArchitecture"]!;
+        JsonObject wellBoreId = (JsonObject)architecture["properties"]!["WellBoreID"]!;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(inputId[SemanticMetadata.ExtensionName]!["resourceType"]!.GetValue<string>(), Is.EqualTo(Concepts.WellBoreArchitecture));
+            Assert.That(wellBoreId[SemanticMetadata.ExtensionName]!["resourceType"]!.GetValue<string>(), Is.EqualTo(Concepts.WellBore));
+        });
+    }
+
+    [Test]
     public void Usage_statistics_are_not_exposed() => Assert.That(_tools.Keys, Has.None.Contains("statistics"));
 
     [Test]

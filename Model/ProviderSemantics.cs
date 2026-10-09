@@ -35,6 +35,13 @@ public static class ProviderSemantics
             Catalogue.OsdcCanonicalDrilling, assertionSource: "provider-binding-registry");
     }
 
+    public static JsonObject ResourceIdentifier(string resourceType)
+    {
+        JsonObject metadata = Metadata(Concepts.ResourceIdentifier);
+        metadata["resourceType"] = resourceType;
+        return metadata;
+    }
+
     public static JsonObject? ForType(Type type)
     {
         if (SemanticMetadata.For(type) is JsonObject direct) return direct;
@@ -49,6 +56,8 @@ public static class ProviderSemantics
 
     public static JsonObject? ForProperty(PropertyInfo property)
     {
+        if (property.DeclaringType == typeof(WellBoreArchitecture) && property.Name == nameof(WellBoreArchitecture.WellBoreID))
+            return ResourceIdentifier(Concepts.WellBore);
         if (SemanticMetadata.For(property) is JsonObject direct) return direct;
         if (property.GetCustomAttribute<EngineeringQuantityAttribute>() is { } engineering)
             return Metadata(engineering.Uncertainty != null ? Concepts.GaussianUncertainValue : Concepts.ScalarValueRepresentation, engineering.Role);

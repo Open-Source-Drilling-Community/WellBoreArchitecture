@@ -12,7 +12,15 @@ internal static class McpOperationSemantics
             : name.Contains("identity_assignment", StringComparison.Ordinal) ? Concepts.IdentityAssignment
             : name.Contains("feature_category", StringComparison.Ordinal) ? Concepts.FeatureCategory
             : name.Contains("identity", StringComparison.Ordinal) && !name.Contains("assignment", StringComparison.Ordinal) ? Concepts.IdentityDefinition : Concepts.WellBoreArchitecture;
-        schema[SemanticMetadata.ExtensionName] = SemanticMetadata.Create(concept, Classify(name), assertionSource: "provider-mcp-operation");
+        string role = Classify(name);
+        schema[SemanticMetadata.ExtensionName] = SemanticMetadata.Create(concept, role, assertionSource: "provider-mcp-operation");
+        if (role == Concepts.ResourceRetrieval && schema["required"] is JsonArray { Count: 1 } required &&
+            required[0]?.GetValue<string>() is string propertyName && schema["properties"]?[propertyName] is JsonObject property &&
+            property[SemanticMetadata.ExtensionName] is JsonObject identifier &&
+            identifier["concept"]?.GetValue<string>() == Concepts.ResourceIdentifier)
+        {
+            identifier["resourceType"] = concept;
+        }
         return schema;
     }
     private static string Classify(string name) =>
