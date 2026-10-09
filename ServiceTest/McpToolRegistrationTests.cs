@@ -6,6 +6,7 @@ using ModelContextProtocol.Server;
 using OSDC.Drilling.WellBoreArchitecture.Service.Controllers;
 using OSDC.Drilling.WellBoreArchitecture.Service.Mcp;
 using OSDC.Drilling.WellBoreArchitecture.Service.Mcp.Tools;
+using OSDC.DotnetLibraries.Drilling.SemanticCatalogue;
 
 namespace ServiceTest;
 
@@ -108,6 +109,18 @@ public sealed class McpToolRegistrationTests
             .Select(method => method.Name);
         Assert.That(endpoints, Is.EquivalentTo(EndpointToolMap.Keys.Take(12)));
         Assert.That(_tools.Keys, Is.EquivalentTo(EndpointToolMap.Values.Concat(AdditionalToolNames).Append("ping")));
+    }
+
+    [Test]
+    public void Inputs_declare_generic_resource_and_evaluation_roles()
+    {
+        string Role(string name) => _tools[name].InputSchema![SemanticMetadata.ExtensionName]!["role"]!.GetValue<string>();
+        Assert.That(Role("well_bore_architecture_get_all"), Is.EqualTo(Concepts.ResourceCollectionRetrieval));
+        Assert.That(Role("well_bore_architecture_get_by_id"), Is.EqualTo(Concepts.ResourceRetrieval));
+        Assert.That(Role("well_bore_architecture_create"), Is.EqualTo(Concepts.ResourceCreation));
+        Assert.That(Role("well_bore_architecture_details_update"), Is.EqualTo(Concepts.ResourcePartialUpdate));
+        Assert.That(Role("well_bore_architecture_delete_by_id"), Is.EqualTo(Concepts.ResourceDeletion));
+        Assert.That(Role("well_bore_architecture_validate_external_references"), Is.EqualTo(Concepts.StatelessEvaluation));
     }
 
     [Test]

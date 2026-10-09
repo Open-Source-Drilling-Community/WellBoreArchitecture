@@ -1,25 +1,28 @@
 using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
 using OSDC.Drilling.WellBoreArchitecture.ModelShared;
 
 namespace ServiceTest
 {
+    [NonParallelizable]
     public class Tests
     {
-        // testing outside Visual Studio requires using http port (https faces authentication issues both in console and on github)
-        private static string host = "http://localhost:8080/";
-        //private static string host = "https://localhost:5001/";
-        //private static string host = "https://localhost:44368/";
-        //private static string host = "http://localhost:54949/";
-        private static HttpClient httpClient;
-        private static Client nSwagClient;
+        private static WebApplicationFactory<Program> factory = null!;
+        private static HttpClient httpClient = null!;
+        private static Client nSwagClient = null!;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            var handler = new HttpClientHandler();
-            handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; }; // temporary workaround for testing purposes: bypass certificate validation (not recommended for production environments due to security risks)
-            httpClient = new HttpClient(handler);
-            httpClient.BaseAddress = new Uri(host + "WellBoreArchitecture/api/");
+            factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+            {
+                builder.UseContentRoot(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Service")));
+                builder.ConfigureLogging(logging => logging.ClearProviders());
+            });
+            httpClient = factory.CreateClient();
+            httpClient.BaseAddress = new Uri(httpClient.BaseAddress!, "WellBoreArchitecture/api/");
             httpClient.DefaultRequestHeaders.Accept.Clear();
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             nSwagClient = new Client(httpClient.BaseAddress.ToString(), httpClient);
@@ -496,6 +499,7 @@ namespace ServiceTest
         public void OneTimeTearDown()
         {
             httpClient?.Dispose();
+            factory?.Dispose();
         }
     }
 }
