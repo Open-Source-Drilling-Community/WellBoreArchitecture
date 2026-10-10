@@ -36,6 +36,8 @@ public static class WellBoreArchitectureRestMcpToolRegistrations
             (sp, _, ct) => Invoke(ct, () => Controller(sp).GetAllWellBoreArchitectureMetaInfo()));
         services.AddLegacyMcpTool("well_bore_architecture_get_by_id", "Retrieve one complete wellbore architecture by its resource UUID, including its external WellBore reference, wellhead, ordered fluid layers, ordered surface sections, side-circuit connectivity, casing sections, and open-hole sizes. Physical distribution values use SI units.", McpToolArgumentHelpers.CreateGuidSchema("id", "UUID of the wellbore-architecture resource to retrieve; this is not the referenced WellBoreID."),
             (sp, args, ct) => InvokeById(args, ct, id => Controller(sp).GetWellBoreArchitectureById(id)));
+        services.AddLegacyMcpTool("well_bore_architecture_get_borehole_diameter_at_abscissa", "Evaluate the outermost applicable borehole diameter at one along-hole depth. The read-only evaluator considers casing size rows and the final open-hole size rows, returns the selected interval, and retains all contributing component provenance.",
+            McpToolArgumentHelpers.CreateBoreholeDiameterAtAbscissaSchema(), InvokeBoreholeDiameterAtAbscissa);
         services.AddLegacyMcpTool("well_bore_architecture_get_all_light", "List lightweight wellbore-architecture records containing metadata, name, description, and timestamps. Use this for human-readable discovery and selection; it intentionally omits WellBoreID and all construction geometry and material data.", McpToolArgumentHelpers.CreateEmptySchema(),
             (sp, _, ct) => Invoke(ct, () => Controller(sp).GetAllWellBoreArchitectureLight()));
         services.AddLegacyMcpTool("well_bore_architecture_get_all", "Legacy unbounded convenience operation that retrieves every complete wellbore architecture. This can be a very large response and may be removed in a future major contract version; new clients must use well_bore_architecture_search, lightweight discovery, and get-by-id.", McpToolArgumentHelpers.CreateEmptySchema(),
@@ -499,6 +501,13 @@ public static class WellBoreArchitectureRestMcpToolRegistrations
         ct.ThrowIfCancellationRequested();
         return McpToolArgumentHelpers.TryParseGuid(args, "id", out Guid id, out JsonNode? error)
             ? Task.FromResult<JsonNode?>(McpActionResultConverter.FromActionResult(action(id))) : Task.FromResult(error);
+    }
+    private static Task<JsonNode?> InvokeBoreholeDiameterAtAbscissa(IServiceProvider sp, JsonObject? args, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        if (!McpToolArgumentHelpers.TryParseGuid(args, "id", out Guid id, out JsonNode? error)) return Task.FromResult(error);
+        if (!McpToolArgumentHelpers.TryParseDouble(args, "alongHoleDepth", out double depth, out error)) return Task.FromResult(error);
+        return Task.FromResult<JsonNode?>(McpActionResultConverter.FromActionResult(Controller(sp).GetBoreholeDiameterAtAbscissa(id, depth)));
     }
     private static async Task<JsonNode?> InvokeByGuidAsync<T>(JsonObject? args, string key, CancellationToken ct,
         Func<Guid, CancellationToken, Task<ActionResult<T>>> action)

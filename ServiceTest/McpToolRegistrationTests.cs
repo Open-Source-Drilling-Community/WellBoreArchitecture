@@ -18,6 +18,7 @@ public sealed class McpToolRegistrationTests
         ["GetAllWellBoreArchitectureId"] = "well_bore_architecture_get_all_ids",
         ["GetAllWellBoreArchitectureMetaInfo"] = "well_bore_architecture_get_all_meta_info",
         ["GetWellBoreArchitectureById"] = "well_bore_architecture_get_by_id",
+        ["GetBoreholeDiameterAtAbscissa"] = "well_bore_architecture_get_borehole_diameter_at_abscissa",
         ["GetAllWellBoreArchitectureLight"] = "well_bore_architecture_get_all_light",
         ["GetAllWellBoreArchitecture"] = "well_bore_architecture_get_all",
         ["PostWellBoreArchitecture"] = "well_bore_architecture_create",
@@ -107,7 +108,7 @@ public sealed class McpToolRegistrationTests
         var endpoints = typeof(WellBoreArchitectureController).GetMethods()
             .Where(method => method.GetCustomAttributes(typeof(HttpMethodAttribute), true).Length > 0)
             .Select(method => method.Name);
-        Assert.That(endpoints, Is.EquivalentTo(EndpointToolMap.Keys.Take(12)));
+        Assert.That(endpoints, Is.EquivalentTo(EndpointToolMap.Keys.Take(13)));
         Assert.That(_tools.Keys, Is.EquivalentTo(EndpointToolMap.Values.Concat(AdditionalToolNames).Append("ping")));
     }
 

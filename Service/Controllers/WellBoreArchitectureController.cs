@@ -94,6 +94,18 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Controllers
             }
         }
 
+        /// <summary>Returns the outermost applicable borehole diameter at an along-hole depth.</summary>
+        [HttpGet("{id}/BoreholeDiameter", Name = "GetBoreholeDiameterAtAbscissa")]
+        public ActionResult<BoreholeDiameterAtAbscissaResult> GetBoreholeDiameterAtAbscissa(Guid id, double alongHoleDepth)
+        {
+            if (id == Guid.Empty || !double.IsFinite(alongHoleDepth)) return BadRequest();
+            var architecture = _wellBoreArchitectureManager.GetWellBoreArchitectureById(id);
+            if (architecture is null) return NotFound();
+            return BoreholeDiameterEvaluator.TryEvaluate(architecture, alongHoleDepth, out var result, out var error)
+                ? Ok(result)
+                : UnprocessableEntity(new { error = "borehole_interval_not_found", message = error });
+        }
+
         /// <summary>
         /// Returns the list of all WellBoreArchitectureLight present in the microservice database, at endpoint WellBoreArchitecture/api/WellBoreArchitecture/LightData
         /// </summary>

@@ -18,6 +18,63 @@ internal static class McpToolArgumentHelpers
         ["additionalProperties"] = false
     };
 
+    public static JsonObject CreateBoreholeDiameterAtAbscissaSchema()
+    {
+        var id = String("UUID of the wellbore architecture resource.", "uuid");
+        id[OSDC.DotnetLibraries.Drilling.SemanticCatalogue.SemanticMetadata.ExtensionName] =
+            Model.ProviderSemantics.ResourceIdentifier(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.WellBoreArchitecture);
+        var depth = Number("Along-hole depth in SI metres from the WGS84 along-hole origin.");
+        depth[OSDC.DotnetLibraries.Drilling.SemanticCatalogue.SemanticMetadata.ExtensionName] = Model.ProviderSemantics.Metadata(
+            OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.AlongHoleDepth, reference: OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.Wgs84AlongHoleOrigin);
+        return new JsonObject
+        {
+            ["type"] = "object",
+            ["properties"] = new JsonObject { ["id"] = id, ["alongHoleDepth"] = depth },
+            ["required"] = new JsonArray("id", "alongHoleDepth"),
+            ["additionalProperties"] = false,
+            [OSDC.DotnetLibraries.Drilling.SemanticCatalogue.SemanticMetadata.ExtensionName] = Model.ProviderSemantics.Metadata(
+                OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.WellBoreArchitecture,
+                OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.BoreholeDiameterAtAbscissaEvaluation)
+        };
+    }
+
+    public static JsonObject CreateBoreholeDiameterAtAbscissaOutputSchema()
+    {
+        JsonObject Scalar(string concept, string description, string? role = null, string? reference = null)
+        {
+            var schema = Number(description);
+            schema[OSDC.DotnetLibraries.Drilling.SemanticCatalogue.SemanticMetadata.ExtensionName] =
+                Model.ProviderSemantics.Metadata(concept, role, reference);
+            return schema;
+        }
+        var data = Object("Outermost applicable borehole diameter and interval provenance.", new JsonObject
+        {
+            ["WellBoreArchitectureID"] = String("Architecture UUID.", "uuid"),
+            ["AlongHoleDepth"] = Scalar(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.AlongHoleDepth, "Evaluated MD in metres.", reference: OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.Wgs84AlongHoleOrigin),
+            ["BoreholeDiameter"] = Scalar(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.BoreholeDiameter, "Selected outermost diameter in metres."),
+            ["BoreholeDiameterStandardDeviation"] = NullableNumber("Standard deviation of the selected diameter in metres, or null when unspecified."),
+            ["IntervalTop"] = Scalar(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.AlongHoleDepth, "Inclusive interval top MD in metres.", OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.IntervalStartCoordinate, OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.Wgs84AlongHoleOrigin),
+            ["IntervalBottom"] = Scalar(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.AlongHoleDepth, "Exclusive interval bottom MD in metres.", OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.IntervalEndCoordinate, OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.Wgs84AlongHoleOrigin),
+            ["SourceKind"] = String("casing or open-hole."),
+            ["SourceSectionComponentID"] = String("Contributing section component UUID.", "uuid"),
+            ["BoreholeSizeComponentID"] = String("Contributing size-row component UUID.", "uuid"),
+            ["Contributors"] = new JsonObject { ["type"] = "array", ["description"] = "Every valid interval containing the evaluated MD, retained for selection provenance.",
+                ["items"] = Object("One applicable architecture interval.", new JsonObject
+                {
+                    ["BoreholeDiameter"] = Scalar(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.BoreholeDiameter, "Contributing diameter in metres.", OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.ResultContribution),
+                    ["BoreholeDiameterStandardDeviation"] = NullableNumber("Diameter standard deviation in metres, or null."),
+                    ["IntervalTop"] = Scalar(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.AlongHoleDepth, "Inclusive interval top MD.", OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.IntervalStartCoordinate, OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.Wgs84AlongHoleOrigin),
+                    ["IntervalBottom"] = Scalar(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.AlongHoleDepth, "Exclusive interval bottom MD.", OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.IntervalEndCoordinate, OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.Wgs84AlongHoleOrigin),
+                    ["SourceKind"] = String("casing or open-hole."),
+                    ["SourceSectionComponentID"] = String("Contributing section component UUID.", "uuid"),
+                    ["BoreholeSizeComponentID"] = String("Contributing size-row component UUID.", "uuid")
+                }, "BoreholeDiameter", "IntervalTop", "IntervalBottom", "SourceKind", "SourceSectionComponentID", "BoreholeSizeComponentID") }
+        }, "WellBoreArchitectureID", "AlongHoleDepth", "BoreholeDiameter", "IntervalTop", "IntervalBottom", "SourceKind", "SourceSectionComponentID", "BoreholeSizeComponentID", "Contributors");
+        data[OSDC.DotnetLibraries.Drilling.SemanticCatalogue.SemanticMetadata.ExtensionName] = Model.ProviderSemantics.Metadata(
+            OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.BoreholeDiameterAtAbscissaResult);
+        return SuccessEnvelope(data);
+    }
+
     public static JsonObject CreateWellBoreArchitectureSchema(bool includeId = false)
     {
         var properties = new JsonObject

@@ -51,6 +51,8 @@ public static class ProviderSemantics
         if (type == typeof(MetaInfo)) return Metadata(Concepts.ResourceMetadata);
         if (type == typeof(GaussianDrillingProperty)) return Metadata(Concepts.GaussianUncertainValue);
         if (type == typeof(ScalarDrillingProperty)) return Metadata(Concepts.ScalarValueRepresentation);
+        if (type == typeof(BoreholeDiameterAtAbscissaResult)) return Metadata(Concepts.BoreholeDiameterAtAbscissaResult);
+        if (type == typeof(BoreholeDiameterContributor)) return Metadata(Concepts.BoreholeDiameterAtAbscissaResult, Concepts.ResultContribution);
         return null;
     }
 
