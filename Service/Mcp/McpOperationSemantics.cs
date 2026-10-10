@@ -13,7 +13,13 @@ internal static class McpOperationSemantics
             : name.Contains("feature_category", StringComparison.Ordinal) ? Concepts.FeatureCategory
             : name.Contains("identity", StringComparison.Ordinal) && !name.Contains("assignment", StringComparison.Ordinal) ? Concepts.IdentityDefinition : Concepts.WellBoreArchitecture;
         string role = Classify(name);
-        schema[SemanticMetadata.ExtensionName] = SemanticMetadata.Create(concept, role, assertionSource: "provider-mcp-operation");
+        if (schema[SemanticMetadata.ExtensionName] is JsonObject declared)
+        {
+            concept = declared["concept"]?.GetValue<string>() ?? concept;
+            role = declared["role"]?.GetValue<string>() ?? role;
+        }
+        else
+            schema[SemanticMetadata.ExtensionName] = SemanticMetadata.Create(concept, role, assertionSource: "provider-mcp-operation");
         if (role == Concepts.ResourceRetrieval && schema["required"] is JsonArray { Count: 1 } required &&
             required[0]?.GetValue<string>() is string propertyName && schema["properties"]?[propertyName] is JsonObject property &&
             property[SemanticMetadata.ExtensionName] is JsonObject identifier &&

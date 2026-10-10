@@ -51,9 +51,34 @@ public static class ProviderSemantics
         if (type == typeof(MetaInfo)) return Metadata(Concepts.ResourceMetadata);
         if (type == typeof(GaussianDrillingProperty)) return Metadata(Concepts.GaussianUncertainValue);
         if (type == typeof(ScalarDrillingProperty)) return Metadata(Concepts.ScalarValueRepresentation);
-        if (type == typeof(BoreholeDiameterAtAbscissaResult)) return Metadata(Concepts.BoreholeDiameterAtAbscissaResult);
-        if (type == typeof(BoreholeDiameterContributor)) return Metadata(Concepts.BoreholeDiameterAtAbscissaResult, Concepts.ResultContribution);
+        if (type == typeof(RadialBoundaryKind)) return EnumMetadata(Concepts.RadialBoundaryKind, new()
+        {
+            [nameof(RadialBoundaryKind.BoreholeWall)] = Concepts.BoreholeWallBoundary,
+            [nameof(RadialBoundaryKind.CementOuter)] = Concepts.CementOuterBoundary,
+            [nameof(RadialBoundaryKind.CementInner)] = Concepts.CementInnerBoundary,
+            [nameof(RadialBoundaryKind.CasingOuter)] = Concepts.CasingOuterBoundary,
+            [nameof(RadialBoundaryKind.CasingInner)] = Concepts.CasingInnerBoundary
+        });
+        if (type == typeof(RadialMaterialKind)) return EnumMetadata(Concepts.RadialMaterialKind, new()
+        {
+            [nameof(RadialMaterialKind.Formation)] = Concepts.FormationMaterial,
+            [nameof(RadialMaterialKind.Cement)] = Concepts.CementMaterial,
+            [nameof(RadialMaterialKind.Casing)] = Concepts.CasingMaterial,
+            [nameof(RadialMaterialKind.InternalFluidOrVoid)] = Concepts.InternalFluidOrVoidMaterial,
+            [nameof(RadialMaterialKind.Unknown)] = Concepts.UnknownRadialMaterial
+        });
+        if (type == typeof(RadialBoundary)) return Metadata(Concepts.RadialBoundary);
+        if (type == typeof(WellboreRadialProfile)) return Metadata(Concepts.WellboreRadialProfile);
+        if (type == typeof(DeepestCasingShoeResult)) return Metadata(Concepts.DeepestCasingShoeResult);
         return null;
+    }
+
+    private static JsonObject EnumMetadata(string concept, Dictionary<string, string> values)
+    {
+        JsonObject metadata = Metadata(concept);
+        metadata["valueConcepts"] = new JsonObject(values.Select(pair =>
+            KeyValuePair.Create<string, JsonNode?>(pair.Key, pair.Value)).ToArray());
+        return metadata;
     }
 
     public static JsonObject? ForProperty(PropertyInfo property)

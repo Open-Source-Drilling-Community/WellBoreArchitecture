@@ -18,7 +18,8 @@ public sealed class McpToolRegistrationTests
         ["GetAllWellBoreArchitectureId"] = "well_bore_architecture_get_all_ids",
         ["GetAllWellBoreArchitectureMetaInfo"] = "well_bore_architecture_get_all_meta_info",
         ["GetWellBoreArchitectureById"] = "well_bore_architecture_get_by_id",
-        ["GetBoreholeDiameterAtAbscissa"] = "well_bore_architecture_get_borehole_diameter_at_abscissa",
+        ["GetRadialProfileAtAbscissa"] = "well_bore_architecture_get_radial_profile_at_abscissa",
+        ["GetDeepestCasingShoe"] = "well_bore_architecture_get_deepest_casing_shoe",
         ["GetAllWellBoreArchitectureLight"] = "well_bore_architecture_get_all_light",
         ["GetAllWellBoreArchitecture"] = "well_bore_architecture_get_all",
         ["PostWellBoreArchitecture"] = "well_bore_architecture_create",
@@ -108,7 +109,7 @@ public sealed class McpToolRegistrationTests
         var endpoints = typeof(WellBoreArchitectureController).GetMethods()
             .Where(method => method.GetCustomAttributes(typeof(HttpMethodAttribute), true).Length > 0)
             .Select(method => method.Name);
-        Assert.That(endpoints, Is.EquivalentTo(EndpointToolMap.Keys.Take(13)));
+        Assert.That(endpoints, Is.EquivalentTo(EndpointToolMap.Keys.Take(14)));
         Assert.That(_tools.Keys, Is.EquivalentTo(EndpointToolMap.Values.Concat(AdditionalToolNames).Append("ping")));
     }
 
@@ -122,6 +123,36 @@ public sealed class McpToolRegistrationTests
         Assert.That(Role("well_bore_architecture_details_update"), Is.EqualTo(Concepts.ResourcePartialUpdate));
         Assert.That(Role("well_bore_architecture_delete_by_id"), Is.EqualTo(Concepts.ResourceDeletion));
         Assert.That(Role("well_bore_architecture_validate_external_references"), Is.EqualTo(Concepts.StatelessEvaluation));
+    }
+
+    [Test]
+    public void Radial_profile_tools_publish_composable_evaluation_and_structured_result_semantics()
+    {
+        IMcpTool profile = _tools["well_bore_architecture_get_radial_profile_at_abscissa"];
+        IMcpTool shoe = _tools["well_bore_architecture_get_deepest_casing_shoe"];
+        JsonObject profileData = (JsonObject)profile.OutputSchema!["properties"]!["data"]!;
+        JsonObject boundary = (JsonObject)profileData["properties"]!["Boundaries"]!["items"]!;
+        JsonObject kind = (JsonObject)boundary["properties"]!["Kind"]!;
+        JsonObject material = (JsonObject)boundary["properties"]!["MaterialInside"]!;
+        JsonObject shoeData = (JsonObject)shoe.OutputSchema!["properties"]!["data"]!;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(profile.InputSchema![SemanticMetadata.ExtensionName]!["role"]!.GetValue<string>(),
+                Is.EqualTo(Concepts.RadialProfileAtAbscissaEvaluation));
+            Assert.That(shoe.InputSchema![SemanticMetadata.ExtensionName]!["role"]!.GetValue<string>(),
+                Is.EqualTo(Concepts.DeepestCasingShoeEvaluation));
+            Assert.That(profileData[SemanticMetadata.ExtensionName]!["concept"]!.GetValue<string>(),
+                Is.EqualTo(Concepts.WellboreRadialProfile));
+            Assert.That(shoeData[SemanticMetadata.ExtensionName]!["concept"]!.GetValue<string>(),
+                Is.EqualTo(Concepts.DeepestCasingShoeResult));
+            Assert.That(kind[SemanticMetadata.ExtensionName]!["valueConcepts"]![nameof(OSDC.Drilling.WellBoreArchitecture.Model.RadialBoundaryKind.CasingInner)]!.GetValue<string>(),
+                Is.EqualTo(Concepts.CasingInnerBoundary));
+            Assert.That(material[SemanticMetadata.ExtensionName]!["valueConcepts"]![nameof(OSDC.Drilling.WellBoreArchitecture.Model.RadialMaterialKind.Cement)]!.GetValue<string>(),
+                Is.EqualTo(Concepts.CementMaterial));
+            Assert.That(material[SemanticMetadata.ExtensionName]!["role"]!.GetValue<string>(),
+                Is.EqualTo(Concepts.MaterialInsideBoundary));
+        });
     }
 
     [Test]

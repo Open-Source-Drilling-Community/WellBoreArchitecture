@@ -36388,7 +36388,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<BoreholeDiameterAtAbscissaResult> GetBoreholeDiameterAtAbscissaAsync(System.Guid id, double? alongHoleDepth = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<WellboreRadialProfile> GetRadialProfileAtAbscissaAsync(System.Guid id, double? alongHoleDepth = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -36404,10 +36404,10 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                     if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
-                    // Operation Path: "WellBoreArchitecture/{id}/BoreholeDiameter"
+                    // Operation Path: "WellBoreArchitecture/{id}/RadialProfile"
                     urlBuilder_.Append("WellBoreArchitecture/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/BoreholeDiameter");
+                    urlBuilder_.Append("/RadialProfile");
                     urlBuilder_.Append('?');
                     if (alongHoleDepth != null)
                     {
@@ -36440,7 +36440,83 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<BoreholeDiameterAtAbscissaResult>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<WellboreRadialProfile>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<DeepestCasingShoeResult> GetDeepestCasingShoeAsync(System.Guid id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "WellBoreArchitecture/{id}/DeepestCasingShoe"
+                    urlBuilder_.Append("WellBoreArchitecture/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/DeepestCasingShoe");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<DeepestCasingShoeResult>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -59826,7 +59902,212 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class BoreholeDiameterAtAbscissaResult
+    public partial class DeepestCasingShoeResult
+    {
+        /// <summary>
+        /// A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("WellBoreArchitectureID")]
+        public System.Guid WellBoreArchitectureID { get; set; }
+
+        /// <summary>
+        /// Along-hole abscissa of the bottom boundary of a casing section. Physical quantity: DepthDrilling; SI unit: metres (m). The SI value is stored at DiracDistributionValue.Value; MinValue/MaxValue are domain bounds in the same unit and reference. Zero along-hole depth is the intersection of the oriented wellbore path, or its defined extension, with the WGS84 ellipsoid. The coordinate is signed accumulated arc length from that intersection along the declared path orientation. It is not obtained by adding or subtracting a vertical elevation offset. This reference applies to canonical storage and APIs; supported user-selected presentation references remain allowed.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("AlongHoleDepth")]
+        public double AlongHoleDepth { get; set; }
+
+        /// <summary>
+        /// A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("CasingSectionComponentID")]
+        public System.Guid CasingSectionComponentID { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("RadialProfile")]
+        public WellboreRadialProfile RadialProfile { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RadialBoundary
+    {
+        /// <summary>
+        /// Diameter of a circular boundary in a wellbore radial construction profile. Physical quantity: DiameterPipeDrilling; SI unit: metres (m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("Diameter")]
+        public double Diameter { get; set; }
+
+        /// <summary>
+        /// Diameter of a circular boundary in a wellbore radial construction profile. Physical quantity: DiameterPipeDrilling; SI unit: metres (m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("DiameterStandardDeviation")]
+        public double? DiameterStandardDeviation { get; set; }
+
+        /// <summary>
+        /// Finite denomination of the physical construction meaning represented by a radial-profile boundary.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("Kind")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public RadialBoundaryKind Kind { get; set; }
+
+        /// <summary>
+        /// Finite material or occupancy classification immediately adjacent to a radial construction boundary.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("MaterialOutside")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public RadialMaterialKind MaterialOutside { get; set; }
+
+        /// <summary>
+        /// Finite material or occupancy classification immediately adjacent to a radial construction boundary.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("MaterialInside")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public RadialMaterialKind MaterialInside { get; set; }
+
+        /// <summary>
+        /// Curvilinear abscissa along an oriented wellbore path, expressed as accumulated arc length from the origin established by the applicable reference convention. It may be planned, calculated, interpolated or measured. Role played by the inclusive start coordinate of a spatial or curvilinear interval in the coordinate concept and reference declared by the value. Physical quantity: DepthDrilling; SI unit: metres (m). The SI value is stored at DiracDistributionValue.Value; MinValue/MaxValue are domain bounds in the same unit and reference. Zero along-hole depth is the intersection of the oriented wellbore path, or its defined extension, with the WGS84 ellipsoid. The coordinate is signed accumulated arc length from that intersection along the declared path orientation. It is not obtained by adding or subtracting a vertical elevation offset. This reference applies to canonical storage and APIs; supported user-selected presentation references remain allowed.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("IntervalTop")]
+        public double IntervalTop { get; set; }
+
+        /// <summary>
+        /// Curvilinear abscissa along an oriented wellbore path, expressed as accumulated arc length from the origin established by the applicable reference convention. It may be planned, calculated, interpolated or measured. Role played by the exclusive end coordinate of a spatial or curvilinear half-open interval in the coordinate concept and reference declared by the value. Physical quantity: DepthDrilling; SI unit: metres (m). The SI value is stored at DiracDistributionValue.Value; MinValue/MaxValue are domain bounds in the same unit and reference. Zero along-hole depth is the intersection of the oriented wellbore path, or its defined extension, with the WGS84 ellipsoid. The coordinate is signed accumulated arc length from that intersection along the declared path orientation. It is not obtained by adding or subtracting a vertical elevation offset. This reference applies to canonical storage and APIs; supported user-selected presentation references remain allowed.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("IntervalBottom")]
+        public double IntervalBottom { get; set; }
+
+        /// <summary>
+        /// A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("SourceSectionComponentID")]
+        public System.Guid SourceSectionComponentID { get; set; }
+
+        /// <summary>
+        /// A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("SourceComponentID")]
+        public System.Guid SourceComponentID { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("SourceDescription")]
+        public string SourceDescription { get; set; }
+
+        /// <summary>
+        /// Diameter of a tubular or component body with an explicit inner, outer or envelope role. Diameter of the exterior body. Physical quantity: DiameterPipeDrilling; SI unit: metres (m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("CasingOuterDiameter")]
+        public double? CasingOuterDiameter { get; set; }
+
+        /// <summary>
+        /// Diameter of a tubular or component body with an explicit inner, outer or envelope role. Diameter of the interior opening; SideElement.ID denotes this dimension, not an identifier. Physical quantity: DiameterPipeDrilling; SI unit: metres (m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("CasingInnerDiameter")]
+        public double? CasingInnerDiameter { get; set; }
+
+        /// <summary>
+        /// Diameter of a tubular or component body with an explicit inner, outer or envelope role. Exterior diameter at the collar. Physical quantity: DiameterPipeDrilling; SI unit: metres (m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("CasingCollarOuterDiameter")]
+        public double? CasingCollarOuterDiameter { get; set; }
+
+        /// <summary>
+        /// Material grade designation interpreted within its material and applicable standard; text alone does not determine a strength value.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("CasingGrade")]
+        public string CasingGrade { get; set; }
+
+        /// <summary>
+        /// Mass density of component material; not inferred from an environmental fluid classification. Physical quantity: MassDensityDrilling; SI unit: kg/m³. GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("CasingMaterialDensity")]
+        public double? CasingMaterialDensity { get; set; }
+
+        /// <summary>
+        /// Mass per unit length, including collars where specified; not force per length. Physical quantity: MassGradientPerLengthDrilling; SI unit: kilograms per metre (kg/m). GaussianValue.Mean is the expected value; StandardDeviation is nonnegative uncertainty in the same SI unit, with no origin offset. Null deviation is unspecified, not zero. MinValue/MaxValue are domain bounds in the mean's unit and reference, not confidence limits or truncation instructions.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("CasingLinearMassDensity")]
+        public double? CasingLinearMassDensity { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum RadialBoundaryKind
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"BoreholeWall")]
+        BoreholeWall = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"CementOuter")]
+        CementOuter = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"CementInner")]
+        CementInner = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"CasingOuter")]
+        CasingOuter = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"CasingInner")]
+        CasingInner = 4,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum RadialMaterialKind
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Formation")]
+        Formation = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Cement")]
+        Cement = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Casing")]
+        Casing = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"InternalFluidOrVoid")]
+        InternalFluidOrVoid = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Unknown")]
+        Unknown = 4,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class WellboreRadialProfile
     {
         /// <summary>
         /// A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.
@@ -59842,112 +60123,22 @@ namespace OSDC.Drilling.WellBoreArchitecture.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("AlongHoleDepth")]
         public double AlongHoleDepth { get; set; }
 
-        /// <summary>
-        /// Diameter of the borehole over the applicable interval. Physical quantity: DiameterPipeDrilling; SI unit: metres (m). The SI value is stored at DiracDistributionValue.Value; MinValue/MaxValue are domain bounds in the same unit and reference.
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("BoreholeDiameter")]
-        public double BoreholeDiameter { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("Boundaries")]
+        public System.Collections.Generic.List<RadialBoundary> Boundaries { get; set; }
 
         /// <summary>
-        /// Standard uncertainty of a physical extent or diameter, expressed as a same-dimensional dispersion without a reference origin. Physical quantity: LengthStandard; SI unit: metres (m). The SI value is stored at DiracDistributionValue.Value; MinValue/MaxValue are domain bounds in the same unit and reference.
+        /// Largest known applicable radial-boundary diameter at the evaluated abscissa, selected for external physical-clearance or projected-envelope calculations. Physical quantity: DiameterPipeDrilling; SI unit: metres (m). The SI value is stored at DiracDistributionValue.Value; MinValue/MaxValue are domain bounds in the same unit and reference.
         /// </summary>
 
-        [System.Text.Json.Serialization.JsonPropertyName("BoreholeDiameterStandardDeviation")]
-        public double? BoreholeDiameterStandardDeviation { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("OutermostKnownPhysicalEnvelopeDiameter")]
+        public double OutermostKnownPhysicalEnvelopeDiameter { get; set; }
 
         /// <summary>
-        /// Curvilinear abscissa along an oriented wellbore path, expressed as accumulated arc length from the origin established by the applicable reference convention. It may be planned, calculated, interpolated or measured. Role played by the inclusive start coordinate of a spatial or curvilinear interval in the coordinate concept and reference declared by the value. Physical quantity: DepthDrilling; SI unit: metres (m). The SI value is stored at DiracDistributionValue.Value; MinValue/MaxValue are domain bounds in the same unit and reference. Zero along-hole depth is the intersection of the oriented wellbore path, or its defined extension, with the WGS84 ellipsoid. The coordinate is signed accumulated arc length from that intersection along the declared path orientation. It is not obtained by adding or subtracting a vertical elevation offset. This reference applies to canonical storage and APIs; supported user-selected presentation references remain allowed.
+        /// Smallest known applicable radial-boundary diameter at the evaluated abscissa, selected for internal-clearance calculations. Physical quantity: DiameterPipeDrilling; SI unit: metres (m). The SI value is stored at DiracDistributionValue.Value; MinValue/MaxValue are domain bounds in the same unit and reference.
         /// </summary>
 
-        [System.Text.Json.Serialization.JsonPropertyName("IntervalTop")]
-        public double IntervalTop { get; set; }
-
-        /// <summary>
-        /// Curvilinear abscissa along an oriented wellbore path, expressed as accumulated arc length from the origin established by the applicable reference convention. It may be planned, calculated, interpolated or measured. Role played by the exclusive end coordinate of a spatial or curvilinear half-open interval in the coordinate concept and reference declared by the value. Physical quantity: DepthDrilling; SI unit: metres (m). The SI value is stored at DiracDistributionValue.Value; MinValue/MaxValue are domain bounds in the same unit and reference. Zero along-hole depth is the intersection of the oriented wellbore path, or its defined extension, with the WGS84 ellipsoid. The coordinate is signed accumulated arc length from that intersection along the declared path orientation. It is not obtained by adding or subtracting a vertical elevation offset. This reference applies to canonical storage and APIs; supported user-selected presentation references remain allowed.
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("IntervalBottom")]
-        public double IntervalBottom { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("SourceKind")]
-        public string SourceKind { get; set; }
-
-        /// <summary>
-        /// A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("SourceSectionComponentID")]
-        public System.Guid SourceSectionComponentID { get; set; }
-
-        /// <summary>
-        /// A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("BoreholeSizeComponentID")]
-        public System.Guid BoreholeSizeComponentID { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("Contributors")]
-        public System.Collections.Generic.List<BoreholeDiameterContributor> Contributors { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class BoreholeDiameterContributor
-    {
-        /// <summary>
-        /// Diameter of the borehole over the applicable interval. Role indicating that an invocation supplied evidence or a value used in a particular derived result or answer. Physical quantity: DiameterPipeDrilling; SI unit: metres (m). The SI value is stored at DiracDistributionValue.Value; MinValue/MaxValue are domain bounds in the same unit and reference.
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("BoreholeDiameter")]
-        public double BoreholeDiameter { get; set; }
-
-        /// <summary>
-        /// Standard uncertainty of a physical extent or diameter, expressed as a same-dimensional dispersion without a reference origin. Physical quantity: LengthStandard; SI unit: metres (m). The SI value is stored at DiracDistributionValue.Value; MinValue/MaxValue are domain bounds in the same unit and reference.
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("BoreholeDiameterStandardDeviation")]
-        public double? BoreholeDiameterStandardDeviation { get; set; }
-
-        /// <summary>
-        /// Curvilinear abscissa along an oriented wellbore path, expressed as accumulated arc length from the origin established by the applicable reference convention. It may be planned, calculated, interpolated or measured. Role played by the inclusive start coordinate of a spatial or curvilinear interval in the coordinate concept and reference declared by the value. Physical quantity: DepthDrilling; SI unit: metres (m). The SI value is stored at DiracDistributionValue.Value; MinValue/MaxValue are domain bounds in the same unit and reference. Zero along-hole depth is the intersection of the oriented wellbore path, or its defined extension, with the WGS84 ellipsoid. The coordinate is signed accumulated arc length from that intersection along the declared path orientation. It is not obtained by adding or subtracting a vertical elevation offset. This reference applies to canonical storage and APIs; supported user-selected presentation references remain allowed.
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("IntervalTop")]
-        public double IntervalTop { get; set; }
-
-        /// <summary>
-        /// Curvilinear abscissa along an oriented wellbore path, expressed as accumulated arc length from the origin established by the applicable reference convention. It may be planned, calculated, interpolated or measured. Role played by the exclusive end coordinate of a spatial or curvilinear half-open interval in the coordinate concept and reference declared by the value. Physical quantity: DepthDrilling; SI unit: metres (m). The SI value is stored at DiracDistributionValue.Value; MinValue/MaxValue are domain bounds in the same unit and reference. Zero along-hole depth is the intersection of the oriented wellbore path, or its defined extension, with the WGS84 ellipsoid. The coordinate is signed accumulated arc length from that intersection along the declared path orientation. It is not obtained by adding or subtracting a vertical elevation offset. This reference applies to canonical storage and APIs; supported user-selected presentation references remain allowed.
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("IntervalBottom")]
-        public double IntervalBottom { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("SourceKind")]
-        public string SourceKind { get; set; }
-
-        /// <summary>
-        /// A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("SourceSectionComponentID")]
-        public System.Guid SourceSectionComponentID { get; set; }
-
-        /// <summary>
-        /// A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("BoreholeSizeComponentID")]
-        public System.Guid BoreholeSizeComponentID { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("InnermostKnownPhysicalEnvelopeDiameter")]
+        public double InnermostKnownPhysicalEnvelopeDiameter { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 

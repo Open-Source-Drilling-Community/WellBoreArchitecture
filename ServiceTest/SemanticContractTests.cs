@@ -60,7 +60,7 @@ public class SemanticContractTests
                         Is.True, $"Semantic metadata changed during merge or HTTP serialization: {name}.{property.Key}");
             }
         }
-        Assert.That(count, Is.EqualTo(52));
+        Assert.That(count, Is.EqualTo(56));
     }
 
     [Test]
@@ -86,7 +86,7 @@ public class SemanticContractTests
                 Assert.That(JsonNode.DeepEquals(mcpField[Binding], expected), Is.True, $"MCP {type.Name}.{field.Name}");
                 foreach (var entry in expected)
                 {
-                    Assert.That(entry.Value!["catalogueVersion"]!.GetValue<string>(), Is.EqualTo("0.19.0"));
+            Assert.That(entry.Value!["catalogueVersion"]!.GetValue<string>(), Is.EqualTo("0.20.0"));
                     Assert.That(entry.Value["curationStatus"]!.GetValue<string>(), Is.EqualTo("Reviewed"));
                     Assert.That(entry.Value["physicalQuantity"]!["name"]!.GetValue<string>(), Is.Not.Empty);
                     Assert.That(entry.Value["siUnit"]!.GetValue<string>(), Is.Not.Empty);

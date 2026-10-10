@@ -94,16 +94,28 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Controllers
             }
         }
 
-        /// <summary>Returns the outermost applicable borehole diameter at an along-hole depth.</summary>
-        [HttpGet("{id}/BoreholeDiameter", Name = "GetBoreholeDiameterAtAbscissa")]
-        public ActionResult<BoreholeDiameterAtAbscissaResult> GetBoreholeDiameterAtAbscissa(Guid id, double alongHoleDepth)
+        /// <summary>Returns all known radial construction boundaries at an along-hole depth, ordered outside to inside.</summary>
+        [HttpGet("{id}/RadialProfile", Name = "GetRadialProfileAtAbscissa")]
+        public ActionResult<WellboreRadialProfile> GetRadialProfileAtAbscissa(Guid id, double alongHoleDepth)
         {
             if (id == Guid.Empty || !double.IsFinite(alongHoleDepth)) return BadRequest();
             var architecture = _wellBoreArchitectureManager.GetWellBoreArchitectureById(id);
             if (architecture is null) return NotFound();
-            return BoreholeDiameterEvaluator.TryEvaluate(architecture, alongHoleDepth, out var result, out var error)
+            return WellboreRadialProfileEvaluator.TryEvaluate(architecture, alongHoleDepth, out var result, out var error)
                 ? Ok(result)
-                : UnprocessableEntity(new { error = "borehole_interval_not_found", message = error });
+                : UnprocessableEntity(new { error = "radial_profile_not_found", message = error });
+        }
+
+        /// <summary>Returns the deepest valid casing shoe and the ordered radial profile at that shoe.</summary>
+        [HttpGet("{id}/DeepestCasingShoe", Name = "GetDeepestCasingShoe")]
+        public ActionResult<DeepestCasingShoeResult> GetDeepestCasingShoe(Guid id)
+        {
+            if (id == Guid.Empty) return BadRequest();
+            var architecture = _wellBoreArchitectureManager.GetWellBoreArchitectureById(id);
+            if (architecture is null) return NotFound();
+            return WellboreRadialProfileEvaluator.TryEvaluateDeepestCasingShoe(architecture, out var result, out var error)
+                ? Ok(result)
+                : UnprocessableEntity(new { error = "casing_shoe_not_found", message = error });
         }
 
         /// <summary>

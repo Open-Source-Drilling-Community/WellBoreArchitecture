@@ -29,7 +29,8 @@ All endpoints are relative to `/WellBoreArchitecture/api/WellBoreArchitecture` a
 - `GET /` – list all architecture IDs.
 - `GET /MetaInfo` – metadata for all architectures.
 - `GET /{id}` – retrieve a full architecture.
-- `GET /{id}/BoreholeDiameter?alongHoleDepth=...` – evaluate the outermost applicable casing/open-hole diameter at one SI measured-depth abscissa and return contributor provenance.
+- `GET /{id}/RadialProfile?alongHoleDepth=...` – return every known borehole, cement, casing-body, casing-collar and casing-inner boundary at one SI measured-depth abscissa, ordered outside to inside with material and component provenance.
+- `GET /{id}/DeepestCasingShoe` – return the deepest valid casing shoe abscissa and the same ordered radial profile at the shoe.
 - `GET /LightData` / `GET /HeavyData` – list light or heavy payloads.
 - `POST /` – add a new architecture after running `Calculate()`.
 - `PUT /{id}` – update an existing architecture with recalculated fields.
@@ -82,7 +83,7 @@ dotnet test ServiceTest/ServiceTest.csproj
 
 ## MCP server
 
-The service publishes 45 tools: architecture reads/search/mutations, ordered section mutations, user-manageable identity and feature catalogues, backup/restore, external-reference diagnostics, the read-only `well_bore_architecture_get_borehole_diameter_at_abscissa` evaluator, and `ping`. Architecture and catalogue mutations use `expectedModifiedUtc` optimistic concurrency; stale calls return conflict without changing stored data. Access-statistics operations are deliberately omitted.
+The service publishes 46 tools: architecture reads/search/mutations, ordered section mutations, user-manageable identity and feature catalogues, backup/restore, external-reference diagnostics, the read-only `well_bore_architecture_get_radial_profile_at_abscissa` and `well_bore_architecture_get_deepest_casing_shoe` evaluators, and `ping`. Architecture and catalogue mutations use `expectedModifiedUtc` optimistic concurrency; stale calls return conflict without changing stored data. Access-statistics operations are deliberately omitted.
 
 The MCP contract also publishes `well_bore_architecture_batch_export` and `well_bore_architecture_batch_restore`. They use the same strict version-2 document and transactional implementation as the REST endpoints.
 
@@ -106,8 +107,8 @@ Identity and feature DTO implementations come from ResourceClassification 0.1.0 
 
 ## Curated architecture semantics (0.10.0)
 
-`SemanticSchemaFilter` publishes `x-osdc-semantic` and property-context `x-osdc-semantic-bindings` from the Model registry. MCP definitions use the same registry, including nested engineering components, catalogue assignments, light records, granular mutations and backup/restore components. Retrieval identifiers carry the operation's resource type, and the external `WellBoreID` relationship identifies `wellbore` as its target type. Reviewed catalogue version is 0.19.0; canonical drilling reference profile is 1.1.0. Metadata describes meaning, not additional runtime validation.
+`SemanticSchemaFilter` publishes `x-osdc-semantic` and property-context `x-osdc-semantic-bindings` from the Model registry. MCP definitions use the same registry, including nested engineering components, catalogue assignments, light records, granular mutations and backup/restore components. Retrieval identifiers carry the operation's resource type, and the external `WellBoreID` relationship identifies `wellbore` as its target type. Reviewed catalogue version is 0.20.0; canonical drilling reference profile is 1.1.0. Metadata describes meaning, not additional runtime validation.
 
 The payload shape and database schema remain unchanged. Descriptions now distinguish stress from force, differential from absolute pressure, extents from coordinates, and local connector position from vertical depth. Regenerate the service OpenAPI and ModelSharedOut before publishing images.
 
-`SemanticOpenApiExtensions` restores semantic extension values from raw JSON after OpenAPI parsing, both during schema merging and when serving Swagger. This preserves string versions such as `1.1.0`, which the reader otherwise treats as dates. A regression test checks all 43 engineering bindings through both stages.
+`SemanticOpenApiExtensions` restores semantic extension values from raw JSON after OpenAPI parsing, both during schema merging and when serving Swagger. This preserves string versions such as `1.1.0`, which the reader otherwise treats as dates. A regression test checks all 56 engineering bindings through both stages.

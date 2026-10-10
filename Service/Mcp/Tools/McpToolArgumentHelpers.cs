@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Text.Json.Nodes;
 
 namespace OSDC.Drilling.WellBoreArchitecture.Service.Mcp.Tools;
@@ -18,7 +19,7 @@ internal static class McpToolArgumentHelpers
         ["additionalProperties"] = false
     };
 
-    public static JsonObject CreateBoreholeDiameterAtAbscissaSchema()
+    public static JsonObject CreateRadialProfileAtAbscissaSchema()
     {
         var id = String("UUID of the wellbore architecture resource.", "uuid");
         id[OSDC.DotnetLibraries.Drilling.SemanticCatalogue.SemanticMetadata.ExtensionName] =
@@ -34,11 +35,21 @@ internal static class McpToolArgumentHelpers
             ["additionalProperties"] = false,
             [OSDC.DotnetLibraries.Drilling.SemanticCatalogue.SemanticMetadata.ExtensionName] = Model.ProviderSemantics.Metadata(
                 OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.WellBoreArchitecture,
-                OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.BoreholeDiameterAtAbscissaEvaluation)
+                OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.RadialProfileAtAbscissaEvaluation)
         };
     }
 
-    public static JsonObject CreateBoreholeDiameterAtAbscissaOutputSchema()
+    public static JsonObject CreateDeepestCasingShoeSchema()
+    {
+        var schema = CreateGuidSchema("id", "UUID of the wellbore architecture resource.");
+        schema[OSDC.DotnetLibraries.Drilling.SemanticCatalogue.SemanticMetadata.ExtensionName] =
+            Model.ProviderSemantics.Metadata(
+                OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.WellBoreArchitecture,
+                OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.DeepestCasingShoeEvaluation);
+        return schema;
+    }
+
+    public static JsonObject CreateRadialProfileOutputSchema(bool deepestShoe = false)
     {
         JsonObject Scalar(string concept, string description, string? role = null, string? reference = null)
         {
@@ -47,32 +58,64 @@ internal static class McpToolArgumentHelpers
                 Model.ProviderSemantics.Metadata(concept, role, reference);
             return schema;
         }
-        var data = Object("Outermost applicable borehole diameter and interval provenance.", new JsonObject
+        JsonObject NullableScalar(string concept, string description, string? role = null)
+        {
+            var schema = NullableNumber(description);
+            schema[OSDC.DotnetLibraries.Drilling.SemanticCatalogue.SemanticMetadata.ExtensionName] =
+                Model.ProviderSemantics.Metadata(concept, role);
+            return schema;
+        }
+        JsonObject Enum(Type type, string description, string? role = null)
+        {
+            var values = new JsonArray(System.Enum.GetNames(type).Select(name => JsonValue.Create(name)).ToArray());
+            var schema = new JsonObject { ["type"] = "string", ["description"] = description, ["enum"] = values };
+            var semantic = (JsonObject)Model.ProviderSemantics.ForType(type)!.DeepClone();
+            if (role is not null) semantic["role"] = role;
+            schema[OSDC.DotnetLibraries.Drilling.SemanticCatalogue.SemanticMetadata.ExtensionName] = semantic;
+            return schema;
+        }
+        var casingGrade = String("Casing grade when declared.");
+        casingGrade[OSDC.DotnetLibraries.Drilling.SemanticCatalogue.SemanticMetadata.ExtensionName] =
+            Model.ProviderSemantics.Metadata(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.MaterialGrade);
+        var boundary = Object("One known radial boundary, ordered with the largest diameter first.", new JsonObject
+        {
+            ["Diameter"] = Scalar(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.RadialBoundaryDiameter, "Boundary diameter in SI metres."),
+            ["DiameterStandardDeviation"] = NullableScalar(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.RadialBoundaryDiameter, "Diameter standard deviation in metres, or null."),
+            ["Kind"] = Enum(typeof(Model.RadialBoundaryKind), "Construction meaning of this boundary."),
+            ["MaterialOutside"] = Enum(typeof(Model.RadialMaterialKind), "Known material immediately outside the boundary.", OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.MaterialOutsideBoundary),
+            ["MaterialInside"] = Enum(typeof(Model.RadialMaterialKind), "Known material immediately inside the boundary.", OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.MaterialInsideBoundary),
+            ["IntervalTop"] = Scalar(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.AlongHoleDepth, "Inclusive interval top MD in metres.", OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.IntervalStartCoordinate, OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.Wgs84AlongHoleOrigin),
+            ["IntervalBottom"] = Scalar(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.AlongHoleDepth, "Interval bottom MD in metres.", OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.IntervalEndCoordinate, OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.Wgs84AlongHoleOrigin),
+            ["SourceSectionComponentID"] = String("Source section component UUID.", "uuid"),
+            ["SourceComponentID"] = String("Source size or casing component UUID.", "uuid"),
+            ["SourceDescription"] = String("Human-readable provenance."),
+            ["CasingOuterDiameter"] = NullableScalar(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.PipeDiameter, "Applicable casing body OD in metres.", OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.OuterDiameter),
+            ["CasingInnerDiameter"] = NullableScalar(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.PipeDiameter, "Applicable casing ID in metres.", OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.InnerDiameter),
+            ["CasingCollarOuterDiameter"] = NullableScalar(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.PipeDiameter, "Applicable collar OD in metres.", OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.CollarOuterDiameter),
+            ["CasingGrade"] = casingGrade,
+            ["CasingMaterialDensity"] = NullableScalar(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.MaterialDensity, "Casing material density in kg/m3 when declared."),
+            ["CasingLinearMassDensity"] = NullableScalar(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.LinearMassDensity, "Casing linear mass density in kg/m when declared.")
+        }, "Diameter", "Kind", "MaterialOutside", "MaterialInside", "IntervalTop", "IntervalBottom", "SourceSectionComponentID", "SourceComponentID");
+        boundary[OSDC.DotnetLibraries.Drilling.SemanticCatalogue.SemanticMetadata.ExtensionName] = Model.ProviderSemantics.Metadata(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.RadialBoundary);
+        var profile = Object("All known radial boundaries at one MD, ordered outside to inside.", new JsonObject
         {
             ["WellBoreArchitectureID"] = String("Architecture UUID.", "uuid"),
             ["AlongHoleDepth"] = Scalar(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.AlongHoleDepth, "Evaluated MD in metres.", reference: OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.Wgs84AlongHoleOrigin),
-            ["BoreholeDiameter"] = Scalar(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.BoreholeDiameter, "Selected outermost diameter in metres."),
-            ["BoreholeDiameterStandardDeviation"] = NullableNumber("Standard deviation of the selected diameter in metres, or null when unspecified."),
-            ["IntervalTop"] = Scalar(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.AlongHoleDepth, "Inclusive interval top MD in metres.", OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.IntervalStartCoordinate, OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.Wgs84AlongHoleOrigin),
-            ["IntervalBottom"] = Scalar(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.AlongHoleDepth, "Exclusive interval bottom MD in metres.", OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.IntervalEndCoordinate, OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.Wgs84AlongHoleOrigin),
-            ["SourceKind"] = String("casing or open-hole."),
-            ["SourceSectionComponentID"] = String("Contributing section component UUID.", "uuid"),
-            ["BoreholeSizeComponentID"] = String("Contributing size-row component UUID.", "uuid"),
-            ["Contributors"] = new JsonObject { ["type"] = "array", ["description"] = "Every valid interval containing the evaluated MD, retained for selection provenance.",
-                ["items"] = Object("One applicable architecture interval.", new JsonObject
-                {
-                    ["BoreholeDiameter"] = Scalar(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.BoreholeDiameter, "Contributing diameter in metres.", OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.ResultContribution),
-                    ["BoreholeDiameterStandardDeviation"] = NullableNumber("Diameter standard deviation in metres, or null."),
-                    ["IntervalTop"] = Scalar(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.AlongHoleDepth, "Inclusive interval top MD.", OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.IntervalStartCoordinate, OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.Wgs84AlongHoleOrigin),
-                    ["IntervalBottom"] = Scalar(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.AlongHoleDepth, "Exclusive interval bottom MD.", OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.IntervalEndCoordinate, OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.Wgs84AlongHoleOrigin),
-                    ["SourceKind"] = String("casing or open-hole."),
-                    ["SourceSectionComponentID"] = String("Contributing section component UUID.", "uuid"),
-                    ["BoreholeSizeComponentID"] = String("Contributing size-row component UUID.", "uuid")
-                }, "BoreholeDiameter", "IntervalTop", "IntervalBottom", "SourceKind", "SourceSectionComponentID", "BoreholeSizeComponentID") }
-        }, "WellBoreArchitectureID", "AlongHoleDepth", "BoreholeDiameter", "IntervalTop", "IntervalBottom", "SourceKind", "SourceSectionComponentID", "BoreholeSizeComponentID", "Contributors");
-        data[OSDC.DotnetLibraries.Drilling.SemanticCatalogue.SemanticMetadata.ExtensionName] = Model.ProviderSemantics.Metadata(
-            OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.BoreholeDiameterAtAbscissaResult);
-        return SuccessEnvelope(data);
+            ["Boundaries"] = new JsonObject { ["type"] = "array", ["items"] = boundary },
+            ["OutermostKnownPhysicalEnvelopeDiameter"] = Scalar(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.OutermostKnownPhysicalEnvelopeDiameter, "Largest known applicable diameter in metres."),
+            ["InnermostKnownPhysicalEnvelopeDiameter"] = Scalar(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.InnermostKnownPhysicalEnvelopeDiameter, "Smallest known applicable diameter in metres.")
+        }, "WellBoreArchitectureID", "AlongHoleDepth", "Boundaries", "OutermostKnownPhysicalEnvelopeDiameter", "InnermostKnownPhysicalEnvelopeDiameter");
+        profile[OSDC.DotnetLibraries.Drilling.SemanticCatalogue.SemanticMetadata.ExtensionName] = Model.ProviderSemantics.Metadata(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.WellboreRadialProfile);
+        if (!deepestShoe) return SuccessEnvelope(profile);
+        var shoe = Object("Deepest casing shoe and its radial profile.", new JsonObject
+        {
+            ["WellBoreArchitectureID"] = String("Architecture UUID.", "uuid"),
+            ["AlongHoleDepth"] = Scalar(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.CasingShoeAlongHoleDepth, "Deepest casing shoe MD in metres.", reference: OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.Wgs84AlongHoleOrigin),
+            ["CasingSectionComponentID"] = String("Selected casing section UUID.", "uuid"),
+            ["RadialProfile"] = profile
+        }, "WellBoreArchitectureID", "AlongHoleDepth", "CasingSectionComponentID", "RadialProfile");
+        shoe[OSDC.DotnetLibraries.Drilling.SemanticCatalogue.SemanticMetadata.ExtensionName] = Model.ProviderSemantics.Metadata(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.DeepestCasingShoeResult);
+        return SuccessEnvelope(shoe);
     }
 
     public static JsonObject CreateWellBoreArchitectureSchema(bool includeId = false)
