@@ -30,6 +30,7 @@ public static class WellBoreArchitectureRestMcpToolRegistrations
 
     public static IServiceCollection AddWellBoreArchitectureRestMcpTools(this IServiceCollection services)
     {
+        services.AddDiscoveryMcpTools();
         services.AddLegacyMcpTool("well_bore_architecture_get_all_ids", "List the UUIDs of every stored wellbore architecture. Use this compact discovery operation when only identifiers are needed, then pass one UUID to well_bore_architecture_get_by_id for the complete construction model.", McpToolArgumentHelpers.CreateEmptySchema(),
             (sp, _, ct) => Invoke(ct, () => Controller(sp).GetAllWellBoreArchitectureId()));
         services.AddLegacyMcpTool("well_bore_architecture_get_all_meta_info", "List MetaInfo for every stored wellbore architecture without loading wellhead, surface-section, casing, fluid, and side-circuit data. Use a returned ID with well_bore_architecture_get_by_id to retrieve one full model.", McpToolArgumentHelpers.CreateEmptySchema(),
@@ -41,10 +42,6 @@ public static class WellBoreArchitectureRestMcpToolRegistrations
         services.AddLegacyMcpTool("well_bore_architecture_get_deepest_casing_shoe", "Select the greatest valid casing-section bottom and return its along-hole depth together with the same outside-to-inside radial profile at the shoe. Invalid or incomplete section geometry is ignored rather than guessed.",
             McpToolArgumentHelpers.CreateDeepestCasingShoeSchema(),
             (sp, args, ct) => InvokeById(args, ct, id => Controller(sp).GetDeepestCasingShoe(id)));
-        services.AddLegacyMcpTool("well_bore_architecture_get_all_light", "List lightweight wellbore-architecture records containing metadata, name, description, and timestamps. Use this for human-readable discovery and selection; it intentionally omits WellBoreID and all construction geometry and material data.", McpToolArgumentHelpers.CreateEmptySchema(),
-            (sp, _, ct) => Invoke(ct, () => Controller(sp).GetAllWellBoreArchitectureLight()));
-        services.AddLegacyMcpTool("well_bore_architecture_get_all", "Legacy unbounded convenience operation that retrieves every complete wellbore architecture. This can be a very large response and may be removed in a future major contract version; new clients must use well_bore_architecture_search, lightweight discovery, and get-by-id.", McpToolArgumentHelpers.CreateEmptySchema(),
-            (sp, _, ct) => Invoke(ct, () => Controller(sp).GetAllWellBoreArchitecture()));
         services.AddLegacyMcpTool("well_bore_architecture_search", "Return one deterministic page of complete WellBoreArchitectures together with the total match count. Filters may target name, external WellBore UUID, identity definition/value, feature category/option, and modification dates; results are ordered by resource UUID.", McpToolArgumentHelpers.CreateSearchSchema(),
             InvokeSearch);
         services.AddLegacyMcpTool("well_bore_architecture_validate_external_references", "Check one stored architecture's optional WellBoreID against the configured WellBore service without changing data. Valid includes unlinked drafts and confirmed references; Invalid identifies a missing WellBore; Unavailable distinguishes configuration, transport, timeout, and malformed dependency responses.",
@@ -131,8 +128,6 @@ public static class WellBoreArchitectureRestMcpToolRegistrations
         Func<IServiceProvider, T?, ActionResult> create, Func<IServiceProvider, Guid, DateTimeOffset, T?, ActionResult> update,
         Func<IServiceProvider, Guid, DateTimeOffset, ActionResult> delete)
     {
-        services.AddLegacyMcpTool(prefix + "_get_all", "List every user-manageable catalog definition, including stable UUIDs, server-owned timestamps, names, and feature options where applicable. Use this read before assigning a definition to an architecture or attempting an optimistic-concurrency update.", McpToolArgumentHelpers.CreateEmptySchema(),
-            (sp, _, ct) => Invoke(ct, () => all(sp)));
         services.AddLegacyMcpTool(prefix + "_get_by_id", "Retrieve one complete catalog definition by its stable UUID, including the latest LastModificationDate concurrency token and all feature options where applicable. An unknown UUID returns not found and does not change service state.", McpToolArgumentHelpers.CreateGuidSchema("id", "Catalog definition UUID."),
             (sp, args, ct) => InvokeById(args, ct, id => get(sp, id)));
         services.AddLegacyMcpTool(prefix + "_create", "Create a custom catalog definition using a caller-generated non-empty UUID. The service owns CreationDate and LastModificationDate, rejects duplicate identifiers, and preserves the supplied category flags and stable option UUIDs for later assignments.", McpToolArgumentHelpers.CreateCatalogSchema(bodyName, feature),

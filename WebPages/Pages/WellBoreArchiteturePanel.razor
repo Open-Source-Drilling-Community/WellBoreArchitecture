@@ -1069,9 +1069,12 @@
     private async Task LoadIdentityAndFeatureCatalogsAsync()
     {
         if (_identityCatalog.Count == 0)
-            _identityCatalog = await Api.ClientWellBoreArchitecture.GetAllWellBoreArchitectureIdentityAsync();
+            _identityCatalog = await Api.ClientWellBoreArchitecture.ListWellBoreArchitectureIdentityReferencesAsync();
         if (_featureCatalog.Count == 0)
-            _featureCatalog = await Api.ClientWellBoreArchitecture.GetAllWellBoreArchitectureFeatureCategoryAsync();
+            _featureCatalog = await Api.ClientWellBoreArchitecture.ListWellBoreArchitectureFeatureCategoryReferencesAsync();
+        foreach (Guid id in WellBoreArchitecture?.WellBoreArchitectureFeatureAssignments?.Where(value => value.FeatureCategoryID.HasValue).Select(value => value.FeatureCategoryID!.Value).Distinct() ?? [])
+            if (_featureCatalog.FirstOrDefault(value => value.MetaInfo.ID == id)?.Options == null)
+                await Api.ClientWellBoreArchitecture.LoadWellBoreArchitectureFeatureCategoryDetailsAsync(_featureCatalog, id);
     }
 
     private void AddSimplifiedIdentityAssignment()
@@ -1098,8 +1101,10 @@
     private bool SimplifiedFeatureHasValidity(WellBoreArchitectureFeatureAssignment assignment) =>
         _featureCatalog.FirstOrDefault(category => category.MetaInfo.ID == assignment.FeatureCategoryID)?.HasValidityPeriod == true;
 
-    private void SetSimplifiedFeatureCategory(WellBoreArchitectureFeatureAssignment assignment, Guid? categoryId)
+    private async Task SetSimplifiedFeatureCategory(WellBoreArchitectureFeatureAssignment assignment, Guid? categoryId)
     {
+        if (categoryId is Guid categoryUuid) await Api.ClientWellBoreArchitecture.LoadWellBoreArchitectureFeatureCategoryDetailsAsync(_featureCatalog, categoryUuid);
+
         assignment.FeatureCategoryID = categoryId;
         assignment.FeatureOptionID = null;
         if (!SimplifiedFeatureHasValidity(assignment))
@@ -1735,6 +1740,13 @@
 
     private async Task ResolveRigAsync()
     {
+        if (_selectedWellBore?.MetaInfo?.ID is Guid wellBoreId && _selectedWellBore.RigJobs == null)
+        {
+            var full = await Api.ClientWellBore.GetWellBoreByIdAsync(wellBoreId);
+            foreach (var property in typeof(OSDC.Drilling.WellBoreArchitecture.ModelShared.WellBore).GetProperties().Where(property => property.CanWrite))
+                property.SetValue(_selectedWellBore, property.GetValue(full));
+        }
+
         _resolvedRig = null;
         _resolvedRigJob = _selectedWellBore?.RigJobs?
             .OrderBy(job => job.StartDate)

@@ -132,7 +132,7 @@
     {
         try
         {
-            _architectures = ((await Api.ClientWellBoreArchitecture.GetAllWellBoreArchitectureAsync()) ?? [])
+            _architectures = ((await Api.ClientWellBoreArchitecture.ListWellBoreArchitectureReferencesAsync()) ?? [])
                 .Where(item => item?.MetaInfo?.ID is Guid id && id != Guid.Empty).OrderBy(item => item.Name).ToList();
             _selected = [];
         }

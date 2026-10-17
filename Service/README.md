@@ -112,3 +112,19 @@ Identity and feature DTO implementations come from ResourceClassification 0.1.0 
 The payload shape and database schema remain unchanged. Descriptions now distinguish stress from force, differential from absolute pressure, extents from coordinates, and local connector position from vertical depth. Regenerate the service OpenAPI and ModelSharedOut before publishing images.
 
 `SemanticOpenApiExtensions` restores semantic extension values from raw JSON after OpenAPI parsing, both during schema merging and when serving Swagger. This preserves string versions such as `1.1.0`, which the reader otherwise treats as dates. A regression test checks all 56 engineering bindings through both stages.
+
+## Bounded light discovery
+
+Resource and catalog discovery returns light pages, with `offset` defaulting to 0 and `limit` defaulting to 50 (allowed range 1–200). Names and relevant resource-reference filters are evaluated on the server. Unbounded full-object `HeavyData` routes and tools, including filtered full-object lists, have been removed. Existing UUID and HTTP-metadata listings remain available; use named light pages for routine discovery.
+
+REST routes and MCP tool names (relative to the service's existing API path base):
+
+- `/WellBoreArchitecture/LightData` / `well_bore_architecture_discover`
+- `/WellBoreArchitectureFeatureCategory/LightData` / `well_bore_architecture_feature_category_discover`
+- `/WellBoreArchitectureIdentity/LightData` / `well_bore_architecture_identity_discover`
+
+Pages contain `Items`, `Offset`, `Limit`, `TotalCount`, and `NextOffset`; `NextOffset` is null on the final page. Offset pages are individually consistent reads, not a snapshot spanning requests: concurrent inserts/deletes can change later pages. Refresh discovery when the underlying collection changes. EarthGeodesy's existing search pages instead expose `Items[].Value`, `Offset`, `Limit`, and `TotalCount`.
+
+Single-record reads, result/chunk reads, and deliberate backup/export/restore operations are preserved. Backups can still contain complete resources and should be treated as explicit bulk operations.
+
+This is a breaking REST/MCP contract change: update generated clients, UIs, and external integrations together with the service release. Removed heavy-list names are not compatibility aliases. No persisted engineering shapes, database names, or storage volumes are changed. Historical usage counters are retained; bounded discovery has a separate additive `DiscoveryRequestsPerDay` history in resource services.

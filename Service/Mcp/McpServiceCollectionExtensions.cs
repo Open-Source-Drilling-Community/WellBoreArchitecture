@@ -39,6 +39,18 @@ public static class McpServiceCollectionExtensions
         return services;
     }
 
+    public static IServiceCollection AddLegacyMcpTool(this IServiceCollection services, string name, string description,
+        JsonNode inputSchema, JsonNode outputSchema, McpToolBehavior behavior,
+        Func<IServiceProvider, JsonObject?, CancellationToken, Task<JsonNode?>> invokeAsync)
+    {
+        McpOperationSemantics.Apply(name, inputSchema);
+        services.AddSingleton<IMcpTool>(sp => new DelegateMcpTool(name, description, inputSchema,
+            outputSchema, behavior, (args, ct) => invokeAsync(sp, args, ct)));
+        services.AddSingleton<McpServerTool>(sp => new LegacyMcpServerToolAdapter(
+            sp.GetServices<IMcpTool>().Last(tool => tool.Name == name), sp.GetRequiredService<ILoggerFactory>()));
+        return services;
+    }
+
     private sealed class DelegateMcpTool : IMcpTool
     {
         private readonly Func<JsonObject?, CancellationToken, Task<JsonNode?>> _invokeAsync;

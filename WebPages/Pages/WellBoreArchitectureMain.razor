@@ -106,7 +106,7 @@
         {
             // Starting all loading tasks asynchronously
             logger.LogInformation("Trying to load list of WellBoreArchitecture from client: " + Api.HttpClientWellBoreArchitecture);
-            var wellBoreArchitectureTask = Api.ClientWellBoreArchitecture.GetAllWellBoreArchitectureAsync();
+            var wellBoreArchitectureTask = Api.ClientWellBoreArchitecture.ListWellBoreArchitectureReferencesAsync();
 
             List<Task> loadingTaskList = new List<Task>() { wellBoreArchitectureTask };
             // Awaiting tasks and retrieve results as they become available
@@ -146,7 +146,7 @@
         try
         {
             // get guid and name from external microservices
-            List<Field> fields = await Api.ClientField.GetAllFieldAsync();
+            List<Field> fields = await Api.ClientField.ListFieldReferencesAsync();
             foreach (Field field in fields)
             {
                 if (!fieldDicts.ContainsKey(field.MetaInfo.ID))
@@ -154,7 +154,7 @@
                     fieldDicts.Add(field.MetaInfo.ID, field);
                 }
             }
-            List<Cluster> clusters = await Api.ClientCluster.GetAllClusterAsync();
+            List<Cluster> clusters = await Api.ClientCluster.ListClusterReferencesAsync();
             foreach (Cluster cluster in clusters)
             {
                 if (!clusterDicts.ContainsKey(cluster.MetaInfo.ID))
@@ -162,7 +162,7 @@
                     clusterDicts.Add(cluster.MetaInfo.ID, cluster);
                 }
             }
-            List<Well> wells = await Api.ClientWell.GetAllWellAsync();
+            List<Well> wells = await Api.ClientWell.ListWellReferencesAsync();
             foreach (Well well in wells)
             {
                 if (!wellDicts.ContainsKey(well.MetaInfo.ID))
@@ -170,7 +170,7 @@
                     wellDicts.Add(well.MetaInfo.ID, well);
                 }
             }
-            List<RigLight> rigs = await Api.ClientRig.GetAllRigLightAsync();
+            List<RigLight> rigs = await Api.ClientRig.ListRigLightAsync();
             foreach (RigLight rig in rigs)
             {
                 if (!rigDicts.ContainsKey(rig.MetaInfo.ID))
@@ -178,7 +178,7 @@
                     rigDicts.Add(rig.MetaInfo.ID, rig);
                 }
             }
-            List<WellBore> wellBores = await Api.ClientWellBore.GetAllWellBoreAsync();
+            List<WellBore> wellBores = await Api.ClientWellBore.ListWellBoreReferencesAsync();
             foreach (WellBore wellBore in wellBores)
             {
                 if (!wellBoreDicts.ContainsKey(wellBore.MetaInfo.ID))

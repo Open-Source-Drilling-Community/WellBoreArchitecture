@@ -92,3 +92,19 @@ The five `WellBoreArchitectureIdentity*` and `WellBoreArchitectureFeature*` DTOs
 Model annotations bind reviewed catalogue 0.20.0 concepts. `EngineeringQuantityAttribute` identifies each Gaussian/scalar measurand, uncertainty and field role; `ProviderSemantics` adds inherited classification, shared-wrapper bindings and borehole-at-abscissa result semantics. Quantities are attached at `/GaussianValue/Mean`, `/GaussianValue/StandardDeviation`, domain-bound paths and `/DiracDistributionValue/Value` in the containing property's context. Shared wrapper types remain quantity-neutral.
 
 References apply to canonical storage/API values only. Casing top/cement-top coordinates use AlongHoleDepth; wellhead/hanger/fluid-top coordinates use EllipsoidalDepth. Connector Position starts at the host top and increases downward; it is not a WGS84 coordinate. Uncertainty has no origin offset. Null standard deviation is unspecified. Bounds are domain limits, not confidence limits or an assertion of Gaussian truncation.
+
+## Bounded light discovery
+
+Resource and catalog discovery returns light pages, with `offset` defaulting to 0 and `limit` defaulting to 50 (allowed range 1–200). Names and relevant resource-reference filters are evaluated on the server. Unbounded full-object `HeavyData` routes and tools, including filtered full-object lists, have been removed. Existing UUID and HTTP-metadata listings remain available; use named light pages for routine discovery.
+
+REST routes and MCP tool names (relative to the service's existing API path base):
+
+- `/WellBoreArchitecture/LightData` / `well_bore_architecture_discover`
+- `/WellBoreArchitectureFeatureCategory/LightData` / `well_bore_architecture_feature_category_discover`
+- `/WellBoreArchitectureIdentity/LightData` / `well_bore_architecture_identity_discover`
+
+Pages contain `Items`, `Offset`, `Limit`, `TotalCount`, and `NextOffset`; `NextOffset` is null on the final page. Offset pages are individually consistent reads, not a snapshot spanning requests: concurrent inserts/deletes can change later pages. Refresh discovery when the underlying collection changes. EarthGeodesy's existing search pages instead expose `Items[].Value`, `Offset`, `Limit`, and `TotalCount`.
+
+Single-record reads, result/chunk reads, and deliberate backup/export/restore operations are preserved. Backups can still contain complete resources and should be treated as explicit bulk operations.
+
+This is a breaking REST/MCP contract change: update generated clients, UIs, and external integrations together with the service release. Removed heavy-list names are not compatibility aliases. No persisted engineering shapes, database names, or storage volumes are changed. Historical usage counters are retained; bounded discovery has a separate additive `DiscoveryRequestsPerDay` history in resource services.

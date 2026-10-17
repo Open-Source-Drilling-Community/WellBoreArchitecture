@@ -312,8 +312,11 @@
             section.CasingSectionElements ??= [];
             section.CasingSectionSizeTable ??= [];
         }
-        if (identityCatalog.Count == 0) identityCatalog = await Api.ClientWellBoreArchitecture.GetAllWellBoreArchitectureIdentityAsync();
-        if (featureCatalog.Count == 0) featureCatalog = await Api.ClientWellBoreArchitecture.GetAllWellBoreArchitectureFeatureCategoryAsync();
+        if (identityCatalog.Count == 0) identityCatalog = await Api.ClientWellBoreArchitecture.ListWellBoreArchitectureIdentityReferencesAsync();
+        if (featureCatalog.Count == 0) featureCatalog = await Api.ClientWellBoreArchitecture.ListWellBoreArchitectureFeatureCategoryReferencesAsync();
+        foreach (Guid id in WellBoreArchitectureInstance.WellBoreArchitectureFeatureAssignments.Where(value => value.FeatureCategoryID.HasValue).Select(value => value.FeatureCategoryID!.Value).Distinct())
+            if (featureCatalog.FirstOrDefault(value => value.MetaInfo.ID == id)?.Options == null)
+                await Api.ClientWellBoreArchitecture.LoadWellBoreArchitectureFeatureCategoryDetailsAsync(featureCatalog, id);
     }
 
     private void AddIdentityAssignment() => WellBoreArchitectureInstance.WellBoreArchitectureIdentityAssignments.Add(new() { ID = Guid.NewGuid() });
@@ -322,7 +325,9 @@
     private void RemoveFeatureAssignment(WellBoreArchitectureFeatureAssignment value) => WellBoreArchitectureInstance.WellBoreArchitectureFeatureAssignments.Remove(value);
     private IEnumerable<WellBoreArchitectureFeatureOption> OptionsFor(WellBoreArchitectureFeatureAssignment value) => featureCatalog.FirstOrDefault(category => category.MetaInfo.ID == value.FeatureCategoryID)?.Options ?? [];
     private bool HasValidity(WellBoreArchitectureFeatureAssignment value) => featureCatalog.FirstOrDefault(category => category.MetaInfo.ID == value.FeatureCategoryID)?.HasValidityPeriod == true;
-    private void SetFeatureCategory(WellBoreArchitectureFeatureAssignment value, Guid? id) { value.FeatureCategoryID = id; value.FeatureOptionID = null; if (!HasValidity(value)) { value.FromDate = null; value.ToDate = null; } }
+    private async Task SetFeatureCategory(WellBoreArchitectureFeatureAssignment value, Guid? id) {
+        if (id is Guid categoryUuid) await Api.ClientWellBoreArchitecture.LoadWellBoreArchitectureFeatureCategoryDetailsAsync(featureCatalog, categoryUuid);
+ value.FeatureCategoryID = id; value.FeatureOptionID = null; if (!HasValidity(value)) { value.FromDate = null; value.ToDate = null; } }
     private static DateTime? ToDateTime(DateTimeOffset? value) => value?.UtcDateTime;
     private static DateTimeOffset? ToDateTimeOffset(DateTime? value) => value == null ? null : new DateTimeOffset(DateTime.SpecifyKind(value.Value, DateTimeKind.Utc));
     

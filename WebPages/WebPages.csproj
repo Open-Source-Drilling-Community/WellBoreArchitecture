@@ -34,7 +34,7 @@
 
 	<!-- Include generated DTO source files directly from ModelSharedOut -->
 	<ItemGroup>
-		<Compile Include="..\ModelSharedOut\WellBoreArchitectureMergedModel.cs" Link="GeneratedDtos\%(RecursiveDir)%(Filename)%(Extension)" />
+		<Compile Include="..\ModelSharedOut\WellBoreArchitectureMergedModel.cs;..\ModelSharedOut\DiscoveryClientExtensions.cs;..\ModelSharedOut\SlotDiscoveryClientExtensions.cs" Link="GeneratedDtos\%(RecursiveDir)%(Filename)%(Extension)" />
 		<Compile Include="..\ModelSharedOut\PseudoConstructors.cs" Link="GeneratedDtos\%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 

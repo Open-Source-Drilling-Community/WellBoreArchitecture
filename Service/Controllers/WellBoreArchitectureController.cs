@@ -1,3 +1,4 @@
+using OSDC.Drilling.WellBoreArchitecture.Service;
 using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
@@ -17,6 +18,28 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Controllers
     [ApiController]
     public class WellBoreArchitectureController : ControllerBase
     {
+        private readonly SqlConnectionManager _discoveryConnections;
+
+        /// <summary>Discover WellBoreArchitecture resources as bounded light records; retrieve selected full records by ID.</summary>
+        [HttpGet("LightData", Name = "DiscoverWellBoreArchitecture")]
+        public ActionResult<OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureDiscoveryPage> DiscoverWellBoreArchitecture([FromQuery] int offset = 0, [FromQuery] int limit = 50, [FromQuery] string? name = null, [FromQuery] System.Guid? wellBoreId = null)
+        {
+            UsageStatisticsWellBoreArchitecture.Instance.IncrementDiscoveryRequestsPerDay();
+            if (offset < 0 || limit < 1 || limit > 200 || name?.Length > 200 || wellBoreId == System.Guid.Empty)
+                return BadRequest(new { error = "invalid_discovery_query", message = "Offset must be non-negative, limit 1–200, name at most 200 characters, and UUID filters non-empty." });
+            try
+            {
+                var records = DiscoveryRecords.ReadPage<OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureLight>(_discoveryConnections.GetConnection(), "WellBoreArchitectureTable", "WellBoreArchitecture", offset, limit, name,
+                    new System.Collections.Generic.Dictionary<string, object?> { ["WellBoreID"] = wellBoreId }, out int total);
+                return Ok(new OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureDiscoveryPage { Items = records, Offset = offset, Limit = limit, TotalCount = total,
+                    NextOffset = offset < total && records.Count < total - offset ? offset + records.Count : null });
+            }
+            catch (System.Exception ex) when (ex is Microsoft.Data.Sqlite.SqliteException or System.Text.Json.JsonException or System.InvalidOperationException)
+            {
+                return StatusCode(500, new { error = "discovery_failed" });
+            }
+        }
+
         private readonly ILogger<WellBoreArchitectureManager> _logger;
         private readonly WellBoreArchitectureManager _wellBoreArchitectureManager;
         private readonly IWellBoreArchitectureExternalReferenceValidator _externalReferenceValidator;
@@ -24,6 +47,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Controllers
         public WellBoreArchitectureController(ILogger<WellBoreArchitectureManager> logger, SqlConnectionManager connectionManager,
             IWellBoreArchitectureExternalReferenceValidator? externalReferenceValidator = null)
         {
+            _discoveryConnections = connectionManager;
             _logger = logger;
             _wellBoreArchitectureManager = WellBoreArchitectureManager.GetInstance(_logger, connectionManager);
             _externalReferenceValidator = externalReferenceValidator ?? new UnavailableWellBoreArchitectureExternalReferenceValidator();
@@ -122,7 +146,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Controllers
         /// Returns the list of all WellBoreArchitectureLight present in the microservice database, at endpoint WellBoreArchitecture/api/WellBoreArchitecture/LightData
         /// </summary>
         /// <returns>the list of all WellBoreArchitectureLight present in the microservice database, at endpoint WellBoreArchitecture/api/WellBoreArchitecture/LightData</returns>
-        [HttpGet("LightData", Name = "GetAllWellBoreArchitectureLight")]
+        [NonAction]
         public ActionResult<IEnumerable<Model.WellBoreArchitectureLight>> GetAllWellBoreArchitectureLight()
         {
             UsageStatisticsWellBoreArchitecture.Instance.IncrementGetAllWellBoreArchitectureLightPerDay();
@@ -141,7 +165,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Controllers
         /// Returns the list of all WellBoreArchitecture present in the microservice database, at endpoint WellBoreArchitecture/api/WellBoreArchitecture/HeavyData
         /// </summary>
         /// <returns>the list of all WellBoreArchitecture present in the microservice database, at endpoint WellBoreArchitecture/api/WellBoreArchitecture/HeavyData</returns>
-        [HttpGet("HeavyData", Name = "GetAllWellBoreArchitecture")]
+        [NonAction]
         public ActionResult<IEnumerable<Model.WellBoreArchitecture?>> GetAllWellBoreArchitecture()
         {
             UsageStatisticsWellBoreArchitecture.Instance.IncrementGetAllWellBoreArchitecturePerDay();

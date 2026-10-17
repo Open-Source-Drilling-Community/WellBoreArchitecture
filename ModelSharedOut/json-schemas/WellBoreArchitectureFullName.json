@@ -5,6 +5,61 @@
     "version": "1.0"
   },
   "paths": {
+    "/WellBoreArchitecture/LightData": {
+      "get": {
+        "tags": [
+          "WellBoreArchitecture"
+        ],
+        "operationId": "DiscoverWellBoreArchitecture",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 50
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "wellBoreId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureDiscoveryPage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/WellBoreArchitecture": {
       "get": {
         "tags": [
@@ -246,52 +301,6 @@
         }
       }
     },
-    "/WellBoreArchitecture/LightData": {
-      "get": {
-        "tags": [
-          "WellBoreArchitecture"
-        ],
-        "operationId": "GetAllWellBoreArchitectureLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureLight"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/WellBoreArchitecture/HeavyData": {
-      "get": {
-        "tags": [
-          "WellBoreArchitecture"
-        ],
-        "operationId": "GetAllWellBoreArchitecture",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitecture"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/WellBoreArchitecture/{id}/ExternalReferences": {
       "get": {
         "tags": [
@@ -500,6 +509,53 @@
         }
       }
     },
+    "/WellBoreArchitectureFeatureCategory/LightData": {
+      "get": {
+        "tags": [
+          "WellBoreArchitectureFeatureCategory"
+        ],
+        "operationId": "DiscoverWellBoreArchitectureFeatureCategory",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 50
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureFeatureCategoryDiscoveryPage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/WellBoreArchitectureFeatureCategory": {
       "get": {
         "tags": [
@@ -569,29 +625,6 @@
                   "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/WellBoreArchitectureFeatureCategory/HeavyData": {
-      "get": {
-        "tags": [
-          "WellBoreArchitectureFeatureCategory"
-        ],
-        "operationId": "GetAllWellBoreArchitectureFeatureCategory",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureFeatureCategory"
                   }
                 }
               }
@@ -710,6 +743,53 @@
         }
       }
     },
+    "/WellBoreArchitectureIdentity/LightData": {
+      "get": {
+        "tags": [
+          "WellBoreArchitectureIdentity"
+        ],
+        "operationId": "DiscoverWellBoreArchitectureIdentity",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 50
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureIdentityDiscoveryPage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/WellBoreArchitectureIdentity": {
       "get": {
         "tags": [
@@ -779,29 +859,6 @@
                   "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/WellBoreArchitectureIdentity/HeavyData": {
-      "get": {
-        "tags": [
-          "WellBoreArchitectureIdentity"
-        ],
-        "operationId": "GetAllWellBoreArchitectureIdentity",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureIdentity"
                   }
                 }
               }
@@ -8778,6 +8835,9 @@
       "OSDC.Drilling.WellBoreArchitecture.Model.UsageStatisticsWellBoreArchitecture": {
         "type": "object",
         "properties": {
+          "DiscoveryRequestsPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.History"
+          },
           "LastSaved": {
             "type": "string",
             "format": "date-time"
@@ -9202,6 +9262,36 @@
               "type": "string",
               "format": "uuid"
             },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureDiscoveryPage": {
+        "type": "object",
+        "properties": {
+          "Items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureLight"
+            },
+            "nullable": true
+          },
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "NextOffset": {
+            "type": "integer",
+            "format": "int32",
             "nullable": true
           }
         },
@@ -9648,6 +9738,66 @@
           ],
           "constraints": [ ]
         }
+      },
+      "OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureFeatureCategoryDiscoveryPage": {
+        "type": "object",
+        "properties": {
+          "Items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureFeatureCategoryLight"
+            },
+            "nullable": true
+          },
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "NextOffset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureFeatureCategoryLight": {
+        "type": "object",
+        "properties": {
+          "MetaInfo": {
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "IsExclusive": {
+            "type": "boolean"
+          },
+          "HasValidityPeriod": {
+            "type": "boolean"
+          },
+          "CreationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "LastModificationDate": {
+            "type": "string",
+            "description": "Server-owned last-modification timestamp and optimistic-concurrency token; echo exactly on update or delete.",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureFeatureOption": {
         "type": "object",
@@ -10109,9 +10259,84 @@
           ]
         }
       },
+      "OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureIdentityDiscoveryPage": {
+        "type": "object",
+        "properties": {
+          "Items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureIdentityLight"
+            },
+            "nullable": true
+          },
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "NextOffset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureIdentityLight": {
+        "type": "object",
+        "properties": {
+          "MetaInfo": {
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "CreationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "LastModificationDate": {
+            "type": "string",
+            "description": "Server-owned last-modification timestamp and optimistic-concurrency token; echo exactly on update or delete.",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "OSDC.Drilling.WellBoreArchitecture.Model.WellBoreArchitectureLight": {
         "type": "object",
         "properties": {
+          "WellBoreID": {
+            "type": "string",
+            "description": "UUID of the externally owned WellBore resource to which this architecture belongs; not an embedded path or architecture UUID.",
+            "format": "uuid",
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.20.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
+          },
           "MetaInfo": {
             "allOf": [
               {

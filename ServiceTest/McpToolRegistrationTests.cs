@@ -20,8 +20,8 @@ public sealed class McpToolRegistrationTests
         ["GetWellBoreArchitectureById"] = "well_bore_architecture_get_by_id",
         ["GetRadialProfileAtAbscissa"] = "well_bore_architecture_get_radial_profile_at_abscissa",
         ["GetDeepestCasingShoe"] = "well_bore_architecture_get_deepest_casing_shoe",
-        ["GetAllWellBoreArchitectureLight"] = "well_bore_architecture_get_all_light",
-        ["GetAllWellBoreArchitecture"] = "well_bore_architecture_get_all",
+        ["DiscoverWellBoreArchitecture"] = "well_bore_architecture_discover",
+
         ["PostWellBoreArchitecture"] = "well_bore_architecture_create",
         ["PutWellBoreArchitectureById"] = "well_bore_architecture_update_by_id",
         ["DeleteWellBoreArchitectureById"] = "well_bore_architecture_delete_by_id",
@@ -29,16 +29,16 @@ public sealed class McpToolRegistrationTests
         ["BatchRestoreWellBoreArchitectures"] = "well_bore_architecture_batch_restore",
         ["ValidateExternalReferences"] = "well_bore_architecture_validate_external_references",
         ["AuditExternalReferences"] = "well_bore_architecture_audit_external_references",
-        ["IdentityGetAll"] = "well_bore_architecture_identity_get_all",
+        ["IdentityDiscover"] = "well_bore_architecture_identity_discover",
         ["IdentityGetById"] = "well_bore_architecture_identity_get_by_id",
         ["IdentityCreate"] = "well_bore_architecture_identity_create",
         ["IdentityUpdate"] = "well_bore_architecture_identity_update_by_id",
         ["IdentityDelete"] = "well_bore_architecture_identity_delete_by_id",
-        ["FeatureGetAll"] = "well_bore_architecture_feature_category_get_all",
+        ["FeatureDiscover"] = "well_bore_architecture_feature_category_discover",
         ["FeatureGetById"] = "well_bore_architecture_feature_category_get_by_id",
         ["FeatureCreate"] = "well_bore_architecture_feature_category_create",
         ["FeatureUpdate"] = "well_bore_architecture_feature_category_update_by_id",
-        ["FeatureDelete"] = "well_bore_architecture_feature_category_delete_by_id"
+        ["FeatureDelete"] = "well_bore_architecture_feature_category_delete_by_id",
     };
 
     private static readonly string[] AdditionalToolNames =
@@ -109,7 +109,7 @@ public sealed class McpToolRegistrationTests
         var endpoints = typeof(WellBoreArchitectureController).GetMethods()
             .Where(method => method.GetCustomAttributes(typeof(HttpMethodAttribute), true).Length > 0)
             .Select(method => method.Name);
-        Assert.That(endpoints, Is.EquivalentTo(EndpointToolMap.Keys.Take(14)));
+        Assert.That(endpoints, Is.EquivalentTo(EndpointToolMap.Keys.Where(key => !key.StartsWith("Identity", StringComparison.Ordinal) && !key.StartsWith("Feature", StringComparison.Ordinal))));
         Assert.That(_tools.Keys, Is.EquivalentTo(EndpointToolMap.Values.Concat(AdditionalToolNames).Append("ping")));
     }
 
@@ -117,7 +117,7 @@ public sealed class McpToolRegistrationTests
     public void Inputs_declare_generic_resource_and_evaluation_roles()
     {
         string Role(string name) => _tools[name].InputSchema![SemanticMetadata.ExtensionName]!["role"]!.GetValue<string>();
-        Assert.That(Role("well_bore_architecture_get_all"), Is.EqualTo(Concepts.ResourceCollectionRetrieval));
+        Assert.That(Role("well_bore_architecture_discover"), Is.EqualTo(Concepts.ResourceCollectionRetrieval));
         Assert.That(Role("well_bore_architecture_get_by_id"), Is.EqualTo(Concepts.ResourceRetrieval));
         Assert.That(Role("well_bore_architecture_create"), Is.EqualTo(Concepts.ResourceCreation));
         Assert.That(Role("well_bore_architecture_details_update"), Is.EqualTo(Concepts.ResourcePartialUpdate));

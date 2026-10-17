@@ -12,6 +12,8 @@ namespace OSDC.Drilling.WellBoreArchitecture.Model
     [Semantic(Concepts.WellBoreArchitecture)]
     public class WellBoreArchitectureLight
     {
+        [Semantic(Concepts.ResourceIdentifier)] public System.Guid? WellBoreID { get; set; }
+
         /// <summary>
         /// a MetaInfo for the WellBoreArchitectureLight
         /// </summary>

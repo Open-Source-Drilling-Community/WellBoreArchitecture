@@ -15,7 +15,7 @@
 
 @code {
     private List<WellBoreArchitectureIdentity> items = [];
-    protected override async Task OnInitializedAsync() => items = await Api.ClientWellBoreArchitecture.GetAllWellBoreArchitectureIdentityAsync();
+    protected override async Task OnInitializedAsync() => items = await Api.ClientWellBoreArchitecture.ListWellBoreArchitectureIdentityReferencesAsync();
     private void Add() => items.Add(new() { MetaInfo = new() { ID = Guid.NewGuid() } });
     private async Task SaveAsync()
     {
@@ -23,7 +23,7 @@
         foreach (var item in items)
             if (existing.Contains(item.MetaInfo.ID)) await Api.ClientWellBoreArchitecture.PutWellBoreArchitectureIdentityByIdAsync(item.MetaInfo.ID, item.LastModificationDate, item);
             else await Api.ClientWellBoreArchitecture.PostWellBoreArchitectureIdentityAsync(item);
-        items = await Api.ClientWellBoreArchitecture.GetAllWellBoreArchitectureIdentityAsync();
+        items = await Api.ClientWellBoreArchitecture.ListWellBoreArchitectureIdentityReferencesAsync();
         Snackbar.Add("Identities saved", Severity.Success);
     }
     private async Task DeleteAsync(WellBoreArchitectureIdentity item)

@@ -6,7 +6,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.WebPages.Shared;
 
 public static class MslDepthReferenceUtils
 {
-    public static Task<double?> ResolveMeanSeaLevelDepthReferenceAsync(
+    public static async Task<double?> ResolveMeanSeaLevelDepthReferenceAsync(
         IWellBoreArchitectureAPIUtils api,
         ModelShared.WellBore? wellBore,
         ModelShared.Well? well,
@@ -17,9 +17,11 @@ public static class MslDepthReferenceUtils
     {
         ModelShared.WellBore? rootWellBore = ResolveRootWellBore(wellBore, wellBores);
         ModelShared.Well? rootWell = ResolveWell(rootWellBore, well, wells);
+        if (rootWell?.ClusterID is Guid rootClusterId && clusters?.TryGetValue(rootClusterId, out var rootCluster) == true) cluster = rootCluster;
+        if (cluster != null) await ModelShared.SlotDiscoveryClientExtensions.LoadClusterSlotReferencesAsync(api.ClientCluster, cluster);
         ModelShared.Slot? slot = ResolveSlot(rootWell, cluster, clusters);
 
-        return CalculateMeanSeaLevelDepthReferenceAsync(
+        return await CalculateMeanSeaLevelDepthReferenceAsync(
             api.HttpClientEarthVerticalDatum,
             slot?.Latitude?.GaussianValue?.Mean ?? cluster?.ReferencePoint?.Latitude,
             slot?.Longitude?.GaussianValue?.Mean ?? cluster?.ReferencePoint?.Longitude);

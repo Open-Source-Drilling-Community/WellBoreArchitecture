@@ -306,7 +306,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
             if (connection != null)
             {
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT MetaInfo, Name, Description, CreationDate, LastModificationDate FROM WellBoreArchitectureTable";
+                command.CommandText = "SELECT MetaInfo, Name, Description, CreationDate, LastModificationDate, json_extract(WellBoreArchitecture, '$.WellBoreID') FROM WellBoreArchitectureTable";
                 try
                 {
                     using var reader = command.ExecuteReader();
@@ -329,7 +329,7 @@ namespace OSDC.Drilling.WellBoreArchitecture.Service.Managers
                                 string.IsNullOrEmpty(name) ? null : name,
                                 string.IsNullOrEmpty(descr) ? null : descr,
                                 creationDate,
-                                lastModificationDate));
+                                lastModificationDate) { WellBoreID = !reader.IsDBNull(5) && Guid.TryParse(reader.GetString(5), out Guid wellBoreId) ? wellBoreId : null });
                     }
                     _logger.LogInformation("Returning the list of existing WellBoreArchitectureLight from WellBoreArchitectureTable");
                     return wellBoreArchitectureLightList;

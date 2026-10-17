@@ -192,7 +192,7 @@ namespace ServiceTest
             List<WellBoreArchitectureLight> wellBoreArchitectureLightList = [];
             try
             {
-                wellBoreArchitectureLightList = (List<WellBoreArchitectureLight>)await nSwagClient.GetAllWellBoreArchitectureLightAsync();
+                wellBoreArchitectureLightList = (List<WellBoreArchitectureLight>)await nSwagClient.ListWellBoreArchitectureLightAsync();
             }
             catch (ApiException ex)
             {
@@ -212,7 +212,7 @@ namespace ServiceTest
             List<WellBoreArchitecture> wellBoreArchitectureList = new();
             try
             {
-                wellBoreArchitectureList = (List<WellBoreArchitecture>)await nSwagClient.GetAllWellBoreArchitectureAsync();
+                wellBoreArchitectureList = (List<WellBoreArchitecture>)await nSwagClient.ListWellBoreArchitectureReferencesAsync();
             }
             catch (ApiException ex)
             {
